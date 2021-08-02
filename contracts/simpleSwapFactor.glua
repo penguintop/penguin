@@ -1,0 +1,140 @@
+-- simpleFactor
+type Contract<T> = {
+    storage: T
+}
+
+type Storage = {
+    -- deployedContracts Map<contract>addr
+    -- userDeployedContracts Map<addr>contract
+    admin:string,
+    state:string,
+    ERC20Address:string,
+}
+
+var M = Contract<Storage>()
+
+function M:init()
+    print("simpleFactor contract creating")
+
+    self.storage.state = 'NOT_INITED'
+    self.storage.admin = caller_address
+    self.storage.ERC20Address=''
+
+    print("simpleFactor contract created")
+end
+
+let function get_from_address()
+    -- erc20 token holder is a contract
+    var from_address: string
+    let prev_contract_id = get_prev_call_frame_contract_address()
+    if prev_contract_id and is_valid_contract_address(prev_contract_id) then
+        -- from contract
+        from_address = prev_contract_id
+    else
+        from_address = caller_address
+    end
+    return from_address
+end
+
+let function checkAdmin(self: table)
+    if self.storage.admin ~= get_from_address() then
+        return error("you are not admin, can't call this function")
+    end
+end
+
+let function checkState(M: table)
+    if M.storage.state ~= 'COMMON' then
+        return error("state error, now state is " .. tostring(M.storage.state))
+    end
+end
+
+let function checkStateInited(self: table)
+    if self.storage.state == 'NOT_INITED' then
+        return error("contract token not inited")
+    end
+end
+
+-- parse a,b,c format string to [a,b,c]
+let function parse_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed ~= count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function parse_at_least_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed < count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function checkAddress(addr: string)
+    let result = is_valid_address(addr)
+    if not result then
+        return error("address format error")
+    end
+    return result
+end
+
+let function require(success:bool,text: string)
+    if success then
+        return true
+    else
+        return error(text)
+    end
+end
+
+let function checkContractAddress(addr: string)
+    let result = is_valid_contract_address(addr)
+    if not result then
+        return error("contract address format error")
+    end
+    return result
+end
+
+--user_addr
+offline function M:deploySimpleSwap(args:string)
+    let from = args
+    let user_contract = fast_map_get("userDeployedContracts",from) or ""
+    return user_contract
+end
+
+-- contract_addr
+offline function M:queryOwnerBySwap(contract_addr:string)
+    let user_addr = fast_map_get("deployedContracts",contract_addr) or ""
+    return user_addr
+end
+
+-- user_addr:contract_addr
+function M:setSimpleSwap(args:string)
+    checkAdmin(self)
+    let parsed = parse_args(args, 2, "argument format error, need format: user_addr,contract_addr")
+    let user_addr = tostring(parsed[1])
+    let contract_addr = tostring(parsed[2])
+    fast_map_set("deployedContracts",contract_addr,user_addr)
+    fast_map_set("userDeployedContracts",user_addr,contract_addr)
+    let eventArgStr = json.dumps({user:user_addr,contract:contract_addr})
+    emit SimpleSwapDeployed(eventArgStr)
+end
+
+function M:setERC20Address(addr:string)
+    checkAdmin(self)
+    checkContractAddress(addr)
+    self.storage.ERC20Address=addr
+    emit ERC20AddressChange(json.dumps({addr:addr}))
+end
+
+offline function M:getErc20Address()
+    return self.storage.ERC20Address
+end
+
+return M

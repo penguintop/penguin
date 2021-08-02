@@ -1,0 +1,403 @@
+-- XRC20SimpleSwap
+type Contract<T> = {
+    storage: T
+}
+
+--struct HardDeposit {
+--   uint amount; /* hard deposit amount allocated */
+--   uint decreaseAmount; /* decreaseAmount substranced from amount when decrease is requested */
+--   uint timeout; /* issuer has to wait timeout seconds to decrease hardDeposit, 0 implies applying defaultHardDepositTimeout */
+--    uint canBeDecreasedAt; /* point in time after which harddeposit can be decreased*/
+--  }
+
+type Storage = {
+    defaultHardDepositTimeout:int,
+    chainId:string,
+    domain:string,
+    token:string,
+    -- paidOut map<string>int
+    totalPaidOut: int,
+    -- hardDeposits map<string>hardDeposit
+    totalHardDeposit: int,
+    issuer : string,
+    bounced: bool,
+    admin:string,
+    changeAdmin:bool,
+    state:string
+}
+
+-- events: Transfer, Paused, Resumed, Stopped, AllowedLock, Locked, Unlocked,ChangeProjectManager,ChangeTeamOwner,addSwapContract
+
+var M = Contract<Storage>()
+
+let function get_from_address()
+    -- erc20 token holder is a contract
+    var from_address: string
+    let prev_contract_id = get_prev_call_frame_contract_address()
+    if prev_contract_id and is_valid_contract_address(prev_contract_id) then
+        -- from contract
+        from_address = prev_contract_id
+    else
+        from_address = caller_address
+    end
+    return from_address
+end
+
+function M:init()
+    print("erc721 contract creating")
+    self.storage.defaultHardDepositTimeout = 0
+    self.storage.chainId = ''
+    self.storage.domain = ''
+    self.storage.token = ''
+
+    self.storage.totalPaidOut= 0
+
+    self.storage.totalHardDeposit = 0
+    self.storage.issuer = ''
+    self.storage.bounced = false
+    self.storage.admin = get_from_address()
+    self.storage.state = 'NOT_INITED'
+    self.storage.changeAdmin = true
+    print("erc721 contract created")
+end
+
+let function checkAdmin(self: table)
+    if self.storage.admin ~= get_from_address() then
+        return error("you are not admin, can't call this function")
+    end
+end
+
+let function checkState(M: table)
+    if M.storage.state ~= 'COMMON' then
+        return error("state error, now state is " .. tostring(M.storage.state))
+    end
+end
+
+let function checkStateInited(self: table)
+    if self.storage.state == 'NOT_INITED' then
+        return error("contract token not inited")
+    end
+end
+
+-- parse a,b,c format string to [a,b,c]
+let function parse_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed ~= count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function parse_at_least_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed < count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function checkAddress(addr: string)
+    let result = is_valid_address(addr)
+    if not result then
+        return error("address format error")
+    end
+    return result
+end
+
+let function require(success:bool,text: string)
+    if success then
+        return true
+    else
+        return error(text)
+    end
+end
+
+let function checkContractAddress(addr: string)
+    let result = is_valid_contract_address(addr)
+    if not result then
+        return error("contract address format error")
+    end
+    return result
+end
+
+let function domain()
+    return self.storage.chainId..self.storage.domain
+end
+
+let function _liquidBalanceFor(self:table,beneficiary:string)
+    let token = import_contract_from_address(self.storage.token)
+    let cur_contract = get_current_contract_address()
+    let balance =  token:balanceOf(cur_contract)
+    let hardDeposit = json.loads( fast_map_get("hardDeposits",beneficiary) or '{}')
+    require(hardDeposit.amount,"beneficiary unkown error")
+    return tointeger(balance)-tointeger(self.storage.totalHardDeposit) + tointeger(hardDeposit.amount)
+end
+
+let function strToHex(s)
+  let bytes = {}
+  for i=1,s:len()  do
+    bytes[#bytes+1] = ('%2x'):format(s:byte(i,i))
+  end
+
+  return table.concat(bytes, '')
+end
+
+
+let function chequeHash(chequebook:string,beneficiary:string,cumulativePayout:int)
+    return sha256_hex(strToHex( domain()..",Cheque(address chequebook,address beneficiary,uint256 cumulativePayout)"..","..chequebook..","..beneficiary..","..tostring(cumulativePayout)))
+end
+
+let function cashOutHash(chequebook:string, sender:string,requestPayout:int,  recipient:string, callerPayout:int)
+    return sha256_hex(strToHex(domain()..",Cashout(address chequebook,address sender,uint256 requestPayout,address recipient,uint256 callerPayout)"..","..chequebook..","..sender..","..tostring(requestPayout)..","..recipient..","..tostring(callerPayout)))
+end
+
+let function customDecreaseTimeoutHash(chequebook:string, beneficiary:string, decreaseTimeout:int)
+    return sha256_hex(strToHex(domain()..",CustomDecreaseTimeout(address chequebook,address beneficiary,uint256 decreaseTimeout)"..","..chequebook..","..beneficiary..","..tostring(decreaseTimeout)))
+end
+
+let function _cashChequeInternal(self:table,beneficiary:string,recipient:string,cumulativePayout:int,callerPayout:int,v:string,r:string,s:string)
+    let from_addr =get_from_address()
+    let cur_contract = get_current_contract_address()
+    if from_addr ~= self.storage.issuer then
+        require(self.storage.issuer == ecrecover(chequeHash(cur_contract,beneficiary,cumulativePayout),v,r,s) ,"invalid issuer signature")
+    end
+    let paidOut = tointeger(fast_map_get("paidOut",beneficiary) or 0)
+    let requestPayout = cumulativePayout - paidOut
+    let totalPayout = math.min(requestPayout,_liquidBalanceFor(self,beneficiary))
+    let hardDeposit = json.loads( fast_map_get("hardDeposits",beneficiary) or '{}')
+    require(hardDeposit.amount,"beneficiary unkown error")
+    let hardDepositUsage = math.min(totalPayout,  tointeger(hardDeposit.amount));
+    require(totalPayout >= callerPayout, "SimpleSwap: cannot pay caller");
+    if hardDepositUsage ~= 0  then
+        let newAmount = tointeger(hardDeposit.amount) - hardDepositUsage;
+        hardDeposit.amount = newAmount
+        fast_map_set("hardDeposits",beneficiary,json.dumps(hardDeposit))
+        self.storage.totalHardDeposit = tointeger(self.storage.totalHardDeposit) - tointeger(hardDepositUsage)
+    end
+    fast_map_set("paidOut",beneficiary,tostring(paidOut+totalPayout))
+
+    self.storage.totalPaidOut = tointeger(self.storage.totalPaidOut) + (totalPayout);
+
+    if requestPayout ~= totalPayout then
+      self.storage.bounced = true
+      emit ChequeBounced("")
+    end
+    let token = import_contract_from_address(self.storage.token)
+    if callerPayout ~= 0 then
+        
+        token:transfer(from_addr..","..tostring(callerPayout))
+      
+        token:transfer(recipient..","..tostring(totalPayout-callerPayout) )
+    else
+        token:transfer(recipient..","..tostring(totalPayout))
+    end
+    let eventArgStr = json.dumps({beneficiary:beneficiary, recipient:recipient, msg_sender:from_addr, totalPayout:totalPayout, cumulativePayout:cumulativePayout, callerPayout:callerPayout})
+    emit ChequeCashed(eventArgStr)
+end
+
+--issuer,token,defaultHardDepositTimeout
+function M:init_config(args:string)
+    checkAdmin(self)
+
+    if self.storage.state ~= 'NOT_INITED' then
+        return error("this token contract inited before")
+    end
+    let parsed = parse_args(args,3,"argument format error, need format: issuer,token,defaultHardDepositTimeout")
+    let info = {issuer:parsed[1],token:parsed[2],defaultHardDepositTimeout:tointeger(parsed[3])}
+    if not info.issuer then
+        return error("issuer needed")
+    end
+    require( checkAddress(info.issuer),"issuer not valid")
+    if not info.token then
+        return error("token needed")
+    end
+    require(checkContractAddress(info.token),"token address not valid")
+    self.storage.issuer = info.issuer
+    self.storage.admin = info.issuer
+    self.storage.token = info.token
+    self.storage.defaultHardDepositTimeout = info.defaultHardDepositTimeout
+
+    self.storage.state = 'COMMON'
+
+    let eventArgStr = json.dumps(info)
+    emit Inited(eventArgStr)
+end
+
+offline function M:balance()
+    let token = import_contract_from_address(self.storage.token)
+    let cur_contract = get_current_contract_address()
+    return token:balanceOf(cur_contract)
+end
+
+offline function M:liquidBalance()
+    let token = import_contract_from_address(self.storage.token)
+    let cur_contract = get_current_contract_address()
+    let balance =  token:balanceOf(cur_contract)
+    return tointeger(balance)-tointeger(self.storage.totalHardDeposit)
+end
+
+offline function M:liquidBalanceFor(beneficiary:string)
+    let token = import_contract_from_address(self.storage.token)
+    let cur_contract = get_current_contract_address()
+    let balance =  token:balanceOf(cur_contract)
+    let hardDeposit = json.loads( fast_map_get("hardDeposits",beneficiary) or '{}')
+    require(hardDeposit.amount,"beneficiary unkown error")
+    return tointeger(balance)-tointeger(self.storage.totalHardDeposit) + tointeger(hardDeposit.amount)
+end
+
+-- beneficiary,recipient,cumulativePayout,beneficiarySigv,beneficiarySigr,beneficiarySigs,callerPayout,issuerSigv,issuerSigr,issuerSigs
+function M:cashCheque(args:string)
+    checkState(self)
+    let cur_contract = get_current_contract_address()
+    let from_addr = get_from_address()
+    let parsed = parse_args(args,10,"argument format error, need format: beneficiary,recipient,cumulativePayout,beneficiarySigv,beneficiarySigr,beneficiarySigs,callerPayout,issuerSigv,issuerSigr,issuerSigs")
+    let beneficiary =parsed[1]
+    let recipient =parsed[2]
+    let cumulativePayout =parsed[3]
+    let beneficiarySigv =parsed[4]
+    let beneficiarySigr =parsed[5]
+    let beneficiarySigs =parsed[6]
+    let callerPayout =parsed[7]
+    let issuerSigv =parsed[8]
+    let issuerSigr =parsed[9]
+    let issuerSigs =parsed[10]
+
+    require(beneficiary == ecrecover(cashOutHash(cur_contract,from_addr,cumulativePayout,recipient,callerPayout),beneficiarySigv,beneficiarySigr,beneficiarySigs),"invalid beneficiary signature")
+
+    _cashChequeInternal(self,beneficiary, recipient, cumulativePayout, callerPayout, issuerSigv, issuerSigr, issuerSigs)
+end
+
+--address recipient, uint cumulativePayout, bytes memory issuerSig
+function M:cashChequeBeneficiary(args:string) 
+    checkState(self)
+    let parsed = parse_args(args,5,"argument format error, need format: recipient,cumulativePayout,issuerSigv,issuerSigr,issuerSigs")
+    let from_addr = get_from_address()
+    let recipient =parsed[1]
+    let cumulativePayout =parsed[2]
+    let issuerSigv =parsed[3]
+    let issuerSigr =parsed[4]
+    let issuerSigs =parsed[5]
+
+    _cashChequeInternal(self,from_addr, recipient, cumulativePayout, 0, issuerSigv, issuerSigr, issuerSigs);
+end
+
+-- beneficiary,decreaseAmount
+function M:prepareDecreaseHardDeposit(args)
+    checkState(self)
+    let from_addr = get_from_address()
+    let parsed = parse_args(args,2,"argument format error, need format:beneficiary,decreaseAmount")
+    let beneficiary = tostring(parsed[1])
+    let decreaseAmount = tointeger(parsed[2])
+    let block_num = get_header_block_num()
+    require(from_addr == self.storage.issuer, "SimpleSwap: not issuer")
+    let hardDeposit = json.loads(fast_map_get("hardDeposits",beneficiary) or "{}")
+    require(decreaseAmount <= hardDeposit.amount, "hard deposit not sufficient")
+    let timeout = 0
+    if hardDeposit.timeout == 0 or not hardDeposit.timeout then
+        timeout = self.storage.defaultHardDepositTimeout
+    else 
+        timeout = hardDeposit.timeout
+    end
+
+    hardDeposit.canBeDecreasedAt = block_num + timeout
+    hardDeposit.decreaseAmount = decreaseAmount
+    fast_map_set("hardDeposits",beneficiary,json.dumps(hardDeposit))
+    let eventArgStr = json.dumps({beneficiary:beneficiary, decreaseAmount:decreaseAmount})
+    emit HardDepositDecreasePrepared(eventArgStr)
+end
+
+function M:decreaseHardDeposit(beneficiary:string)
+    checkState(self)
+    let hardDeposit = json.loads(fast_map_get("hardDeposits",beneficiary) or "{}")
+    let block_num = get_header_block_num()
+    require(block_num >= tointeger(hardDeposit.canBeDecreasedAt) and tointeger(hardDeposit.canBeDecreasedAt) ~= tointeger(0), "deposit not yet timed out")
+    hardDeposit.amount = tointeger(hardDeposit.amount) - tointeger(hardDeposit.decreaseAmount)
+    hardDeposit.canBeDecreasedAt = 0
+    self.storage.totalHardDeposit = self.storage.totalHardDeposit - tointeger(hardDeposit.decreaseAmount)
+    fast_map_set("hardDeposits",beneficiary,json.dumps(hardDeposit))
+    emit HardDepositAmountChanged(json.dumps({beneficiary:beneficiary, hardDeposit_amount:hardDeposit.amount}))
+end
+
+--address beneficiary, uint amount
+function M:increaseHardDeposit(args:string)
+    let from_addr = get_from_address()
+    checkAdmin(self)
+    checkState(self)
+    require(from_addr == self.storage.issuer, "SimpleSwap: not issuer");
+    let parsed = parse_args(args,2,"argument format error, need format:beneficiary,amount")
+    let beneficiary = tostring(parsed[1])
+    let amount = tointeger(parsed[2])
+
+    require( tointeger(self.storage.totalHardDeposit) + tointeger(amount) <= tointeger( self:balance()), "hard deposit exceeds balance")
+
+    let hardDeposit = json.loads(fast_map_get("hardDeposits",beneficiary) or "{}")
+    hardDeposit.amount = tointeger(hardDeposit.amount) +amount
+
+    self.storage.totalHardDeposit = tointeger(self.storage.totalHardDeposit)+amount
+
+    hardDeposit.canBeDecreasedAt = 0
+    fast_map_set("hardDeposits",beneficiary,json.dumps(hardDeposit))
+    emit HardDepositAmountChanged(json.dumps({beneficiary:beneficiary, hardDeposit_amount:hardDeposit.amount}))
+end
+
+-- beneficiary,hardDepositTimeout,beneficiarySigv,beneficiarySigr,beneficiarySigs
+function M:setCustomHardDepositTimeout(args:string)
+    let from_addr = get_from_address()
+
+    checkState(self)
+    checkAdmin(self)
+    let cur_contract = get_current_contract_address()
+    let parsed = parse_args(args,5,"argument format error, need format: beneficiary,hardDepositTimeout,beneficiarySigv,beneficiarySigr,beneficiarySigs")
+    let beneficiary = tostring(parsed[1])
+    let hardDepositTimeout = tointeger(parsed[2])
+    let beneficiarySigv = tostring(parsed[3])
+    let beneficiarySigr = tostring(parsed[4])
+    let beneficiarySigs = tostring(parsed[5])
+    
+    require(beneficiary == ecrecover(customDecreaseTimeoutHash(cur_contract, beneficiary, tostring(hardDepositTimeout)), beneficiarySigv,beneficiarySigr,beneficiarySigs),"invalid beneficiary signature")
+
+    let hardDeposit = json.loads(fast_map_get("hardDeposits",beneficiary) or "{}")
+    hardDeposit.timeout = hardDepositTimeout
+    fast_map_set("hardDeposits",beneficiary,json.dumps(hardDeposit))
+    emit HardDepositTimeoutChanged(json.dumps({beneficiary:beneficiary, hardDepositTimeout:hardDepositTimeout}))
+end
+
+function M:withdraw(amountStr:string)
+    let amount = tointeger(amountStr)
+    checkAdmin(self)
+    require(amount <= tointeger(self:liquidBalance()), "liquidBalance not sufficient")
+    let token = import_contract_from_address(self.storage.token)
+    token:transfer(self.storage.issuer..","..tostring(amount))
+end
+
+offline function M:admin()
+    return self.storage.admin
+end
+
+function M:transferAdmin(newAdmin:string)
+    require(self.storage.changeAdmin,"swap can't change twice")
+    require(checkAddress(newAdmin),"args must be address")
+    emit ChangeAdmin(json.dumps({old:self.storage.admin,new:newAdmin}))
+    self.storage.admin = newAdmin
+end
+
+offline function M:paidOut(beneficiary:string)
+    let data = tointeger(fast_map_get("paidOut",beneficiary) or 0)
+    return data
+end
+
+offline function M:issuer()
+    return self.storage.issuer
+end
+
+offline function M:totalPaidOut()
+    return self.storage.totalPaidOut
+end
+
+return M

@@ -1,0 +1,372 @@
+-- staking
+--
+type Contract<T> = {
+    storage: T
+}
+
+-- type State = 'NOT_INITED' | 'COMMON' | 'PAUSED' | 'STOPPED'
+
+type Storage = {
+    state: string,
+
+    admin: string, -- admin user address
+    totalMinerCount:int, -- miner count
+    totalStakingAmount:int,
+    totalPunishAmount:int,
+    obtainPunishAmount:int,
+    stakingNeedAmount:int,
+    tokenAddr:string,
+    -- stakes map<addr>obj
+    -- nodes map<nodeAddr>xwcAddr
+    defaultLockDuration: int,
+}
+
+var M = Contract<Storage>()
+
+function M:init()
+    print("staking contract creating")
+    self.storage.state = 'NOT_INITED'
+    self.storage.admin = caller_address
+    self.storage.totalMinerCount = 0
+    self.storage.totalStakingAmount = 0
+    self.storage.stakingNeedAmount = 0
+    self.storage.totalPunishAmount = 0
+    self.storage.obtainPunishAmount = 0
+    self.storage.tokenAddr = ''
+    self.storage.defaultLockDuration = 432000
+    
+    print("staking contract created")
+end
+
+let function checkState(self: table)
+    if self.storage.state == 'NOT_INITED' then
+        return error("contract token not inited")
+    end
+    if self.storage.state == 'PAUSED' then
+        return error("contract paused")
+    end
+    if self.storage.state == 'STOPPED' then
+        return error("contract stopped")
+    end
+end
+
+let function checkStateInited(self: table)
+    if self.storage.state == 'NOT_INITED' then
+        return error("contract token not inited")
+    end
+end
+
+let function checkAddress(addr: string)
+    let result = is_valid_address(addr)
+    if not result then
+        return error("address format error")
+    end
+    return result
+end
+
+let function get_from_address()
+    -- erc20 token holder is a contract
+    var from_address: string
+    let prev_contract_id = get_prev_call_frame_contract_address()
+    if prev_contract_id and is_valid_contract_address(prev_contract_id) then
+        -- from contract
+        from_address = prev_contract_id
+    else
+        from_address = caller_address
+    end
+    return from_address
+end
+
+let function checkAdmin(self: table)
+    if self.storage.admin ~= get_from_address() then
+        return error("you are not admin, can't call this function")
+    end
+end
+
+let function checkMigration(self:table)
+    if self.storage.isMigration then 
+        return error("contract already migration!can't obtain reward ,can't deposit asset.only can withdraw asset!can't migration again!")
+    end
+end
+
+let function check_caller_frame_valid(M: table)
+    return
+    -- let prev_contract_id =  get_prev_call_frame_contract_address()
+    -- let prev_api_name = get_prev_call_frame_api_name()
+    -- if (not prev_contract_id) or (#prev_contract_id < 1) then
+    --     return true
+    -- elseif (prev_api_name == "vote") or (prev_api_name == "voteFunc") then
+    --     return true
+    -- else
+    --     return error("this api can't called by invalid contract")
+    -- end
+end
+
+-- parse a,b,c format string to [a,b,c]
+let function parse_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed ~= count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function parse_at_least_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed < count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function arrayContains(col: Array<object>, item: object)
+    if not item then
+        return false
+    end
+    var value: object
+    for _, value in ipairs(col) do
+        if value == item then
+            return true
+        end
+    end
+    return false
+end
+
+let function checkContractAddress(addr: string)
+    let result = is_valid_contract_address(addr)
+    if not result then
+        return error("contract address format error")
+    end
+    return result
+end
+
+let function is_native_asset_symbol(token_address: string)
+    let len = #token_address
+    if not token_address then
+        return false
+    end
+    if len < tointeger(1) then
+        return false
+    end
+    if tointeger(15) < len then
+        return false
+    end
+    return true
+end
+
+let function require(success:bool,text: string)
+    if success then
+        return true
+    else
+        return error(text)
+    end
+end
+
+-- arg: tokenAddr,stakingNeedAmount,defaultLockDuration
+function M:init_config(arg: string)
+    checkAdmin(self)
+    check_caller_frame_valid(self)
+    pprint('arg:', arg)
+    if self.storage.state ~= 'NOT_INITED' then
+        return error("this token contract inited before")
+    end
+    let parsed = parse_args(arg, 3, "argument format error, need format: tokenAddr,stakingNeedAmount,defaultLockDuration")
+    let info = {tokenAddr: parsed[1], stakingNeedAmount: tointeger(parsed[2]), defaultLockDuration: tointeger(parsed[3])}
+    if not info.tokenAddr then
+        return error("tokenAddr needed")
+    end
+    checkContractAddress(info.tokenAddr)
+    self.storage.tokenAddr = tostring(info.tokenAddr)
+    if not info.stakingNeedAmount then
+        return error("stakingNeedAmount needed")
+    end
+    require(info.stakingNeedAmount > tointeger(0),"stakingNeedAmount not valid")
+    self.storage.stakingNeedAmount = tointeger(info.stakingNeedAmount)
+    if not info.defaultLockDuration then
+        return error("defaultLockDuration needed")
+    end
+    require(info.defaultLockDuration > tointeger(0),"defaultLockDuration not valid")
+    self.storage.defaultLockDuration = tointeger(info.defaultLockDuration)
+
+    let from_address = get_from_address()
+    if from_address ~= caller_address then
+        return error("init_token can't be called from other contract")
+    end
+
+    self.storage.state = 'COMMON'
+    emit Inited(arg)
+end
+
+function M:setStakingNeedAmount(amountStr:string)
+    checkAdmin(self)
+    let amount = tointeger(amountStr)
+    require(amount>tointeger(0),"amount not valid")
+    self.storage.stakingNeedAmount = amount
+    emit ChangeStakingNeedAmount(json.dumps({amount:amountStr}))
+    return amount
+end
+
+function M:setDefaultLockDuration(durationStr:string)
+    checkAdmin(self)
+    let duration = tointeger(durationStr)
+    require(duration>tointeger(0),"duration not valid")
+    self.storage.defaultLockDuration = duration
+    emit ChangeDefaultLockDuration(json.dumps({defaultLockDuration:durationStr}))
+    return duration
+end
+
+function M:Staking(nodeAddr:string)
+    checkState(self)
+    let from_addr = get_from_address()
+    let TokenObj = import_contract_from_address(self.storage.tokenAddr)
+    let cur_addr = get_current_contract_address()
+    let block_num = tointeger(get_header_block_num())
+    let stakeObj = tostring(fast_map_get("stakes",from_addr) or "{}")
+
+    require(stakeObj == "{}","address only can staking once")
+    TokenObj:transferFrom(from_addr..","..cur_addr..","..tostring(self.storage.stakingNeedAmount))
+
+    let stake = {}
+    stake["lockAddr"] = from_addr
+    stake["lockStartNum"] = block_num
+    stake["lockEndNum" ] = block_num +tointeger( self.storage.defaultLockDuration)
+    stake["lockAmount"] = self.storage.stakingNeedAmount
+    stake["nodeAddr"] = nodeAddr
+    stake["forfeit"] = tointeger(0)
+
+    fast_map_set("stakes",from_addr,json.dumps(stake))
+    fast_map_set("nodes",nodeAddr,from_addr)
+    self.storage.totalMinerCount  = tointeger(self.storage.totalMinerCount) +1
+
+    self.storage.totalStakingAmount = tointeger(self.storage.totalStakingAmount) + tointeger(self.storage.stakingNeedAmount)
+
+    emit NewStaking(json.dumps(stake))
+end
+
+offline function M:queryStaking(addr:string)
+    let stakeObj = fast_map_get("stakes",addr) or "{}"
+    return stakeObj
+end
+
+offline function M:queryXwcAddr(nodeAddr:string)
+    return fast_map_get("nodes",nodeAddr)
+end
+
+function M:Redeem()
+    checkState(self)
+
+    let from_addr = get_from_address()
+    let TokenObj = import_contract_from_address(self.storage.tokenAddr)
+    let cur_addr = get_current_contract_address()
+    let block_num = tointeger(get_header_block_num())
+    let stakeObj = fast_map_get("stakes",from_addr) or "{}"
+    require(stakeObj ~="{}","user not staking.")
+    let stake = json.loads(stakeObj)
+    require(tointeger(stake["lockEndNum"]) < block_num,"The assets cannot be redeem until the time of locking up")
+    require(tointeger(self.storage.totalStakingAmount)>=(tointeger(stake["lockAmount"]) -tointeger(stake["forfeit"])),"unknow error")
+    TokenObj:transfer(from_addr..","..tostring(tointeger(stake["lockAmount"]) -tointeger(stake["forfeit"])))
+    self.storage.totalMinerCount = tointeger(self.storage.totalMinerCount) - 1
+    self.storage.totalStakingAmount = tointeger(self.storage.totalStakingAmount) - tointeger(stake["lockAmount"])
+    fast_map_set("stakes",from_addr,"{}")
+    emit Redeem(stakeObj)
+end
+
+function M:ForceRedeem(xwcAddr:string)
+    checkAdmin(self)
+    let from_addr = get_from_address()
+    let TokenObj = import_contract_from_address(self.storage.tokenAddr)
+    let cur_addr = get_current_contract_address()
+    let block_num = tointeger(get_header_block_num())
+    let stakeObj = fast_map_get("stakes",xwcAddr) or "{}"
+    require(stakeObj ~="{}","user not staking.")
+    let stake = json.loads(stakeObj)
+    TokenObj:transfer(xwcAddr..","..tostring(tointeger(stake["lockAmount"]) -tointeger(stake["forfeit"])))
+    self.storage.totalMinerCount = tointeger(self.storage.totalMinerCount) - 1
+    self.storage.totalStakingAmount = tointeger(self.storage.totalStakingAmount) - tointeger(stake["lockAmount"])
+    fast_map_set("stakes",from_addr,"{}")
+    emit ForceRedeem(stakeObj)
+end
+
+-- xwcAddr,amount
+function M:Punish(arg:string)
+    checkAdmin(self)
+    let parsed = parse_args(arg, 2, "argument format error, need format: xwcAddr,amount")
+    let xwcAddr = parsed[1]
+    let amount = tointeger(parsed[2])
+    require(amount>tointeger(0),"punish amount need more than zero")
+    
+    let TokenObj = import_contract_from_address(self.storage.tokenAddr)
+    let stakeObj = fast_map_get("stakes",xwcAddr) or "{}"
+    require(stakeObj ~="{}","user not staking.")
+    let stake = json.loads(stakeObj)
+    let real_punish_amount = safemath.toint( safemath.min(safemath.bigint(amount),safemath.bigint(tointeger(stake["lockAmount"])-tointeger(stake["forfeit"]))))
+    stake["forfeit"] = tointeger(stake["forfeit"])+amount
+    if tointeger(stake["forfeit"]) >= tointeger(stake["lockAmount"]) then
+        fast_map_set("stakes",xwcAddr,"{}")
+    else
+        fast_map_set("stakes",xwcAddr,json.dumps(stake))
+    end
+    self.storage.totalPunishAmount  = tointeger(self.storage.totalPunishAmount) + real_punish_amount
+    emit Punish(json.dumps({xwcAddr:xwcAddr,amount:real_punish_amount}))
+end
+
+function M:ObtainPunish()
+    checkAdmin(self)
+    let TokenObj = import_contract_from_address(self.storage.tokenAddr)
+    let amount = tointeger(self.storage.totalPunishAmount) - tointeger(self.storage.obtainPunishAmount)
+    self.storage.obtainPunishAmount = self.storage.totalPunishAmount
+    TokenObj:transfer(self.storage.admin..","..tostring(amount))
+
+    emit ObtainPunish(json.dumps({obtainAmount:amount}))
+end
+
+offline function M:info()
+    let res = {}
+    res["totalMinerCount"] = self.storage.totalMinerCount 
+    res["totalStakingAmount"] = self.storage.totalStakingAmount 
+    res["stakingNeedAmount"] = self.storage.stakingNeedAmount 
+    res["totalPunishAmount"] = self.storage.totalPunishAmount 
+    res["obtainPunishAmount"] = self.storage.obtainPunishAmount 
+    res["tokenAddr"] = self.storage.tokenAddr 
+    res["defaultLockDuration"] = self.storage.defaultLockDuration 
+    return json.dumps(res)
+end
+
+function M:pause()
+    if self.storage.state == 'STOPPED' then
+        return error("this contract stopped now, can't pause")
+    end
+    if self.storage.state == 'PAUSED' then
+        return error("this contract paused now, can't pause")
+    end
+    checkAdmin(self)
+    self.storage.state = 'PAUSED'
+    emit Paused("")
+end
+
+function M:unPause()
+    if self.storage.state ~= 'PAUSED' then
+        return error("this contract not paused now, can't resume")
+    end
+    checkAdmin(self)
+    self.storage.state = 'COMMON'
+    emit UnPaused("")
+end
+
+offline function M:PenToken()
+    return self.storage.tokenAddr
+end
+
+offline function M:admin()
+    return self.storage.admin
+end
+
+
+return M 
+

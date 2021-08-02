@@ -1,0 +1,270 @@
+-- poststamp
+type Contract<T> = {
+    storage: T
+}
+
+type Storage = {
+    state: string,
+    admin: string,
+    --batches : map<int>Batch
+    penToken:string,
+    totalOutPayment:int,
+    lastPrice:int,
+    lastUpdatedBlock:int,
+}
+
+--   struct Batch {
+--        // Owner of this batch (0 if not valid).
+--        address owner;
+--        // Current depth of this batch.
+--        uint8 depth;
+--        // Normalised balance per chunk.
+--        uint256 normalisedBalance;
+--    }
+
+-- events: Transfer, Paused, Resumed, Stopped, AllowedLock, Locked, Unlocked,ChangeProjectManager,ChangeTeamOwner,addSwapContract
+
+var M = Contract<Storage>()
+
+function M:init()
+    print("erc721 contract creating")
+    self.storage.state = 'NOT_INITED'
+    self.storage.admin = caller_address
+    self.storage.penToken = ''
+    self.storage.totalOutPayment = 0
+    self.storage.lastPrice = 0
+    self.storage.lastUpdatedBlock = 0
+    print("erc721 contract created")
+end
+
+let function get_from_address()
+    -- erc20 token holder is a contract
+    var from_address: string
+    let prev_contract_id = get_prev_call_frame_contract_address()
+    if prev_contract_id and is_valid_contract_address(prev_contract_id) then
+        -- from contract
+        from_address = prev_contract_id
+    else
+        from_address = caller_address
+    end
+    return from_address
+end
+
+let function checkAdmin(self: table)
+    if self.storage.admin ~= get_from_address() then
+        return error("you are not admin, can't call this function")
+    end
+end
+
+let function checkState(M: table)
+    if M.storage.state ~= 'COMMON' then
+        return error("state error, now state is " .. tostring(M.storage.state))
+    end
+end
+
+let function checkStateInited(self: table)
+    if self.storage.state == 'NOT_INITED' then
+        return error("contract token not inited")
+    end
+end
+
+let function _ownerOf(tokenId:string)
+    let owner = fast_map_get("_owners",tostring(tokenId))
+    if not owner then
+        return ""
+    end
+    return  owner
+end
+
+-- parse a,b,c format string to [a,b,c]
+let function parse_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed ~= count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function parse_at_least_args(arg: string, count: int, error_msg: string)
+    if not arg then
+        return error(error_msg)
+    end
+    let parsed = string.split(arg, ',')
+    if (not parsed) or (#parsed < count) then
+        return error(error_msg)
+    end
+    return parsed
+end
+
+let function checkAddress(addr: string)
+    let result = is_valid_address(addr)
+    if not result then
+        return error("address format error")
+    end
+    return result
+end
+
+let function require(success:bool,text: string)
+    if success then
+        return true
+    else
+        return error(text)
+    end
+end
+
+let function checkContractAddress(addr: string)
+    let result = is_valid_contract_address(addr)
+    if not result then
+        return error("contract address format error")
+    end
+    return result
+end
+
+let function currentTotalOutPayment(self:table)
+    let cur_block = get_header_block_num()
+    let blocks = tointeger(cur_block - self.storage.lastUpdatedBlock)
+    let increaseSinceLastUpdate = tointeger(self.storage.lastPrice)*blocks
+    return tointeger(self.storage.totalOutPayment) + increaseSinceLastUpdate
+end
+
+let function remainingBalance(self:table,batchId:string)
+    let batch = fast_map_get("batches",batchId) or "{}"
+    require(batch ~="{}","batch does not exist")
+    let batchObj = json.loads(batch)
+    return tointeger(batchObj.normalisedBalance)-currentTotalOutPayment(self)
+end
+
+let function strToHex(s)
+  let bytes = {}
+  for i=1,s:len()  do
+    bytes[#bytes+1] = ('%2x'):format(s:byte(i,i))
+  end
+
+  return table.concat(bytes, '')
+end
+
+function M:init_config(pen_token:string)
+    checkAdmin(self)
+    if self.storage.state ~= 'NOT_INITED' then
+        return error("this token contract inited before")
+    end
+    checkContractAddress(pen_token)
+    self.storage.penToken = pen_token
+    self.storage.state =  'COMMON'
+
+    let eventArgStr = json.dumps({penToken:pen_token})
+    emit Inited(eventArgStr)
+end
+
+-- owner,initialBalancePerChunk,depth,nonce
+function M:createBatch(arg:string)
+    checkState(self)
+    let parsed = parse_args(arg, 4, "argument format error, need format: owner,initialBalancePerChunk,depth,nonce")
+    let owner = tostring(parsed[1])
+    let initialBalancePerChunk = tointeger(parsed[2])
+    let depth = tointeger(parsed[3])
+    let nonce = tostring(parsed[4])
+    
+    checkAddress(owner)
+    let hexStr = strToHex(owner..","..nonce)
+    print(hexStr)
+    let batchId = sha256_hex(hexStr)
+    print(batchId)
+    let batch = fast_map_get("batches",batchId) or "{}"
+    require(batch == "{}", "batch already exists")
+    let totalAmount = safemath.toint(safemath.pow(safemath.bigint(2),safemath.bigint(depth)))*initialBalancePerChunk
+    require(totalAmount>0,"invalid fee amount")
+    let PENTOKEN = import_contract_from_address(self.storage.penToken)
+    let from = get_from_address()
+    let cur_addr = get_current_contract_address()
+    PENTOKEN:transferFrom(from..","..cur_addr..","..tostring(totalAmount))
+    let normalisedBalance = currentTotalOutPayment(self)+ tointeger(initialBalancePerChunk)
+    
+    fast_map_set("batches",batchId,json.dumps({owner:owner,depth:depth,normalisedBalance:normalisedBalance}))
+    emit BatchCreated(json.dumps({batchId:batchId, totalAmount:totalAmount, normalisedBalance:normalisedBalance, _owner:owner, _depth:depth}))
+    return batchId
+end
+
+--batchId,topupAmountPerChunk
+function M:topUp(args:string)
+    checkState(self)
+    let parsed = parse_args(args, 2, "argument format error, need format: batchId,topupAmountPerChunk")
+    let batchId = tostring(parsed[1])
+    let topupAmountPerChunk = tointeger(parsed[2])
+    let batch = fast_map_get("batches",batchId) or "{}"
+    require(batch ~="{}","batch does not exist")
+    let batchObj = json.loads(batch)
+    require(tointeger(batchObj.normalisedBalance)>currentTotalOutPayment(),"batch already expired")
+    let totalAmount = safemath.toint(safemath.pow(safemath.bigint(2),safemath.bigint(batchObj.depth)))*topupAmountPerChunk
+    let PENTOKEN = import_contract_from_address(self.storage.penToken)
+    let from = get_from_address()
+    let cur_addr = get_current_contract_address()
+    PENTOKEN:transferFrom(from..","..cur_addr..","..tostring(totalAmount))
+    batchObj.normalisedBalance = tointeger(batchObj.normalisedBalance) + tointeger(topupAmountPerChunk)
+    fast_map_set("batches",batchId,json.dumps(batchObj))
+    emit BatchTopUp(json.dumps({_batchId:batchId, totalAmount:totalAmount, normalisedBalance:batchObj.normalisedBalance}));
+end
+
+--batchId,newDepth
+function M:increaseDepth(args:string)
+    checkState(self)
+    let parsed = parse_args(args, 2, "argument format error, need format: batchId,topupAmountPerChunk")
+    let batchId = tostring(parsed[1])
+    let newDepth = tointeger(parsed[2])
+    let from = get_from_address()
+    let batch = fast_map_get("batches",batchId) or "{}"
+    require(batch ~="{}","batch does not exist")
+    let batchObj = json.loads(batch)
+    require(from == batchObj.owner,"not batch owner")
+    require(newDepth> batchObj.depth, "depth not increasing")
+    require(batchObj.normalisedBalance > currentTotalOutPayment(), "batch already expired")
+    let  depthChange = newDepth - batchObj.depth
+    let newRemainingBalance = safemath.toint(safemath.div( safemath.bigint(remainingBalance(self,batchId)),safemath.pow(safemath.bigint(2),safemath.bigint(depthChange))))
+    batchObj.depth = newDepth
+    batchObj.normalisedBalance= currentTotalOutPayment() +newRemainingBalance
+    fast_map_set("batches",batchId,json.dumps(batchObj))
+    emit BatchDepthIncrease(json.dumps({batchId:batchId, newDepth:newDepth, batch_normalisedBalance:batchObj.normalisedBalance}))
+end
+
+function M:setPrice(price:string) 
+    checkAdmin(self)
+    
+    if self.storage.lastPrice ~= 0 then
+            self.storage.totalOutPayment = currentTotalOutPayment()
+    end
+
+    self.storage.lastPrice = tointeger(price)
+    self.storage.lastUpdatedBlock = get_header_block_num()
+
+    emit PriceUpdate(json.dumps({price:price}))
+end
+
+function M:pause()
+    if self.storage.state == 'STOPPED' then
+        return error("this contract stopped now, can't pause")
+    end
+    if self.storage.state == 'PAUSED' then
+        return error("this contract paused now, can't pause")
+    end
+    checkAdmin(self)
+    self.storage.state = 'PAUSED'
+    emit Paused("")
+end
+
+function M:unPause()
+    if self.storage.state ~= 'PAUSED' then
+        return error("this contract not paused now, can't resume")
+    end
+    checkAdmin(self)
+    self.storage.state = 'COMMON'
+    emit UnPaused("")
+end
+
+offline function M:PenToken()
+    return self.storage.penToken
+end
+
+return M
