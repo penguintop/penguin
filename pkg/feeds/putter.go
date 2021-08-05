@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/soc"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // Updater is the generic interface f
@@ -58,7 +58,7 @@ func (u *Putter) Put(ctx context.Context, i Index, at int64, payload []byte) err
 	return err
 }
 
-func toChunk(at uint64, payload []byte) (swarm.Chunk, error) {
+func toChunk(at uint64, payload []byte) (penguin.Chunk, error) {
 	ts := make([]byte, 8)
 	binary.BigEndian.PutUint64(ts, at)
 	return cac.New(append(ts, payload...))

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,19 +11,19 @@ import (
 	"sync"
 
 	"github.com/penguintop/penguin/pkg/p2p"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/pslice"
 )
 
 type Container struct {
-	base              swarm.Address
+	base              penguin.Address
 	connectedPeers    *pslice.PSlice
 	disconnectedPeers *pslice.PSlice
 	peerMu            sync.Mutex
 }
 
-func NewContainer(base swarm.Address) *Container {
+func NewContainer(base penguin.Address) *Container {
 	return &Container{
 		base:              base,
 		connectedPeers:    pslice.New(1, base),
@@ -55,24 +55,24 @@ func (c *Container) Count() int {
 	return c.connectedPeers.Length()
 }
 
-func (c *Container) RandomPeer(not swarm.Address) (swarm.Address, error) {
+func (c *Container) RandomPeer(not penguin.Address) (penguin.Address, error) {
 	c.peerMu.Lock()
 	defer c.peerMu.Unlock()
 	var (
 		cnt   = big.NewInt(int64(c.Count()))
-		addr  = swarm.ZeroAddress
+		addr  = penguin.ZeroAddress
 		count = int64(0)
 	)
 
 PICKPEER:
 	i, e := rand.Int(rand.Reader, cnt)
 	if e != nil {
-		return swarm.ZeroAddress, e
+		return penguin.ZeroAddress, e
 	}
 	i64 := i.Int64()
 
 	count = 0
-	_ = c.connectedPeers.EachBinRev(func(peer swarm.Address, _ uint8) (bool, bool, error) {
+	_ = c.connectedPeers.EachBinRev(func(peer penguin.Address, _ uint8) (bool, bool, error) {
 		if count == i64 {
 			addr = peer
 			return true, false, nil
@@ -102,7 +102,7 @@ func peersInfo(s *pslice.PSlice) []*topology.PeerInfo {
 		return nil
 	}
 	peers := make([]*topology.PeerInfo, 0, s.Length())
-	_ = s.EachBin(func(addr swarm.Address, po uint8) (bool, bool, error) {
+	_ = s.EachBin(func(addr penguin.Address, po uint8) (bool, bool, error) {
 		peers = append(peers, &topology.PeerInfo{Address: addr})
 		return false, false, nil
 	})

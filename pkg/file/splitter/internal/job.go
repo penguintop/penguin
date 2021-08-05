@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -14,13 +14,13 @@ import (
 	"github.com/penguintop/penguin/pkg/encryption"
 	"github.com/penguintop/penguin/pkg/file"
 	"github.com/penguintop/penguin/pkg/sctx"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"golang.org/x/crypto/sha3"
 )
 
 type Putter interface {
-	Put(context.Context, swarm.Chunk) ([]bool, error)
+	Put(context.Context, penguin.Chunk) ([]bool, error)
 }
 
 // maximum amount of file tree levels this file hasher component can handle
@@ -32,7 +32,7 @@ const levelBufferLimit = 9
 //
 // After the job is constructed, Write must be called with up to ChunkSize byte slices
 // until the full data length has been written. The Sum should be called which will
-// return the SwarmHash of the data.
+// return the PenguinHash of the data.
 //
 // Called Sum before the last Write, or Write after Sum has been called, may result in
 // error and will may result in undefined result.
@@ -53,7 +53,7 @@ type SimpleSplitterJob struct {
 //
 // The spanLength is the length of the data that will be written.
 func NewSimpleSplitterJob(ctx context.Context, putter Putter, spanLength int64, toEncrypt bool) *SimpleSplitterJob {
-	hashSize := swarm.HashSize
+	hashSize := penguin.HashSize
 	refSize := int64(hashSize)
 	if toEncrypt {
 		refSize += encryption.KeyLength
@@ -65,7 +65,7 @@ func NewSimpleSplitterJob(ctx context.Context, putter Putter, spanLength int64, 
 		spanLength: spanLength,
 		sumCounts:  make([]int, levelBufferLimit),
 		cursors:    make([]int, levelBufferLimit),
-		buffer:     make([]byte, swarm.ChunkWithSpanSize*levelBufferLimit*2), // double size as temp workaround for weak calculation of needed buffer space
+		buffer:     make([]byte, penguin.ChunkWithSpanSize*levelBufferLimit*2), // double size as temp workaround for weak calculation of needed buffer space
 		tag:        sctx.GetTag(ctx),
 		toEncrypt:  toEncrypt,
 		refSize:    refSize,
@@ -74,8 +74,8 @@ func NewSimpleSplitterJob(ctx context.Context, putter Putter, spanLength int64, 
 
 // Write adds data to the file splitter.
 func (j *SimpleSplitterJob) Write(b []byte) (int, error) {
-	if len(b) > swarm.ChunkSize {
-		return 0, fmt.Errorf("Write must be called with a maximum of %d bytes", swarm.ChunkSize)
+	if len(b) > penguin.ChunkSize {
+		return 0, fmt.Errorf("Write must be called with a maximum of %d bytes", penguin.ChunkSize)
 	}
 	j.length += int64(len(b))
 	if j.length > j.spanLength {
@@ -100,7 +100,7 @@ func (j *SimpleSplitterJob) Write(b []byte) (int, error) {
 	return len(b), nil
 }
 
-// Sum returns the Swarm hash of the data.
+// Sum returns the Penguin hash of the data.
 func (j *SimpleSplitterJob) Sum(b []byte) []byte {
 	return j.digest()
 }
@@ -113,7 +113,7 @@ func (j *SimpleSplitterJob) Sum(b []byte) []byte {
 func (s *SimpleSplitterJob) writeToLevel(lvl int, data []byte) error {
 	copy(s.buffer[s.cursors[lvl]:s.cursors[lvl]+len(data)], data)
 	s.cursors[lvl] += len(data)
-	if s.cursors[lvl]-s.cursors[lvl+1] == swarm.ChunkSize {
+	if s.cursors[lvl]-s.cursors[lvl+1] == penguin.ChunkSize {
 		ref, err := s.sumLevel(lvl)
 		if err != nil {
 			return err
@@ -132,12 +132,12 @@ func (s *SimpleSplitterJob) writeToLevel(lvl int, data []byte) error {
 // TODO: error handling on store write fail
 func (s *SimpleSplitterJob) sumLevel(lvl int) ([]byte, error) {
 	s.sumCounts[lvl]++
-	spanSize := file.Spans[lvl] * swarm.ChunkSize
+	spanSize := file.Spans[lvl] * penguin.ChunkSize
 	span := (s.length-1)%spanSize + 1
 
 	var chunkData []byte
 
-	head := make([]byte, swarm.SpanSize)
+	head := make([]byte, penguin.SpanSize)
 	binary.LittleEndian.PutUint64(head, uint64(span))
 	tail := s.buffer[s.cursors[lvl+1]:s.cursors[lvl]]
 	chunkData = append(head, tail...)
@@ -193,16 +193,16 @@ func (s *SimpleSplitterJob) sumLevel(lvl int) ([]byte, error) {
 // timing is the responsibility of the caller.
 func (s *SimpleSplitterJob) digest() []byte {
 	if s.toEncrypt {
-		return s.buffer[:swarm.SectionSize*2]
+		return s.buffer[:penguin.SectionSize*2]
 	} else {
-		return s.buffer[:swarm.SectionSize]
+		return s.buffer[:penguin.SectionSize]
 	}
 }
 
 // hashUnfinished hasher the remaining unhashed chunks at the end of each level if
 // write doesn't end on a chunk boundary.
 func (s *SimpleSplitterJob) hashUnfinished() error {
-	if s.length%swarm.ChunkSize != 0 {
+	if s.length%penguin.ChunkSize != 0 {
 		ref, err := s.sumLevel(0)
 		if err != nil {
 			return err
@@ -235,7 +235,7 @@ func (s *SimpleSplitterJob) hashUnfinished() error {
 // After which the SS will be hashed to obtain the final root hash
 func (s *SimpleSplitterJob) moveDanglingChunk() error {
 	// calculate the total number of levels needed to represent the data (including the data level)
-	targetLevel := file.Levels(s.length, swarm.SectionSize, swarm.Branches)
+	targetLevel := file.Levels(s.length, penguin.SectionSize, penguin.Branches)
 
 	// sum every intermediate level and write to the level above it
 	for i := 1; i < targetLevel; i++ {
@@ -291,11 +291,11 @@ func (s *SimpleSplitterJob) encrypt(chunkData []byte) (encryption.Key, []byte, [
 }
 
 func (s *SimpleSplitterJob) newSpanEncryption(key encryption.Key) encryption.Interface {
-	return encryption.New(key, 0, uint32(swarm.ChunkSize/s.refSize), sha3.NewLegacyKeccak256)
+	return encryption.New(key, 0, uint32(penguin.ChunkSize/s.refSize), sha3.NewLegacyKeccak256)
 }
 
 func (s *SimpleSplitterJob) newDataEncryption(key encryption.Key) encryption.Interface {
-	return encryption.New(key, int(swarm.ChunkSize), 0, sha3.NewLegacyKeccak256)
+	return encryption.New(key, int(penguin.ChunkSize), 0, sha3.NewLegacyKeccak256)
 }
 
 func (s *SimpleSplitterJob) incrTag(state tags.State) error {

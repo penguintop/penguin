@@ -1,21 +1,20 @@
 #!/bin/sh
 
-RESP=$(/usr/local/bin/bee init --config /usr/local/etc/swarm-bee/bee.yaml 2>&1)
+RESP=$(/usr/local/bin/pen init --config /usr/local/etc/penguin-pen/pen.yaml 2>&1)
 case "$RESP" in
     Error*)
         echo "
 Enabled clef-signer but clef is not running.
-Check https://docs.ethswarm.org/ for more info.
-After you fix configuration run 'bee-get-addr' again.
+After you fix configuration run 'pen-get-addr' again.
         "
         ;;
     *)
         ETH_ADDRESS=$(echo "$RESP" | grep ethereum | cut -d' ' -f6 | tr -d '"')
         echo "
 Please make sure there is sufficient eth and pen available on $ETH_ADDRESS address.
-Learn how to fund your node by visiting our docs at https://docs.ethswarm.org/docs/installation/fund-your-node
+Learn how to fund your node by visiting our docs at 
 
-After you get the funds start service with 'brew services start swarm-bee'.
+After you get the funds start service with 'brew services start penguin-pen'.
         "
         ;;
 esac

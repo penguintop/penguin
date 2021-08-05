@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -23,7 +23,7 @@ import (
 	"github.com/penguintop/penguin/pkg/pushsync/pb"
 	"github.com/penguintop/penguin/pkg/soc"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/tracing"
@@ -48,27 +48,27 @@ var (
 )
 
 type PushSyncer interface {
-	PushChunkToClosest(ctx context.Context, ch swarm.Chunk) (*Receipt, error)
+	PushChunkToClosest(ctx context.Context, ch penguin.Chunk) (*Receipt, error)
 }
 
 type Receipt struct {
-	Address   swarm.Address
+	Address   penguin.Address
 	Signature []byte
 }
 
 type PushSync struct {
-	address        swarm.Address
+	address        penguin.Address
 	streamer       p2p.StreamerDisconnecter
 	storer         storage.Putter
 	topologyDriver topology.Driver
 	tagger         *tags.Tags
-	unwrap         func(swarm.Chunk)
+	unwrap         func(penguin.Chunk)
 	logger         logging.Logger
 	accounting     accounting.Interface
 	pricer         pricer.Interface
 	metrics        metrics
 	tracer         *tracing.Tracer
-	validStamp     func(swarm.Chunk, []byte) (swarm.Chunk, error)
+	validStamp     func(penguin.Chunk, []byte) (penguin.Chunk, error)
 	signer         crypto.Signer
 	isFullNode     bool
 	failedRequests *failedRequestCache
@@ -78,7 +78,7 @@ var defaultTTL = 20 * time.Second                     // request time to live
 var timeToWaitForPushsyncToNeighbor = 3 * time.Second // time to wait to get a receipt for a chunk
 var nPeersToPushsync = 3                              // number of peers to replicate to as receipt is sent upstream
 
-func New(address swarm.Address, streamer p2p.StreamerDisconnecter, storer storage.Putter, topology topology.Driver, tagger *tags.Tags, isFullNode bool, unwrap func(swarm.Chunk), validStamp func(swarm.Chunk, []byte) (swarm.Chunk, error), logger logging.Logger, accounting accounting.Interface, pricer pricer.Interface, signer crypto.Signer, tracer *tracing.Tracer) *PushSync {
+func New(address penguin.Address, streamer p2p.StreamerDisconnecter, storer storage.Putter, topology topology.Driver, tagger *tags.Tags, isFullNode bool, unwrap func(penguin.Chunk), validStamp func(penguin.Chunk, []byte) (penguin.Chunk, error), logger logging.Logger, accounting accounting.Interface, pricer pricer.Interface, signer crypto.Signer, tracer *tracing.Tracer) *PushSync {
 	ps := &PushSync{
 		address:        address,
 		streamer:       streamer,
@@ -132,7 +132,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 	}
 	ps.metrics.TotalReceived.Inc()
 
-	chunk := swarm.NewChunk(swarm.NewAddress(ch.Address), ch.Data)
+	chunk := penguin.NewChunk(penguin.NewAddress(ch.Address), ch.Data)
 	if chunk, err = ps.validStamp(chunk, ch.Stamp); err != nil {
 		return fmt.Errorf("pushsync valid stamp: %w", err)
 	}
@@ -142,7 +142,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 			go ps.unwrap(chunk)
 		}
 	} else if !soc.Valid(chunk) {
-		return swarm.ErrInvalidChunk
+		return penguin.ErrInvalidChunk
 	}
 
 	price := ps.pricer.Price(chunk.Address())
@@ -150,7 +150,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 	// if the peer is closer to the chunk, AND it's a full node, we were selected for replication. Return early.
 	if p.FullNode {
 		bytes := chunk.Address().Bytes()
-		if dcmp, _ := swarm.DistanceCmp(bytes, p.Address.Bytes(), ps.address.Bytes()); dcmp == 1 {
+		if dcmp, _ := penguin.DistanceCmp(bytes, p.Address.Bytes(), ps.address.Bytes()); dcmp == 1 {
 			if ps.topologyDriver.IsWithinDepth(chunk.Address()) {
 				ctxd, canceld := context.WithTimeout(context.Background(), timeToWaitForPushsyncToNeighbor)
 				defer canceld()
@@ -207,7 +207,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 			count := 0
 			// Push the chunk to some peers in the neighborhood in parallel for replication.
 			// Any errors here should NOT impact the rest of the handler.
-			err = ps.topologyDriver.EachNeighbor(func(peer swarm.Address, po uint8) (bool, bool, error) {
+			err = ps.topologyDriver.EachNeighbor(func(peer penguin.Address, po uint8) (bool, bool, error) {
 
 				// skip forwarding peer
 				if peer.Equal(p.Address) {
@@ -219,7 +219,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 				}
 				count++
 
-				go func(peer swarm.Address) {
+				go func(peer penguin.Address) {
 
 					var err error
 					defer func() {
@@ -278,7 +278,7 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 						return
 					}
 
-					if !chunk.Address().Equal(swarm.NewAddress(receipt.Address)) {
+					if !chunk.Address().Equal(penguin.NewAddress(receipt.Address)) {
 						// if the receipt is invalid, give up
 						return
 					}
@@ -327,22 +327,22 @@ func (ps *PushSync) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) 
 // PushChunkToClosest sends chunk to the closest peer by opening a stream. It then waits for
 // a receipt from that peer and returns error or nil based on the receiving and
 // the validity of the receipt.
-func (ps *PushSync) PushChunkToClosest(ctx context.Context, ch swarm.Chunk) (*Receipt, error) {
+func (ps *PushSync) PushChunkToClosest(ctx context.Context, ch penguin.Chunk) (*Receipt, error) {
 	r, err := ps.pushToClosest(ctx, ch, true)
 	if err != nil {
 		return nil, err
 	}
 	return &Receipt{
-		Address:   swarm.NewAddress(r.Address),
+		Address:   penguin.NewAddress(r.Address),
 		Signature: r.Signature}, nil
 }
 
-func (ps *PushSync) pushToClosest(ctx context.Context, ch swarm.Chunk, retryAllowed bool) (*pb.Receipt, error) {
+func (ps *PushSync) pushToClosest(ctx context.Context, ch penguin.Chunk, retryAllowed bool) (*pb.Receipt, error) {
 	span, logger, ctx := ps.tracer.StartSpanFromContext(ctx, "push-closest", ps.logger, opentracing.Tag{Key: "address", Value: ch.Address().String()})
 	defer span.Finish()
 
 	var (
-		skipPeers      []swarm.Address
+		skipPeers      []penguin.Address
 		allowedRetries = 1
 		resultC        = make(chan *pushResult)
 		includeSelf    = ps.isFullNode
@@ -370,7 +370,7 @@ func (ps *PushSync) pushToClosest(ctx context.Context, ch swarm.Chunk, retryAllo
 		skipPeers = append(skipPeers, peer)
 		ps.metrics.TotalSendAttempts.Inc()
 
-		go func(peer swarm.Address, ch swarm.Chunk) {
+		go func(peer penguin.Address, ch penguin.Chunk) {
 			ctxd, canceld := context.WithTimeout(ctx, defaultTTL)
 			defer canceld()
 
@@ -415,7 +415,7 @@ func (ps *PushSync) pushToClosest(ctx context.Context, ch swarm.Chunk, retryAllo
 	return nil, ErrNoPush
 }
 
-func (ps *PushSync) pushPeer(ctx context.Context, peer swarm.Address, ch swarm.Chunk) (*pb.Receipt, bool, error) {
+func (ps *PushSync) pushPeer(ctx context.Context, peer penguin.Address, ch penguin.Chunk) (*pb.Receipt, bool, error) {
 	// compute the price we pay for this receipt and reserve it for the rest of this function
 	receiptPrice := ps.pricer.PeerPrice(peer, ch.Address())
 
@@ -464,7 +464,7 @@ func (ps *PushSync) pushPeer(ctx context.Context, peer swarm.Address, ch swarm.C
 		return nil, true, fmt.Errorf("chunk %s receive receipt from peer %s: %w", ch.Address(), peer, err)
 	}
 
-	if !ch.Address().Equal(swarm.NewAddress(receipt.Address)) {
+	if !ch.Address().Equal(penguin.NewAddress(receipt.Address)) {
 		// if the receipt is invalid, try to push to the next peer
 		return nil, true, fmt.Errorf("invalid receipt. chunk %s, peer %s", ch.Address(), peer)
 	}
@@ -496,11 +496,11 @@ func newFailedRequestCache() *failedRequestCache {
 	return &failedRequestCache{cache: cache}
 }
 
-func keyForReq(peer swarm.Address, chunk swarm.Address) string {
+func keyForReq(peer penguin.Address, chunk penguin.Address) string {
 	return fmt.Sprintf("%s/%s", peer, chunk)
 }
 
-func (f *failedRequestCache) RecordFailure(peer swarm.Address, chunk swarm.Address) {
+func (f *failedRequestCache) RecordFailure(peer penguin.Address, chunk penguin.Address) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
@@ -513,13 +513,13 @@ func (f *failedRequestCache) RecordFailure(peer swarm.Address, chunk swarm.Addre
 	f.cache.Add(keyForReq(peer, chunk), count)
 }
 
-func (f *failedRequestCache) RecordSuccess(peer swarm.Address, chunk swarm.Address) {
+func (f *failedRequestCache) RecordSuccess(peer penguin.Address, chunk penguin.Address) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 	f.cache.Remove(keyForReq(peer, chunk))
 }
 
-func (f *failedRequestCache) Useful(peer swarm.Address, chunk swarm.Address) bool {
+func (f *failedRequestCache) Useful(peer penguin.Address, chunk penguin.Address) bool {
 	f.mtx.RLock()
 	val, found := f.cache.Get(keyForReq(peer, chunk))
 	f.mtx.RUnlock()

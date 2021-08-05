@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/debugapi"
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestBalances(t *testing.T) {
@@ -79,7 +79,7 @@ func TestBalancesError(t *testing.T) {
 
 func TestBalancesPeers(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	compensatedBalanceFunc := func(swarm.Address) (*big.Int, error) {
+	compensatedBalanceFunc := func(penguin.Address) (*big.Int, error) {
 		return big.NewInt(100000000000000000), nil
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -97,7 +97,7 @@ func TestBalancesPeers(t *testing.T) {
 func TestBalancesPeersError(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
 	wantErr := errors.New("Error")
-	compensatedBalanceFunc := func(swarm.Address) (*big.Int, error) {
+	compensatedBalanceFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, wantErr
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -114,7 +114,7 @@ func TestBalancesPeersError(t *testing.T) {
 
 func TestBalancesPeersNoBalance(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	compensatedBalanceFunc := func(swarm.Address) (*big.Int, error) {
+	compensatedBalanceFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, accounting.ErrPeerNoBalance
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -232,7 +232,7 @@ func TestConsumedError(t *testing.T) {
 
 func TestConsumedPeers(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	balanceFunc := func(swarm.Address) (*big.Int, error) {
+	balanceFunc := func(penguin.Address) (*big.Int, error) {
 		return big.NewInt(1000000000000000000), nil
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -250,7 +250,7 @@ func TestConsumedPeers(t *testing.T) {
 func TestConsumedPeersError(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
 	wantErr := errors.New("Error")
-	balanceFunc := func(swarm.Address) (*big.Int, error) {
+	balanceFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, wantErr
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -267,7 +267,7 @@ func TestConsumedPeersError(t *testing.T) {
 
 func TestConsumedPeersNoBalance(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	balanceFunc := func(swarm.Address) (*big.Int, error) {
+	balanceFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, accounting.ErrPeerNoBalance
 	}
 	testServer := newTestServer(t, testServerOptions{

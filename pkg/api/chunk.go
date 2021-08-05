@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,13 +19,13 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/gorilla/mux"
 )
 
 type chunkAddressResponse struct {
-	Reference swarm.Address `json:"reference"`
+	Reference penguin.Address `json:"reference"`
 }
 
 func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +35,7 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 		err error
 	)
 
-	if h := r.Header.Get(SwarmTagHeader); h != "" {
+	if h := r.Header.Get(PenguinTagHeader); h != "" {
 		tag, err = s.getTag(h)
 		if err != nil {
 			s.logger.Debugf("chunk upload: get tag: %v", err)
@@ -69,7 +69,7 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(data) < swarm.SpanSize {
+	if len(data) < penguin.SpanSize {
 		s.logger.Debug("chunk upload: not enough data")
 		s.logger.Error("chunk upload: data length")
 		jsonhttp.BadRequest(w, "data length")
@@ -125,10 +125,10 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 			jsonhttp.InternalServerError(w, "increment tag")
 			return
 		}
-		w.Header().Set(SwarmTagHeader, fmt.Sprint(tag.Uid))
+		w.Header().Set(PenguinTagHeader, fmt.Sprint(tag.Uid))
 	}
 
-	if strings.ToLower(r.Header.Get(SwarmPinHeader)) == "true" {
+	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, chunk.Address(), false); err != nil {
 			s.logger.Debugf("chunk upload: creation of pin for %q failed: %v", chunk.Address(), err)
 			s.logger.Error("chunk upload: creation of pin failed")
@@ -137,7 +137,7 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Access-Control-Expose-Headers", SwarmTagHeader)
+	w.Header().Set("Access-Control-Expose-Headers", PenguinTagHeader)
 	jsonhttp.Created(w, chunkAddressResponse{Reference: chunk.Address()})
 }
 

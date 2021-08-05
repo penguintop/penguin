@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/handshake/pb"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/pen"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 
 	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
@@ -737,6 +737,6 @@ type MockSenderMatcher struct {
 	v bool
 }
 
-func (m MockSenderMatcher) Matches(context.Context, []byte, uint64, swarm.Address) (bool, error) {
+func (m MockSenderMatcher) Matches(context.Context, []byte, uint64, penguin.Address) (bool, error) {
 	return m.v, nil
 }

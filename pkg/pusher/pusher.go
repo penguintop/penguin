@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/pushsync"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/tracing"
@@ -68,7 +68,7 @@ func New(networkID uint64, storer storage.Storer, peerSuggester topology.Closest
 // and pushes them to the closest peer and get a receipt.
 func (s *Service) chunksWorker() {
 	var (
-		chunks        <-chan swarm.Chunk
+		chunks        <-chan penguin.Chunk
 		unsubscribe   func()
 		timer         = time.NewTimer(0) // timer, initially set to 0 to fall through select case on timer.C for initialisation
 		chunksInBatch = -1
@@ -134,13 +134,13 @@ LOOP:
 			inflight[ch.Address().String()] = struct{}{}
 			mtx.Unlock()
 
-			go func(ctx context.Context, ch swarm.Chunk) {
+			go func(ctx context.Context, ch penguin.Chunk) {
 				var (
 					err        error
 					startTime  = time.Now()
 					t          *tags.Tag
 					wantSelf   bool
-					storerPeer swarm.Address
+					storerPeer penguin.Address
 				)
 				defer func() {
 					if err == nil {

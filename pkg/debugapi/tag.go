@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,21 +11,21 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/gorilla/mux"
 )
 
 type tagResponse struct {
-	Total     int64         `json:"total"`
-	Split     int64         `json:"split"`
-	Seen      int64         `json:"seen"`
-	Stored    int64         `json:"stored"`
-	Sent      int64         `json:"sent"`
-	Synced    int64         `json:"synced"`
-	Uid       uint32        `json:"uid"`
-	Address   swarm.Address `json:"address"`
-	StartedAt time.Time     `json:"startedAt"`
+	Total     int64           `json:"total"`
+	Split     int64           `json:"split"`
+	Seen      int64           `json:"seen"`
+	Stored    int64           `json:"stored"`
+	Sent      int64           `json:"sent"`
+	Synced    int64           `json:"synced"`
+	Uid       uint32          `json:"uid"`
+	Address   penguin.Address `json:"address"`
+	StartedAt time.Time       `json:"startedAt"`
 }
 
 func newTagResponse(tag *tags.Tag) tagResponse {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/pullsync"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
@@ -52,7 +52,7 @@ type Puller struct {
 
 func New(stateStore storage.StateStorer, topology topology.Driver, pullSync pullsync.Interface, logger logging.Logger, o Options) *Puller {
 	var (
-		bins uint8 = swarm.MaxBins
+		bins uint8 = penguin.MaxBins
 	)
 	if o.Bins != 0 {
 		bins = o.Bins
@@ -82,7 +82,7 @@ func New(stateStore storage.StateStorer, topology topology.Driver, pullSync pull
 }
 
 type peer struct {
-	addr swarm.Address
+	addr penguin.Address
 	po   uint8
 }
 
@@ -132,7 +132,7 @@ func (p *Puller) manage() {
 			// EachPeerRev in this case will never return an error, since the content of the callback
 			// never returns an error. In case in the future changes are made to the callback in a
 			// way that it returns an error - the value must be checked.
-			_ = p.topology.EachPeerRev(func(peerAddr swarm.Address, po uint8) (stop, jumpToNext bool, err error) {
+			_ = p.topology.EachPeerRev(func(peerAddr penguin.Address, po uint8) (stop, jumpToNext bool, err error) {
 				bp := p.syncPeers[po]
 				if po >= depth {
 					// delete from peersDisconnected since we'd like to sync
@@ -186,7 +186,7 @@ func (p *Puller) manage() {
 	}
 }
 
-func (p *Puller) disconnectPeer(peer swarm.Address, po uint8) {
+func (p *Puller) disconnectPeer(peer penguin.Address, po uint8) {
 	if logMore {
 		p.logger.Debugf("puller disconnect cleanup peer %s po %d", peer, po)
 	}
@@ -197,7 +197,7 @@ func (p *Puller) disconnectPeer(peer swarm.Address, po uint8) {
 	delete(p.syncPeers[po], peer.ByteString())
 }
 
-func (p *Puller) recalcPeer(ctx context.Context, peer swarm.Address, po, d uint8) (dontSync bool) {
+func (p *Puller) recalcPeer(ctx context.Context, peer penguin.Address, po, d uint8) (dontSync bool) {
 	if logMore {
 		p.logger.Debugf("puller recalculating peer %s po %d depth %d", peer, po, d)
 	}
@@ -248,7 +248,7 @@ func (p *Puller) recalcPeer(ctx context.Context, peer swarm.Address, po, d uint8
 	return false
 }
 
-func (p *Puller) syncPeer(ctx context.Context, peer swarm.Address, po, d uint8) {
+func (p *Puller) syncPeer(ctx context.Context, peer penguin.Address, po, d uint8) {
 
 	p.syncPeersMtx.Lock()
 	syncCtx := p.syncPeers[po][peer.ByteString()]
@@ -298,7 +298,7 @@ func (p *Puller) syncPeer(ctx context.Context, peer swarm.Address, po, d uint8) 
 	}
 }
 
-func (p *Puller) syncPeerBin(ctx context.Context, syncCtx *syncPeer, peer swarm.Address, bin uint8, cur uint64) {
+func (p *Puller) syncPeerBin(ctx context.Context, syncCtx *syncPeer, peer penguin.Address, bin uint8, cur uint64) {
 	binCtx, cancel := context.WithCancel(ctx)
 	syncCtx.setBinCancel(cancel, bin)
 	if cur > 0 {
@@ -310,7 +310,7 @@ func (p *Puller) syncPeerBin(ctx context.Context, syncCtx *syncPeer, peer swarm.
 	go p.liveSyncWorker(binCtx, peer, bin, cur)
 }
 
-func (p *Puller) histSyncWorker(ctx context.Context, peer swarm.Address, bin uint8, cur uint64) {
+func (p *Puller) histSyncWorker(ctx context.Context, peer penguin.Address, bin uint8, cur uint64) {
 	defer func() {
 		p.wg.Done()
 		p.metrics.HistWorkerDoneCounter.Inc()
@@ -371,7 +371,7 @@ func (p *Puller) histSyncWorker(ctx context.Context, peer swarm.Address, bin uin
 	}
 }
 
-func (p *Puller) liveSyncWorker(ctx context.Context, peer swarm.Address, bin uint8, cur uint64) {
+func (p *Puller) liveSyncWorker(ctx context.Context, peer penguin.Address, bin uint8, cur uint64) {
 	defer p.wg.Done()
 	if logMore {
 		p.logger.Tracef("liveSyncWorker starting, peer %s bin %d cursor %d", peer, bin, cur)
@@ -436,7 +436,7 @@ func (p *Puller) Close() error {
 	return nil
 }
 
-func (p *Puller) addPeerInterval(peer swarm.Address, bin uint8, start, end uint64) (err error) {
+func (p *Puller) addPeerInterval(peer penguin.Address, bin uint8, start, end uint64) (err error) {
 
 	peerStreamKey := peerIntervalKey(peer, bin)
 	i, err := p.getOrCreateInterval(peer, bin)
@@ -449,7 +449,7 @@ func (p *Puller) addPeerInterval(peer swarm.Address, bin uint8, start, end uint6
 	return p.statestore.Put(peerStreamKey, i)
 }
 
-func (p *Puller) nextPeerInterval(peer swarm.Address, bin uint8) (start, end uint64, empty bool, err error) {
+func (p *Puller) nextPeerInterval(peer penguin.Address, bin uint8) (start, end uint64, empty bool, err error) {
 
 	i, err := p.getOrCreateInterval(peer, bin)
 	if err != nil {
@@ -460,7 +460,7 @@ func (p *Puller) nextPeerInterval(peer swarm.Address, bin uint8) (start, end uin
 	return start, end, empty, nil
 }
 
-func (p *Puller) getOrCreateInterval(peer swarm.Address, bin uint8) (*intervalstore.Intervals, error) {
+func (p *Puller) getOrCreateInterval(peer penguin.Address, bin uint8) (*intervalstore.Intervals, error) {
 	// check that an interval entry exists
 	key := peerIntervalKey(peer, bin)
 	i := &intervalstore.Intervals{}
@@ -479,19 +479,19 @@ func (p *Puller) getOrCreateInterval(peer swarm.Address, bin uint8) (*intervalst
 	return i, nil
 }
 
-func peerIntervalKey(peer swarm.Address, bin uint8) string {
+func peerIntervalKey(peer penguin.Address, bin uint8) string {
 	k := fmt.Sprintf("%s|%d", peer.String(), bin)
 	return k
 }
 
 type syncPeer struct {
-	address        swarm.Address
+	address        penguin.Address
 	binCancelFuncs map[uint8]func() // slice of context cancel funcs for historical sync. index is bin
 
 	sync.Mutex
 }
 
-func newSyncPeer(addr swarm.Address, bins uint8) *syncPeer {
+func newSyncPeer(addr penguin.Address, bins uint8) *syncPeer {
 	return &syncPeer{
 		address:        addr,
 		binCancelFuncs: make(map[uint8]func(), bins),
@@ -526,7 +526,7 @@ func (p *syncPeer) isBinSyncing(bin uint8) bool {
 	return ok
 }
 
-func isSyncing(p *Puller, addr swarm.Address) bool {
+func isSyncing(p *Puller, addr penguin.Address) bool {
 	// this is needed for testing purposes in order
 	// to verify that a peer is no longer syncing on
 	// disconnect

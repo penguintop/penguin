@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,12 +10,12 @@ import (
 
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/pricer/headerutils"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestMakePricingHeaders(t *testing.T) {
 
-	addr := swarm.MustParseHexAddress("010101e1010101")
+	addr := penguin.MustParseHexAddress("010101e1010101")
 
 	makeHeaders, err := headerutils.MakePricingHeaders(uint64(5348), addr)
 	if err != nil {
@@ -36,7 +36,7 @@ func TestMakePricingHeaders(t *testing.T) {
 
 func TestMakePricingResponseHeaders(t *testing.T) {
 
-	addr := swarm.MustParseHexAddress("010101e1010101")
+	addr := penguin.MustParseHexAddress("010101e1010101")
 
 	makeHeaders, err := headerutils.MakePricingResponseHeaders(uint64(5348), addr, uint8(11))
 	if err != nil {
@@ -67,7 +67,7 @@ func TestParsePricingHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	addr := swarm.MustParseHexAddress("010101e1010101")
+	addr := penguin.MustParseHexAddress("010101e1010101")
 
 	if parsedPrice != uint64(5348) {
 		t.Fatalf("Price mismatch, got %v, want %v", parsedPrice, 5348)
@@ -91,7 +91,7 @@ func TestParsePricingResponseHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	addr := swarm.MustParseHexAddress("010101e1010101")
+	addr := penguin.MustParseHexAddress("010101e1010101")
 
 	if parsedPrice != uint64(5348) {
 		t.Fatalf("Price mismatch, got %v, want %v", parsedPrice, 5348)
@@ -133,7 +133,7 @@ func TestParseTargetHeader(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	addr := swarm.MustParseHexAddress("010101e1010101")
+	addr := penguin.MustParseHexAddress("010101e1010101")
 
 	if !parsedTarget.Equal(addr) {
 		t.Fatalf("Target mismatch, got %v, want %v", parsedTarget, addr)

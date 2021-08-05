@@ -1,14 +1,14 @@
 [Unit]
-Description=Bee - XWC Swarm node
+Description=Pen - XWC Penguin node
 Documentation=
 After=network.target
 
 [Service]
-EnvironmentFile=-/etc/default/bee
+EnvironmentFile=-/etc/default/pen
 NoNewPrivileges=true
-User=bee
-Group=bee
-ExecStart=/usr/bin/bee start --config /etc/bee/bee.yaml
+User=pen
+Group=pen
+ExecStart=/usr/bin/pen start --config /etc/pen/pen.yaml
 Restart=on-failure
 RestartSec=5s
 

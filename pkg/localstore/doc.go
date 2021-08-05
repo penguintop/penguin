@@ -15,8 +15,8 @@
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 /*
-Package localstore provides disk storage layer for Swarm Chunk persistence.
-It uses swarm/shed abstractions.
+Package localstore provides disk storage layer for Penguin Chunk persistence.
+It uses penguin/shed abstractions.
 
 The main type is DB which manages the storage by providing methods to
 access and add Chunks and to manage their status.

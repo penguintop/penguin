@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/penguintop/penguin/pkg/pullsync"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ pullsync.Interface = (*PullSyncMock)(nil)
@@ -55,7 +55,7 @@ func WithLateSyncReply(r ...SyncReply) Option {
 const limit = 50
 
 type SyncCall struct {
-	Peer     swarm.Address
+	Peer     penguin.Address
 	Bin      uint8
 	From, To uint64
 	Live     bool
@@ -81,7 +81,7 @@ type PullSyncMock struct {
 	mtx             sync.Mutex
 	syncCalls       []SyncCall
 	cursors         []uint64
-	getCursorsPeers []swarm.Address
+	getCursorsPeers []penguin.Address
 	autoReply       bool
 	blockLiveSync   bool
 	liveSyncReplies []uint64
@@ -106,7 +106,7 @@ func NewPullSync(opts ...Option) *PullSyncMock {
 	return s
 }
 
-func (p *PullSyncMock) SyncInterval(ctx context.Context, peer swarm.Address, bin uint8, from, to uint64) (topmost uint64, ruid uint32, err error) {
+func (p *PullSyncMock) SyncInterval(ctx context.Context, peer penguin.Address, bin uint8, from, to uint64) (topmost uint64, ruid uint32, err error) {
 	isLive := to == math.MaxUint64
 
 	call := SyncCall{
@@ -190,14 +190,14 @@ func (p *PullSyncMock) SyncInterval(ctx context.Context, peer swarm.Address, bin
 	return to, 1, nil
 }
 
-func (p *PullSyncMock) GetCursors(_ context.Context, peer swarm.Address) ([]uint64, error) {
+func (p *PullSyncMock) GetCursors(_ context.Context, peer penguin.Address) ([]uint64, error) {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	p.getCursorsPeers = append(p.getCursorsPeers, peer)
 	return p.cursors, nil
 }
 
-func (p *PullSyncMock) SyncCalls(peer swarm.Address) (res []SyncCall) {
+func (p *PullSyncMock) SyncCalls(peer penguin.Address) (res []SyncCall) {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 
@@ -209,11 +209,11 @@ func (p *PullSyncMock) SyncCalls(peer swarm.Address) (res []SyncCall) {
 	return res
 }
 
-func (p *PullSyncMock) CancelRuid(ctx context.Context, peer swarm.Address, ruid uint32) error {
+func (p *PullSyncMock) CancelRuid(ctx context.Context, peer penguin.Address, ruid uint32) error {
 	return nil
 }
 
-func (p *PullSyncMock) LiveSyncCalls(peer swarm.Address) (res []SyncCall) {
+func (p *PullSyncMock) LiveSyncCalls(peer penguin.Address) (res []SyncCall) {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 
@@ -225,7 +225,7 @@ func (p *PullSyncMock) LiveSyncCalls(peer swarm.Address) (res []SyncCall) {
 	return res
 }
 
-func (p *PullSyncMock) CursorsCalls(peer swarm.Address) bool {
+func (p *PullSyncMock) CursorsCalls(peer penguin.Address) bool {
 	p.mtx.Lock()
 	defer p.mtx.Unlock()
 	for _, v := range p.getCursorsPeers {

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ethersphere/bee"
-	"github.com/penguintop/penguin/cmd/bee/cmd"
+	"github.com/penguintop/penguin"
+	"github.com/penguintop/penguin/cmd/pen/cmd"
 )
 
 func TestVersionCmd(t *testing.T) {
@@ -21,7 +21,7 @@ func TestVersionCmd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	want := bee.Version + "\n"
+	want := pen.Version + "\n"
 	got := outputBuf.String()
 	if got != want {
 		t.Errorf("got output %q, want %q", got, want)

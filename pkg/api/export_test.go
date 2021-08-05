@@ -1,10 +1,10 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package api
 
-import "github.com/penguintop/penguin/pkg/swarm"
+import "github.com/penguintop/penguin/pkg/penguin"
 
 type Server = server
 
@@ -44,7 +44,7 @@ var (
 	FeedMetadataEntryType  = feedMetadataEntryType
 )
 
-func (s *Server) ResolveNameOrAddress(str string) (swarm.Address, error) {
+func (s *Server) ResolveNameOrAddress(str string) (penguin.Address, error) {
 	return s.resolveNameOrAddress(str)
 }
 

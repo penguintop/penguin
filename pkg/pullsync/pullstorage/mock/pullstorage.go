@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,13 +10,13 @@ import (
 
 	"github.com/penguintop/penguin/pkg/pullsync/pullstorage"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ pullstorage.Storer = (*PullStorage)(nil)
 
 type chunksResponse struct {
-	chunks  []swarm.Address
+	chunks  []penguin.Address
 	topmost uint64
 	err     error
 }
@@ -25,14 +25,14 @@ type chunksResponse struct {
 // Different possible responses for subsequent responses in multi-call scenarios
 // are possible (i.e. first call yields a,b,c, second call yields d,e,f).
 // Mock maintains state of current call using chunksCalls counter.
-func WithIntervalsResp(addrs []swarm.Address, top uint64, err error) Option {
+func WithIntervalsResp(addrs []penguin.Address, top uint64, err error) Option {
 	return optionFunc(func(p *PullStorage) {
 		p.intervalChunksResponses = append(p.intervalChunksResponses, chunksResponse{chunks: addrs, topmost: top, err: err})
 	})
 }
 
 // WithChunks mocks the set of chunks that the store is aware of (used in Get and Has calls).
-func WithChunks(chs ...swarm.Chunk) Option {
+func WithChunks(chs ...penguin.Chunk) Option {
 	return optionFunc(func(p *PullStorage) {
 		for _, c := range chs {
 			c := c
@@ -43,7 +43,7 @@ func WithChunks(chs ...swarm.Chunk) Option {
 
 // WithEvilChunk allows to inject a malicious chunk (request a certain address
 // of a chunk, but get another), in order to mock unsolicited chunk delivery.
-func WithEvilChunk(addr swarm.Address, ch swarm.Chunk) Option {
+func WithEvilChunk(addr penguin.Address, ch penguin.Chunk) Option {
 	return optionFunc(func(p *PullStorage) {
 		p.evilAddr = addr
 		p.evilChunk = ch
@@ -68,9 +68,9 @@ type PullStorage struct {
 	putCalls    int
 	setCalls    int
 
-	chunks    map[string]swarm.Chunk
-	evilAddr  swarm.Address
-	evilChunk swarm.Chunk
+	chunks    map[string]penguin.Chunk
+	evilAddr  penguin.Address
+	evilChunk penguin.Chunk
 
 	cursors    []uint64
 	cursorsErr error
@@ -81,7 +81,7 @@ type PullStorage struct {
 // NewPullStorage returns a new PullStorage mock.
 func NewPullStorage(opts ...Option) *PullStorage {
 	s := &PullStorage{
-		chunks: make(map[string]swarm.Chunk),
+		chunks: make(map[string]penguin.Chunk),
 	}
 	for _, v := range opts {
 		v.apply(s)
@@ -90,7 +90,7 @@ func NewPullStorage(opts ...Option) *PullStorage {
 }
 
 // IntervalChunks returns a set of chunk in a requested interval.
-func (s *PullStorage) IntervalChunks(_ context.Context, bin uint8, from, to uint64, limit int) (chunks []swarm.Address, topmost uint64, err error) {
+func (s *PullStorage) IntervalChunks(_ context.Context, bin uint8, from, to uint64, limit int) (chunks []penguin.Address, topmost uint64, err error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
@@ -120,7 +120,7 @@ func (s *PullStorage) SetCalls() int {
 }
 
 // Get chunks.
-func (s *PullStorage) Get(_ context.Context, _ storage.ModeGet, addrs ...swarm.Address) (chs []swarm.Chunk, err error) {
+func (s *PullStorage) Get(_ context.Context, _ storage.ModeGet, addrs ...penguin.Address) (chs []penguin.Chunk, err error) {
 	for _, a := range addrs {
 		if s.evilAddr.Equal(a) {
 			//inject the malicious chunk instead
@@ -138,7 +138,7 @@ func (s *PullStorage) Get(_ context.Context, _ storage.ModeGet, addrs ...swarm.A
 }
 
 // Put chunks.
-func (s *PullStorage) Put(_ context.Context, _ storage.ModePut, chs ...swarm.Chunk) error {
+func (s *PullStorage) Put(_ context.Context, _ storage.ModePut, chs ...penguin.Chunk) error {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	for _, c := range chs {
@@ -150,7 +150,7 @@ func (s *PullStorage) Put(_ context.Context, _ storage.ModePut, chs ...swarm.Chu
 }
 
 // Set chunks.
-func (s *PullStorage) Set(ctx context.Context, mode storage.ModeSet, addrs ...swarm.Address) error {
+func (s *PullStorage) Set(ctx context.Context, mode storage.ModeSet, addrs ...penguin.Address) error {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	s.setCalls++
@@ -158,7 +158,7 @@ func (s *PullStorage) Set(ctx context.Context, mode storage.ModeSet, addrs ...sw
 }
 
 // Has chunks.
-func (s *PullStorage) Has(_ context.Context, addr swarm.Address) (bool, error) {
+func (s *PullStorage) Has(_ context.Context, addr penguin.Address) (bool, error) {
 	if _, ok := s.chunks[addr.String()]; !ok {
 		return false, nil
 	}

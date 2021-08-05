@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/pen"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const keyPrefix = "addressbook_entry_"
@@ -25,7 +25,7 @@ type Interface interface {
 	GetPutter
 	Remover
 	// Overlays returns a list of all overlay addresses saved in addressbook.
-	Overlays() ([]swarm.Address, error)
+	Overlays() ([]penguin.Address, error)
 	// Addresses returns a list of all pen.Address-es saved in addressbook.
 	Addresses() ([]pen.Address, error)
 }
@@ -37,17 +37,17 @@ type GetPutter interface {
 
 type Getter interface {
 	// Get returns pointer to saved pen.Address for requested overlay address.
-	Get(overlay swarm.Address) (addr *pen.Address, err error)
+	Get(overlay penguin.Address) (addr *pen.Address, err error)
 }
 
 type Putter interface {
 	// Put saves relation between peer overlay address and pen.Address address.
-	Put(overlay swarm.Address, addr pen.Address) (err error)
+	Put(overlay penguin.Address, addr pen.Address) (err error)
 }
 
 type Remover interface {
 	// Remove removes overlay address.
-	Remove(overlay swarm.Address) error
+	Remove(overlay penguin.Address) error
 }
 
 type store struct {
@@ -61,7 +61,7 @@ func New(storer storage.StateStorer) Interface {
 	}
 }
 
-func (s *store) Get(overlay swarm.Address) (*pen.Address, error) {
+func (s *store) Get(overlay penguin.Address) (*pen.Address, error) {
 	key := keyPrefix + overlay.String()
 	v := &pen.Address{}
 	err := s.store.Get(key, &v)
@@ -75,16 +75,16 @@ func (s *store) Get(overlay swarm.Address) (*pen.Address, error) {
 	return v, nil
 }
 
-func (s *store) Put(overlay swarm.Address, addr pen.Address) (err error) {
+func (s *store) Put(overlay penguin.Address, addr pen.Address) (err error) {
 	key := keyPrefix + overlay.String()
 	return s.store.Put(key, &addr)
 }
 
-func (s *store) Remove(overlay swarm.Address) error {
+func (s *store) Remove(overlay penguin.Address) error {
 	return s.store.Delete(keyPrefix + overlay.String())
 }
 
-func (s *store) Overlays() (overlays []swarm.Address, err error) {
+func (s *store) Overlays() (overlays []penguin.Address, err error) {
 	err = s.store.Iterate(keyPrefix, func(key, _ []byte) (stop bool, err error) {
 		k := string(key)
 		if !strings.HasPrefix(k, keyPrefix) {
@@ -94,7 +94,7 @@ func (s *store) Overlays() (overlays []swarm.Address, err error) {
 		if len(split) != 2 {
 			return true, fmt.Errorf("invalid overlay key: %s", k)
 		}
-		addr, err := swarm.ParseHexAddress(split[1])
+		addr, err := penguin.ParseHexAddress(split[1])
 		if err != nil {
 			return true, err
 		}

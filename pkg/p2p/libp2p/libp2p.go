@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/addressbook"
-	beecrypto "github.com/penguintop/penguin/pkg/crypto"
+	pencrypto "github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/blocklist"
@@ -22,7 +22,7 @@ import (
 	handshake "github.com/penguintop/penguin/pkg/p2p/libp2p/internal/handshake"
 	"github.com/penguintop/penguin/pkg/pen"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/libp2p/go-libp2p"
@@ -79,7 +79,7 @@ type lightnodes interface {
 	Connected(context.Context, p2p.Peer)
 	Disconnected(p2p.Peer)
 	Count() int
-	RandomPeer(swarm.Address) (swarm.Address, error)
+	RandomPeer(penguin.Address) (penguin.Address, error)
 }
 
 type Options struct {
@@ -94,7 +94,7 @@ type Options struct {
 	Transaction    []byte
 }
 
-func New(ctx context.Context, signer beecrypto.Signer, networkID uint64, overlay swarm.Address, addr string, ab addressbook.Putter, storer storage.StateStorer, lightNodes *lightnode.Container, swapBackend handshake.SenderMatcher, logger logging.Logger, tracer *tracing.Tracer, o Options) (*Service, error) {
+func New(ctx context.Context, signer pencrypto.Signer, networkID uint64, overlay penguin.Address, addr string, ab addressbook.Putter, storer storage.StateStorer, lightNodes *lightnode.Container, swapBackend handshake.SenderMatcher, logger logging.Logger, tracer *tracing.Tracer, o Options) (*Service, error) {
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, fmt.Errorf("address: %w", err)
@@ -252,7 +252,7 @@ func New(ctx context.Context, signer beecrypto.Signer, networkID uint64, overlay
 	}
 
 	// Construct protocols.
-	id := protocol.ID(p2p.NewSwarmStreamName(handshake.ProtocolName, handshake.ProtocolVersion, handshake.StreamName))
+	id := protocol.ID(p2p.NewPenguinStreamName(handshake.ProtocolName, handshake.ProtocolVersion, handshake.StreamName))
 	matcher, err := s.protocolSemverMatcher(id)
 	if err != nil {
 		return nil, fmt.Errorf("protocol version match %s: %w", id, err)
@@ -416,7 +416,7 @@ func (s *Service) SetPickyNotifier(n p2p.PickyNotifier) {
 func (s *Service) AddProtocol(p p2p.ProtocolSpec) (err error) {
 	for _, ss := range p.StreamSpecs {
 		ss := ss
-		id := protocol.ID(p2p.NewSwarmStreamName(p.Name, p.Version, ss.Name))
+		id := protocol.ID(p2p.NewPenguinStreamName(p.Name, p.Version, ss.Name))
 		matcher, err := s.protocolSemverMatcher(id)
 		if err != nil {
 			return fmt.Errorf("protocol version match %s: %w", id, err)
@@ -519,7 +519,7 @@ func (s *Service) NATManager() basichost.NATManager {
 	return s.natManager
 }
 
-func (s *Service) Blocklist(overlay swarm.Address, duration time.Duration) error {
+func (s *Service) Blocklist(overlay penguin.Address, duration time.Duration) error {
 	if err := s.blocklist.Add(overlay, duration); err != nil {
 		s.metrics.BlocklistedPeerErrCount.Inc()
 		_ = s.Disconnect(overlay)
@@ -660,7 +660,7 @@ func (s *Service) Connect(ctx context.Context, addr ma.Multiaddr) (address *pen.
 	return i.PenAddress, nil
 }
 
-func (s *Service) Disconnect(overlay swarm.Address) error {
+func (s *Service) Disconnect(overlay penguin.Address) error {
 	s.metrics.DisconnectCount.Inc()
 
 	s.logger.Debugf("libp2p disconnect: disconnecting peer %s", overlay)
@@ -698,7 +698,7 @@ func (s *Service) Disconnect(overlay swarm.Address) error {
 }
 
 // disconnected is a registered peer registry event
-func (s *Service) disconnected(address swarm.Address) {
+func (s *Service) disconnected(address penguin.Address) {
 
 	peer := p2p.Peer{Address: address}
 	peerID, found := s.peers.peerID(address)
@@ -736,7 +736,7 @@ func (s *Service) BlocklistedPeers() ([]p2p.Peer, error) {
 	return s.blocklist.Peers()
 }
 
-func (s *Service) NewStream(ctx context.Context, overlay swarm.Address, headers p2p.Headers, protocolName, protocolVersion, streamName string) (p2p.Stream, error) {
+func (s *Service) NewStream(ctx context.Context, overlay penguin.Address, headers p2p.Headers, protocolName, protocolVersion, streamName string) (p2p.Stream, error) {
 	peerID, found := s.peers.peerID(overlay)
 	if !found {
 		return nil, p2p.ErrPeerNotFound
@@ -767,8 +767,8 @@ func (s *Service) NewStream(ctx context.Context, overlay swarm.Address, headers 
 }
 
 func (s *Service) newStreamForPeerID(ctx context.Context, peerID libp2ppeer.ID, protocolName, protocolVersion, streamName string) (network.Stream, error) {
-	swarmStreamName := p2p.NewSwarmStreamName(protocolName, protocolVersion, streamName)
-	st, err := s.host.NewStream(ctx, peerID, protocol.ID(swarmStreamName))
+	penguinStreamName := p2p.NewPenguinStreamName(protocolName, protocolVersion, streamName)
+	st, err := s.host.NewStream(ctx, peerID, protocol.ID(penguinStreamName))
 	if err != nil {
 		if st != nil {
 			s.logger.Debug("stream experienced unexpected early close")
@@ -777,7 +777,7 @@ func (s *Service) newStreamForPeerID(ctx context.Context, peerID libp2ppeer.ID, 
 		if err == multistream.ErrNotSupported || err == multistream.ErrIncorrectVersion {
 			return nil, p2p.NewIncompatibleStreamError(err)
 		}
-		return nil, fmt.Errorf("create stream %q to %q: %w", swarmStreamName, peerID, err)
+		return nil, fmt.Errorf("create stream %q to %q: %w", penguinStreamName, peerID, err)
 	}
 	s.metrics.CreatedStreamCount.Inc()
 	return st, nil

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,40 +12,40 @@ import (
 
 	"github.com/penguintop/penguin/pkg/settlement/swap"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Service struct {
 	settlementsSent map[string]*big.Int
 	settlementsRecv map[string]*big.Int
 
-	settlementSentFunc func(swarm.Address) (*big.Int, error)
-	settlementRecvFunc func(swarm.Address) (*big.Int, error)
+	settlementSentFunc func(penguin.Address) (*big.Int, error)
+	settlementRecvFunc func(penguin.Address) (*big.Int, error)
 
 	settlementsSentFunc func() (map[string]*big.Int, error)
 	settlementsRecvFunc func() (map[string]*big.Int, error)
 
-	receiveChequeFunc   func(context.Context, swarm.Address, *chequebook.SignedCheque) error
-	payFunc             func(context.Context, swarm.Address, *big.Int)
-	handshakeFunc       func(swarm.Address, common.Address) error
-	lastSentChequeFunc  func(swarm.Address) (*chequebook.SignedCheque, error)
+	receiveChequeFunc   func(context.Context, penguin.Address, *chequebook.SignedCheque) error
+	payFunc             func(context.Context, penguin.Address, *big.Int)
+	handshakeFunc       func(penguin.Address, common.Address) error
+	lastSentChequeFunc  func(penguin.Address) (*chequebook.SignedCheque, error)
 	lastSentChequesFunc func() (map[string]*chequebook.SignedCheque, error)
 
-	lastReceivedChequeFunc  func(swarm.Address) (*chequebook.SignedCheque, error)
+	lastReceivedChequeFunc  func(penguin.Address) (*chequebook.SignedCheque, error)
 	lastReceivedChequesFunc func() (map[string]*chequebook.SignedCheque, error)
 
-	cashChequeFunc    func(ctx context.Context, peer swarm.Address) (common.Hash, error)
-	cashoutStatusFunc func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error)
+	cashChequeFunc    func(ctx context.Context, peer penguin.Address) (common.Hash, error)
+	cashoutStatusFunc func(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error)
 }
 
 // WithsettlementFunc sets the mock settlement function
-func WithSettlementSentFunc(f func(swarm.Address) (*big.Int, error)) Option {
+func WithSettlementSentFunc(f func(penguin.Address) (*big.Int, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.settlementSentFunc = f
 	})
 }
 
-func WithSettlementRecvFunc(f func(swarm.Address) (*big.Int, error)) Option {
+func WithSettlementRecvFunc(f func(penguin.Address) (*big.Int, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.settlementRecvFunc = f
 	})
@@ -64,25 +64,25 @@ func WithSettlementsRecvFunc(f func() (map[string]*big.Int, error)) Option {
 	})
 }
 
-func WithReceiveChequeFunc(f func(context.Context, swarm.Address, *chequebook.SignedCheque) error) Option {
+func WithReceiveChequeFunc(f func(context.Context, penguin.Address, *chequebook.SignedCheque) error) Option {
 	return optionFunc(func(s *Service) {
 		s.receiveChequeFunc = f
 	})
 }
 
-func WithPayFunc(f func(context.Context, swarm.Address, *big.Int)) Option {
+func WithPayFunc(f func(context.Context, penguin.Address, *big.Int)) Option {
 	return optionFunc(func(s *Service) {
 		s.payFunc = f
 	})
 }
 
-func WithHandshakeFunc(f func(swarm.Address, common.Address) error) Option {
+func WithHandshakeFunc(f func(penguin.Address, common.Address) error) Option {
 	return optionFunc(func(s *Service) {
 		s.handshakeFunc = f
 	})
 }
 
-func WithLastSentChequeFunc(f func(swarm.Address) (*chequebook.SignedCheque, error)) Option {
+func WithLastSentChequeFunc(f func(penguin.Address) (*chequebook.SignedCheque, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.lastSentChequeFunc = f
 	})
@@ -94,7 +94,7 @@ func WithLastSentChequesFunc(f func() (map[string]*chequebook.SignedCheque, erro
 	})
 }
 
-func WithLastReceivedChequeFunc(f func(swarm.Address) (*chequebook.SignedCheque, error)) Option {
+func WithLastReceivedChequeFunc(f func(penguin.Address) (*chequebook.SignedCheque, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.lastReceivedChequeFunc = f
 	})
@@ -106,13 +106,13 @@ func WithLastReceivedChequesFunc(f func() (map[string]*chequebook.SignedCheque, 
 	})
 }
 
-func WithCashChequeFunc(f func(ctx context.Context, peer swarm.Address) (common.Hash, error)) Option {
+func WithCashChequeFunc(f func(ctx context.Context, peer penguin.Address) (common.Hash, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.cashChequeFunc = f
 	})
 }
 
-func WithCashoutStatusFunc(f func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error)) Option {
+func WithCashoutStatusFunc(f func(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.cashoutStatusFunc = f
 	})
@@ -130,7 +130,7 @@ func New(opts ...Option) swap.Interface {
 }
 
 // ReceiveCheque is the mock ReceiveCheque function of swap.
-func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
+func (s *Service) ReceiveCheque(ctx context.Context, peer penguin.Address, cheque *chequebook.SignedCheque) (err error) {
 	if s.receiveChequeFunc != nil {
 		return s.receiveChequeFunc(ctx, peer, cheque)
 	}
@@ -138,7 +138,7 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 }
 
 // Pay is the mock Pay function of swap.
-func (s *Service) Pay(ctx context.Context, peer swarm.Address, amount *big.Int) {
+func (s *Service) Pay(ctx context.Context, peer penguin.Address, amount *big.Int) {
 	if s.payFunc != nil {
 		s.payFunc(ctx, peer, amount)
 		return
@@ -151,7 +151,7 @@ func (s *Service) Pay(ctx context.Context, peer swarm.Address, amount *big.Int) 
 }
 
 // TotalSent is the mock TotalSent function of swap.
-func (s *Service) TotalSent(peer swarm.Address) (totalSent *big.Int, err error) {
+func (s *Service) TotalSent(peer penguin.Address) (totalSent *big.Int, err error) {
 	if s.settlementSentFunc != nil {
 		return s.settlementSentFunc(peer)
 	}
@@ -162,7 +162,7 @@ func (s *Service) TotalSent(peer swarm.Address) (totalSent *big.Int, err error) 
 }
 
 // TotalReceived is the mock TotalReceived function of swap.
-func (s *Service) TotalReceived(peer swarm.Address) (totalReceived *big.Int, err error) {
+func (s *Service) TotalReceived(peer penguin.Address) (totalReceived *big.Int, err error) {
 	if s.settlementRecvFunc != nil {
 		return s.settlementRecvFunc(peer)
 	}
@@ -189,14 +189,14 @@ func (s *Service) SettlementsReceived() (map[string]*big.Int, error) {
 }
 
 // Handshake is called by the swap protocol when a handshake is received.
-func (s *Service) Handshake(peer swarm.Address, beneficiary common.Address) error {
+func (s *Service) Handshake(peer penguin.Address, beneficiary common.Address) error {
 	if s.handshakeFunc != nil {
 		return s.handshakeFunc(peer, beneficiary)
 	}
 	return nil
 }
 
-func (s *Service) LastSentCheque(address swarm.Address) (*chequebook.SignedCheque, error) {
+func (s *Service) LastSentCheque(address penguin.Address) (*chequebook.SignedCheque, error) {
 	if s.lastSentChequeFunc != nil {
 		return s.lastSentChequeFunc(address)
 	}
@@ -210,7 +210,7 @@ func (s *Service) LastSentCheques() (map[string]*chequebook.SignedCheque, error)
 	return nil, nil
 }
 
-func (s *Service) LastReceivedCheque(address swarm.Address) (*chequebook.SignedCheque, error) {
+func (s *Service) LastReceivedCheque(address penguin.Address) (*chequebook.SignedCheque, error) {
 	if s.lastReceivedChequeFunc != nil {
 		return s.lastReceivedChequeFunc(address)
 	}
@@ -224,14 +224,14 @@ func (s *Service) LastReceivedCheques() (map[string]*chequebook.SignedCheque, er
 	return nil, nil
 }
 
-func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+func (s *Service) CashCheque(ctx context.Context, peer penguin.Address) (common.Hash, error) {
 	if s.cashChequeFunc != nil {
 		return s.cashChequeFunc(ctx, peer)
 	}
 	return common.Hash{}, nil
 }
 
-func (s *Service) CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {
+func (s *Service) CashoutStatus(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error) {
 	if s.cashoutStatusFunc != nil {
 		return s.cashoutStatusFunc(ctx, peer)
 	}

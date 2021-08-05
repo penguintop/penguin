@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/penguintop/penguin/pkg/crypto"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/transaction"
 	"github.com/penguintop/penguin/pkg/transaction/backendmock"
 )
@@ -33,7 +33,7 @@ func TestMatchesSender(t *testing.T) {
 
 		matcher := transaction.NewMatcher(backendmock.New(txByHash), nil)
 
-		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, swarm.NewAddress([]byte{}))
+		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, penguin.NewAddress([]byte{}))
 		if !errors.Is(err, transaction.ErrTransactionNotFound) {
 			t.Fatalf("bad error type, want %v, got %v", transaction.ErrTransactionNotFound, err)
 		}
@@ -46,7 +46,7 @@ func TestMatchesSender(t *testing.T) {
 
 		matcher := transaction.NewMatcher(backendmock.New(txByHash), nil)
 
-		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, swarm.NewAddress([]byte{}))
+		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, penguin.NewAddress([]byte{}))
 		if !errors.Is(err, transaction.ErrTransactionPending) {
 			t.Fatalf("bad error type, want %v, got %v", transaction.ErrTransactionPending, err)
 		}
@@ -63,7 +63,7 @@ func TestMatchesSender(t *testing.T) {
 
 		matcher := transaction.NewMatcher(backendmock.New(txByHash), signer)
 
-		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, swarm.NewAddress([]byte{}))
+		_, err := matcher.Matches(context.Background(), []byte("0x123"), 0, penguin.NewAddress([]byte{}))
 		if !errors.Is(err, transaction.ErrTransactionSenderInvalid) {
 			t.Fatalf("bad error type, want %v, got %v", transaction.ErrTransactionSenderInvalid, err)
 		}
@@ -80,7 +80,7 @@ func TestMatchesSender(t *testing.T) {
 
 		matcher := transaction.NewMatcher(backendmock.New(txByHash), signer)
 
-		matches, err := matcher.Matches(context.Background(), []byte("0x123"), 0, swarm.NewAddress([]byte{}))
+		matches, err := matcher.Matches(context.Background(), []byte("0x123"), 0, penguin.NewAddress([]byte{}))
 		if err != nil {
 			t.Fatalf("expected no err, got %v", err)
 		}

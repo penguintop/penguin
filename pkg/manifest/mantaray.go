@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/file"
 	"github.com/penguintop/penguin/pkg/manifest/mantaray"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -45,7 +45,7 @@ func NewMantarayManifest(
 
 // NewMantarayManifestReference loads existing mantaray-based manifest.
 func NewMantarayManifestReference(
-	reference swarm.Address,
+	reference penguin.Address,
 	ls file.LoadSaver,
 ) (Interface, error) {
 	return &mantarayManifest{
@@ -94,7 +94,7 @@ func (m *mantarayManifest) Lookup(ctx context.Context, path string) (Entry, erro
 		return nil, ErrNotFound
 	}
 
-	address := swarm.NewAddress(node.Entry())
+	address := penguin.NewAddress(node.Entry())
 	entry := NewEntry(address, node.Metadata())
 
 	return entry, nil
@@ -106,7 +106,7 @@ func (m *mantarayManifest) HasPrefix(ctx context.Context, prefix string) (bool, 
 	return m.trie.HasPrefix(ctx, p, m.ls)
 }
 
-func (m *mantarayManifest) Store(ctx context.Context, storeSizeFn ...StoreSizeFunc) (swarm.Address, error) {
+func (m *mantarayManifest) Store(ctx context.Context, storeSizeFn ...StoreSizeFunc) (penguin.Address, error) {
 	var ls mantaray.LoadSaver
 	if len(storeSizeFn) > 0 {
 		ls = &mantarayLoadSaver{
@@ -119,22 +119,22 @@ func (m *mantarayManifest) Store(ctx context.Context, storeSizeFn ...StoreSizeFu
 
 	err := m.trie.Save(ctx, ls)
 	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("manifest save error: %w", err)
+		return penguin.ZeroAddress, fmt.Errorf("manifest save error: %w", err)
 	}
 
-	address := swarm.NewAddress(m.trie.Reference())
+	address := penguin.NewAddress(m.trie.Reference())
 
 	return address, nil
 }
 
-func (m *mantarayManifest) IterateAddresses(ctx context.Context, fn swarm.AddressIterFunc) error {
-	reference := swarm.NewAddress(m.trie.Reference())
+func (m *mantarayManifest) IterateAddresses(ctx context.Context, fn penguin.AddressIterFunc) error {
+	reference := penguin.NewAddress(m.trie.Reference())
 
-	if swarm.ZeroAddress.Equal(reference) {
+	if penguin.ZeroAddress.Equal(reference) {
 		return ErrMissingReference
 	}
 
-	emptyAddr := swarm.NewAddress([]byte{31: 0})
+	emptyAddr := penguin.NewAddress([]byte{31: 0})
 	walker := func(path []byte, node *mantaray.Node, err error) error {
 		if err != nil {
 			return err
@@ -142,7 +142,7 @@ func (m *mantarayManifest) IterateAddresses(ctx context.Context, fn swarm.Addres
 
 		if node != nil {
 			if node.Reference() != nil {
-				ref := swarm.NewAddress(node.Reference())
+				ref := penguin.NewAddress(node.Reference())
 
 				err = fn(ref)
 				if err != nil {
@@ -151,7 +151,7 @@ func (m *mantarayManifest) IterateAddresses(ctx context.Context, fn swarm.Addres
 			}
 
 			if node.IsValueType() && len(node.Entry()) > 0 {
-				entry := swarm.NewAddress(node.Entry())
+				entry := penguin.NewAddress(node.Entry())
 				// The following comparison to the emptyAddr is
 				// a dirty hack which prevents the walker to
 				// fail when it encounters an empty address

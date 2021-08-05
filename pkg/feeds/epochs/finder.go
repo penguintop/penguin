@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/feeds"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ feeds.Lookup = (*finder)(nil)
@@ -29,7 +29,7 @@ func NewFinder(getter storage.Getter, feed *feeds.Feed) feeds.Lookup {
 
 // At looks up the version valid at time `at`
 // after is a unix time hint of the latest known update
-func (f *finder) At(ctx context.Context, at, after int64) (swarm.Chunk, feeds.Index, feeds.Index, error) {
+func (f *finder) At(ctx context.Context, at, after int64) (penguin.Chunk, feeds.Index, feeds.Index, error) {
 	e, ch, err := f.common(ctx, at, after)
 	if err != nil {
 		return nil, nil, nil, err
@@ -39,7 +39,7 @@ func (f *finder) At(ctx context.Context, at, after int64) (swarm.Chunk, feeds.In
 }
 
 // common returns the lowest common ancestor for which a feed update chunk is found in the chunk store
-func (f *finder) common(ctx context.Context, at, after int64) (*epoch, swarm.Chunk, error) {
+func (f *finder) common(ctx context.Context, at, after int64) (*epoch, penguin.Chunk, error) {
 	for e := lca(at, after); ; e = e.parent() {
 		ch, err := f.getter.Get(ctx, e)
 		if err != nil {
@@ -62,7 +62,7 @@ func (f *finder) common(ctx context.Context, at, after int64) (*epoch, swarm.Chu
 }
 
 // at is a non-concurrent recursive Finder function to find the version update chunk at time `at`
-func (f *finder) at(ctx context.Context, at uint64, e *epoch, ch swarm.Chunk) (swarm.Chunk, error) {
+func (f *finder) at(ctx context.Context, at uint64, e *epoch, ch penguin.Chunk) (penguin.Chunk, error) {
 	uch, err := f.getter.Get(ctx, e)
 	if err != nil {
 		// error retrieving
@@ -97,7 +97,7 @@ func (f *finder) at(ctx context.Context, at uint64, e *epoch, ch swarm.Chunk) (s
 
 type result struct {
 	path  *path
-	chunk swarm.Chunk
+	chunk penguin.Chunk
 	*epoch
 }
 
@@ -123,7 +123,7 @@ func NewAsyncFinder(getter storage.Getter, feed *feeds.Feed) feeds.Lookup {
 	return &asyncFinder{feeds.NewGetter(getter, feed)}
 }
 
-func (f *asyncFinder) get(ctx context.Context, at int64, e *epoch) (swarm.Chunk, error) {
+func (f *asyncFinder) get(ctx context.Context, at int64, e *epoch) (penguin.Chunk, error) {
 	u, err := f.getter.Get(ctx, e)
 	if err != nil {
 		if !errors.Is(err, storage.ErrNotFound) {
@@ -165,7 +165,7 @@ func (f *asyncFinder) at(ctx context.Context, at int64, p *path, e *epoch, c cha
 		}
 	}
 }
-func (f *asyncFinder) At(ctx context.Context, at, after int64) (swarm.Chunk, feeds.Index, feeds.Index, error) {
+func (f *asyncFinder) At(ctx context.Context, at, after int64) (penguin.Chunk, feeds.Index, feeds.Index, error) {
 	// TODO: current and next index return values need to be implemented
 	ch, err := f.asyncAt(ctx, at, after)
 	return ch, nil, nil, err
@@ -173,7 +173,7 @@ func (f *asyncFinder) At(ctx context.Context, at, after int64) (swarm.Chunk, fee
 
 // At looks up the version valid at time `at`
 // after is a unix time hint of the latest known update
-func (f *asyncFinder) asyncAt(ctx context.Context, at, after int64) (swarm.Chunk, error) {
+func (f *asyncFinder) asyncAt(ctx context.Context, at, after int64) (penguin.Chunk, error) {
 	c := make(chan *result)
 	go f.at(ctx, at, newPath(at), &epoch{0, maxLevel}, c)
 LOOP:

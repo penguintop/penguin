@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
@@ -63,7 +63,7 @@ func TestTags(t *testing.T) {
 	})
 }
 
-func tagValueTest(t *testing.T, id uint32, split, stored, seen, sent, synced, total int64, address swarm.Address, client *http.Client) {
+func tagValueTest(t *testing.T, id uint32, split, stored, seen, sent, synced, total int64, address penguin.Address, client *http.Client) {
 	t.Helper()
 
 	tag := debugapi.TagResponse{}

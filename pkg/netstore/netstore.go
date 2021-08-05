@@ -1,9 +1,9 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Package netstore provides an abstraction layer over the
-// Swarm local storage layer that leverages connectivity
+// Penguin local storage layer that leverages connectivity
 // with other peers in order to retrieve chunks from the network that cannot
 // be found locally.
 package netstore
@@ -18,14 +18,14 @@ import (
 	"github.com/penguintop/penguin/pkg/retrieval"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type store struct {
 	storage.Storer
 	retrieval        retrieval.Interface
 	logger           logging.Logger
-	validStamp       func(swarm.Chunk, []byte) (swarm.Chunk, error)
+	validStamp       func(penguin.Chunk, []byte) (penguin.Chunk, error)
 	recoveryCallback recovery.Callback // this is the callback to be executed when a chunk fails to be retrieved
 }
 
@@ -34,7 +34,7 @@ var (
 )
 
 // New returns a new NetStore that wraps a given Storer.
-func New(s storage.Storer, validStamp func(swarm.Chunk, []byte) (swarm.Chunk, error), rcb recovery.Callback, r retrieval.Interface, logger logging.Logger) storage.Storer {
+func New(s storage.Storer, validStamp func(penguin.Chunk, []byte) (penguin.Chunk, error), rcb recovery.Callback, r retrieval.Interface, logger logging.Logger) storage.Storer {
 	return &store{Storer: s, validStamp: validStamp, recoveryCallback: rcb, retrieval: r, logger: logger}
 }
 
@@ -42,7 +42,7 @@ func New(s storage.Storer, validStamp func(swarm.Chunk, []byte) (swarm.Chunk, er
 // It will request a chunk from the network whenever it cannot be found locally.
 // If the network path is taken, the method also stores the found chunk into the
 // local-store.
-func (s *store) Get(ctx context.Context, mode storage.ModeGet, addr swarm.Address) (ch swarm.Chunk, err error) {
+func (s *store) Get(ctx context.Context, mode storage.ModeGet, addr penguin.Address) (ch penguin.Chunk, err error) {
 	ch, err = s.Storer.Get(ctx, mode, addr)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {

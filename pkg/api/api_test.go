@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -33,7 +33,7 @@ import (
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/traversal"
 	"github.com/gorilla/websocket"
@@ -155,7 +155,7 @@ func TestParseName(t *testing.T) {
 		name       string
 		res        resolver.Interface
 		noResolver bool
-		wantAdr    swarm.Address
+		wantAdr    penguin.Address
 		wantErr    error
 	}{
 		{
@@ -166,13 +166,13 @@ func TestParseName(t *testing.T) {
 		{
 			desc:    "pen hash",
 			name:    penHash,
-			wantAdr: swarm.MustParseHexAddress(penHash),
+			wantAdr: penguin.MustParseHexAddress(penHash),
 		},
 		{
 			desc:       "no resolver connected with pen hash",
 			name:       penHash,
 			noResolver: true,
-			wantAdr:    swarm.MustParseHexAddress(penHash),
+			wantAdr:    penguin.MustParseHexAddress(penHash),
 		},
 		{
 			desc:       "no resolver connected with name",
@@ -184,8 +184,8 @@ func TestParseName(t *testing.T) {
 			desc: "name not resolved",
 			name: "not.good",
 			res: resolverMock.NewResolver(
-				resolverMock.WithResolveFunc(func(string) (swarm.Address, error) {
-					return swarm.ZeroAddress, errors.New("failed to resolve")
+				resolverMock.WithResolveFunc(func(string) (penguin.Address, error) {
+					return penguin.ZeroAddress, errors.New("failed to resolve")
 				}),
 			),
 			wantErr: api.ErrInvalidNameOrAddress,
@@ -193,13 +193,13 @@ func TestParseName(t *testing.T) {
 		{
 			desc:    "name resolved",
 			name:    "everything.okay",
-			wantAdr: swarm.MustParseHexAddress("89c17d0d8018a19057314aa035e61c9d23c47581a61dd3a79a7839692c617e4d"),
+			wantAdr: penguin.MustParseHexAddress("89c17d0d8018a19057314aa035e61c9d23c47581a61dd3a79a7839692c617e4d"),
 		},
 	}
 	for _, tC := range testCases {
 		if tC.res == nil && !tC.noResolver {
 			tC.res = resolverMock.NewResolver(
-				resolverMock.WithResolveFunc(func(string) (swarm.Address, error) {
+				resolverMock.WithResolveFunc(func(string) (penguin.Address, error) {
 					return tC.wantAdr, nil
 				}))
 		}
@@ -285,7 +285,7 @@ func TestPostageHeaderError(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchEmpty)
 			expCode := http.StatusBadRequest
 			jsonhttptest.Request(t, client, http.MethodPost, "/"+endpoint, expCode,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestHeader(api.ContentTypeHeader, "application/octet-stream"),
 				jsonhttptest.WithRequestBody(bytes.NewReader(content)),
 			)
@@ -294,7 +294,7 @@ func TestPostageHeaderError(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchOk)
 			expCode := http.StatusCreated
 			jsonhttptest.Request(t, client, http.MethodPost, "/"+endpoint, expCode,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestHeader(api.ContentTypeHeader, "application/octet-stream"),
 				jsonhttptest.WithRequestBody(bytes.NewReader(content)),
 			)
@@ -303,7 +303,7 @@ func TestPostageHeaderError(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchInvalid)
 			expCode := http.StatusBadRequest
 			jsonhttptest.Request(t, client, http.MethodPost, "/"+endpoint, expCode,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestHeader(api.ContentTypeHeader, "application/octet-stream"),
 				jsonhttptest.WithRequestBody(bytes.NewReader(content)),
 			)

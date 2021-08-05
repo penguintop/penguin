@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,14 +15,14 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/soc"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
 var errBadRequestParams = errors.New("owner, id or span is not well formed")
 
 type socPostResponse struct {
-	Reference swarm.Address `json:"reference"`
+	Reference penguin.Address `json:"reference"`
 }
 
 func (s *server) socUploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,15 +68,15 @@ func (s *server) socUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(data) < swarm.SpanSize {
+	if len(data) < penguin.SpanSize {
 		s.logger.Debugf("soc upload: chunk data too short")
 		s.logger.Error("soc upload: %v", errBadRequestParams)
 		jsonhttp.BadRequest(w, "short chunk data")
 		return
 	}
 
-	if len(data) > swarm.ChunkSize+swarm.SpanSize {
-		s.logger.Debugf("soc upload: chunk data exceeds %d bytes", swarm.ChunkSize+swarm.SpanSize)
+	if len(data) > penguin.ChunkSize+penguin.SpanSize {
+		s.logger.Debugf("soc upload: chunk data exceeds %d bytes", penguin.ChunkSize+penguin.SpanSize)
 		s.logger.Error("soc upload: chunk data error")
 		jsonhttp.RequestEntityTooLarge(w, "payload too large")
 		return
@@ -159,7 +159,7 @@ func (s *server) socUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if strings.ToLower(r.Header.Get(SwarmPinHeader)) == "true" {
+	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, sch.Address(), false); err != nil {
 			s.logger.Debugf("soc upload: creation of pin for %q failed: %v", sch.Address(), err)
 			s.logger.Error("soc upload: creation of pin failed")

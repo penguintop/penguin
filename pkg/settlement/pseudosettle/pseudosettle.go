@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement"
 	pb "github.com/penguintop/penguin/pkg/settlement/pseudosettle/pb"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -113,23 +113,23 @@ func (s *Service) terminate(p p2p.Peer) error {
 	return nil
 }
 
-func totalKey(peer swarm.Address, prefix string) string {
+func totalKey(peer penguin.Address, prefix string) string {
 	return fmt.Sprintf("%v%v", prefix, peer.String())
 }
 
-func totalKeyPeer(key []byte, prefix string) (peer swarm.Address, err error) {
+func totalKeyPeer(key []byte, prefix string) (peer penguin.Address, err error) {
 	k := string(key)
 
 	split := strings.SplitAfter(k, prefix)
 	if len(split) != 2 {
-		return swarm.ZeroAddress, errors.New("no peer in key")
+		return penguin.ZeroAddress, errors.New("no peer in key")
 	}
-	return swarm.ParseHexAddress(split[1])
+	return penguin.ParseHexAddress(split[1])
 }
 
 // peerAllowance computes the maximum incoming payment value we accept
 // this is the time based allowance or the peers actual debt, whichever is less
-func (s *Service) peerAllowance(peer swarm.Address) (limit *big.Int, stamp int64, err error) {
+func (s *Service) peerAllowance(peer penguin.Address) (limit *big.Int, stamp int64, err error) {
 	var lastTime lastPayment
 	err = s.store.Get(totalKey(peer, SettlementReceivedPrefix), &lastTime)
 	if err != nil {
@@ -234,7 +234,7 @@ func (s *Service) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) (e
 }
 
 // Pay initiates a payment to the given peer
-func (s *Service) Pay(ctx context.Context, peer swarm.Address, amount *big.Int, checkAllowance *big.Int) (*big.Int, int64, error) {
+func (s *Service) Pay(ctx context.Context, peer penguin.Address, amount *big.Int, checkAllowance *big.Int) (*big.Int, int64, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -348,7 +348,7 @@ func (s *Service) SetAccounting(accounting settlement.Accounting) {
 }
 
 // TotalSent returns the total amount sent to a peer
-func (s *Service) TotalSent(peer swarm.Address) (totalSent *big.Int, err error) {
+func (s *Service) TotalSent(peer penguin.Address) (totalSent *big.Int, err error) {
 	var lastTime lastPayment
 
 	err = s.store.Get(totalKey(peer, SettlementSentPrefix), &lastTime)
@@ -363,7 +363,7 @@ func (s *Service) TotalSent(peer swarm.Address) (totalSent *big.Int, err error) 
 }
 
 // TotalReceived returns the total amount received from a peer
-func (s *Service) TotalReceived(peer swarm.Address) (totalReceived *big.Int, err error) {
+func (s *Service) TotalReceived(peer penguin.Address) (totalReceived *big.Int, err error) {
 	var lastTime lastPayment
 
 	err = s.store.Get(totalKey(peer, SettlementReceivedPrefix), &lastTime)

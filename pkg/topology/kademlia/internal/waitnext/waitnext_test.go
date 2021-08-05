@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/topology/kademlia/internal/waitnext"
 )
 

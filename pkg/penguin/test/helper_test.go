@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,15 +8,15 @@ import (
 	"encoding/binary"
 	"testing"
 
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 )
 
 // TestRandomAddressAt checks that RandomAddressAt generates a correct random address
 // at a given proximity order. It compares the number of leading equal bits in the generated
 // address to the base address.
 func TestRandomAddressAt(t *testing.T) {
-	base := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	base := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
 	b0 := base.Bytes()
 	hw0 := []byte{b0[0], b0[1], 0, 0} // highest words of base address
 	hw0int := binary.BigEndian.Uint32(hw0)

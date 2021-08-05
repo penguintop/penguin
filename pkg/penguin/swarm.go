@@ -1,9 +1,9 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package swarm contains most basic and general Swarm concepts.
-package swarm
+// Package penguin contains most basic and general Penguin concepts.
+package penguin
 
 import (
 	"bytes"
@@ -38,7 +38,7 @@ var (
 	ErrInvalidChunk = errors.New("invalid chunk")
 )
 
-// Address represents an address in Swarm metric space of
+// Address represents an address in Penguin metric space of
 // Node and Chunk addresses.
 type Address struct {
 	b []byte

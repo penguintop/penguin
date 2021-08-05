@@ -1,9 +1,9 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Package stewardess provides convenience methods
-// for reseeding content on Swarm.
+// for reseeding content on Penguin.
 package steward
 
 import (
@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/pushsync"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/traversal"
 	"golang.org/x/sync/errgroup"
 )
@@ -23,7 +23,7 @@ const parallelPush = 5
 type Reuploader interface {
 	// Reupload root hash and all of its underlying
 	// associated chunks to the network.
-	Reupload(context.Context, swarm.Address) error
+	Reupload(context.Context, penguin.Address) error
 }
 
 type steward struct {
@@ -41,10 +41,10 @@ func New(getter storage.Getter, t traversal.Traverser, p pushsync.PushSyncer) Re
 // addresses and push every chunk individually to the network.
 // It assumes all chunks are available locally. It is therefore
 // advisable to pin the content locally before trying to reupload it.
-func (s *steward) Reupload(ctx context.Context, root swarm.Address) error {
+func (s *steward) Reupload(ctx context.Context, root penguin.Address) error {
 	sem := make(chan struct{}, parallelPush)
 	eg, _ := errgroup.WithContext(ctx)
-	fn := func(addr swarm.Address) error {
+	fn := func(addr penguin.Address) error {
 		c, err := s.getter.Get(ctx, storage.ModeGetSync, addr)
 		if err != nil {
 			return err

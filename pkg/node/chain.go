@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/penguintop/penguin/pkg/property"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/xwcclient"
 	"github.com/penguintop/penguin/pkg/xwcfmt"
 	"math/big"
@@ -44,45 +44,45 @@ func InitChain(
 	endpoint string,
 	signer crypto.Signer,
 	blocktime uint64,
-) (*xwcclient.Client, common.Address, swarm.Address, int64, transaction.Monitor, transaction.Service, error) {
+) (*xwcclient.Client, common.Address, penguin.Address, int64, transaction.Monitor, transaction.Service, error) {
 	backend, err := xwcclient.Dial(endpoint)
 	if err != nil {
-		return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("dial eth client: %w", err)
+		return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("dial eth client: %w", err)
 	}
 
 	chainID, err := backend.ChainID(ctx)
 	if err != nil {
 		logger.Infof("could not connect to backend at %v. In a swap-enabled network a working blockchain node (for goerli network in production) is required. Check your node or specify another node using --swap-endpoint.", endpoint)
-		return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("get chain id: %w", err)
+		return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("get chain id: %w", err)
 	}
 
 	pollingInterval := time.Duration(blocktime) * time.Second
 	overlayXwcAddress, err := signer.XwcAddress()
 	if err != nil {
-		return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("xwc address: %w", err)
+		return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("xwc address: %w", err)
 	}
-	swarmNodeAddress := crypto.NewOverlayFromXwcAddress(overlayXwcAddress[:], uint64(property.CHAIN_ID_NUM))
+	penguinNodeAddress := crypto.NewOverlayFromXwcAddress(overlayXwcAddress[:], uint64(property.CHAIN_ID_NUM))
 
 	transactionMonitor := transaction.NewMonitor(logger, backend, overlayXwcAddress, pollingInterval, cancellationDepth)
 
 	transactionService, err := transaction.NewService(logger, backend, signer, stateStore, big.NewInt(chainID), transactionMonitor)
 	if err != nil {
-		return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("new transaction service: %w", err)
+		return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("new transaction service: %w", err)
 	}
 
 	// Sync the with the given Xwc backend:
 	isSynced, err := transaction.IsSynced(ctx, backend, maxDelay)
 	if err != nil {
-		return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("is synced: %w", err)
+		return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("is synced: %w", err)
 	}
 	if !isSynced {
 		logger.Infof("waiting to sync with the XWC backend")
 		err := transaction.WaitSynced(ctx, backend, maxDelay)
 		if err != nil {
-			return nil, common.Address{}, swarm.Address{}, 0, nil, nil, fmt.Errorf("waiting backend sync: %w", err)
+			return nil, common.Address{}, penguin.Address{}, 0, nil, nil, fmt.Errorf("waiting backend sync: %w", err)
 		}
 	}
-	return backend, overlayXwcAddress, swarmNodeAddress, chainID, transactionMonitor, transactionService, nil
+	return backend, overlayXwcAddress, penguinNodeAddress, chainID, transactionMonitor, transactionService, nil
 }
 
 // InitChequebookFactory will initialize the chequebook factory with the given

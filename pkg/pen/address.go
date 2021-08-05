@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,19 +16,19 @@ import (
 	"fmt"
 
 	"github.com/penguintop/penguin/pkg/crypto"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 
 	ma "github.com/multiformats/go-multiaddr"
 )
 
 var ErrInvalidAddress = errors.New("invalid address")
 
-// Address represents the pen address in swarm.
+// Address represents the pen address in penguin.
 // It consists of a peers underlay (physical) address, overlay (topology) address and signature.
 // Signature is used to verify the `Overlay/Underlay` pair, as it is based on `underlay|networkID`, signed with the public key of Overlay address
 type Address struct {
 	Underlay  ma.Multiaddr
-	Overlay   swarm.Address
+	Overlay   penguin.Address
 	Signature []byte
 }
 
@@ -38,7 +38,7 @@ type addressJSON struct {
 	Signature string `json:"signature"`
 }
 
-func NewAddress(signer crypto.Signer, underlay ma.Multiaddr, overlay swarm.Address, networkID uint64) (*Address, error) {
+func NewAddress(signer crypto.Signer, underlay ma.Multiaddr, overlay penguin.Address, networkID uint64) (*Address, error) {
 	underlayBinary, err := underlay.MarshalBinary()
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func ParseAddress(underlay, overlay, signature []byte, networkID uint64) (*Addre
 
 	return &Address{
 		Underlay:  multiUnderlay,
-		Overlay:   swarm.NewAddress(overlay),
+		Overlay:   penguin.NewAddress(overlay),
 		Signature: signature,
 	}, nil
 }
@@ -85,7 +85,7 @@ func ParseAddress(underlay, overlay, signature []byte, networkID uint64) (*Addre
 func generateSignData(underlay, overlay []byte, networkID uint64) []byte {
 	networkIDBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(networkIDBytes, networkID)
-	signData := append([]byte("bee-handshake-"), underlay...)
+	signData := append([]byte("pen-handshake-"), underlay...)
 	signData = append(signData, overlay...)
 	return append(signData, networkIDBytes...)
 }
@@ -109,7 +109,7 @@ func (a *Address) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	addr, err := swarm.ParseHexAddress(v.Overlay)
+	addr, err := penguin.ParseHexAddress(v.Overlay)
 	if err != nil {
 		return err
 	}

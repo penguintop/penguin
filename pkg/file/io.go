@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 
 	"io"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // simpleReadCloser wraps a byte slice in a io.ReadCloser implementation.
@@ -50,9 +50,9 @@ func JoinReadAll(ctx context.Context, j Joiner, outFile io.Writer) (int64, error
 	l := j.Size()
 
 	// join, rinse, repeat until done
-	data := make([]byte, swarm.ChunkSize)
+	data := make([]byte, penguin.ChunkSize)
 	var total int64
-	for i := int64(0); i < l; i += swarm.ChunkSize {
+	for i := int64(0); i < l; i += penguin.ChunkSize {
 		cr, err := j.Read(data)
 		if err != nil {
 			return total, err
@@ -73,11 +73,11 @@ func JoinReadAll(ctx context.Context, j Joiner, outFile io.Writer) (int64, error
 }
 
 // SplitWriteAll writes all input from provided reader to the provided splitter
-func SplitWriteAll(ctx context.Context, s Splitter, r io.Reader, l int64, toEncrypt bool) (swarm.Address, error) {
+func SplitWriteAll(ctx context.Context, s Splitter, r io.Reader, l int64, toEncrypt bool) (penguin.Address, error) {
 	chunkPipe := NewChunkPipe()
 	errC := make(chan error)
 	go func() {
-		buf := make([]byte, swarm.ChunkSize)
+		buf := make([]byte, penguin.ChunkSize)
 		c, err := io.CopyBuffer(chunkPipe, r, buf)
 		if err != nil {
 			errC <- err
@@ -94,16 +94,16 @@ func SplitWriteAll(ctx context.Context, s Splitter, r io.Reader, l int64, toEncr
 
 	addr, err := s.Split(ctx, chunkPipe, l, toEncrypt)
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 
 	select {
 	case err := <-errC:
 		if err != nil {
-			return swarm.ZeroAddress, err
+			return penguin.ZeroAddress, err
 		}
 	case <-ctx.Done():
-		return swarm.ZeroAddress, ctx.Err()
+		return penguin.ZeroAddress, ctx.Err()
 	}
 	return addr, nil
 }

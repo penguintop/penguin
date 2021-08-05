@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Reader interface {
@@ -21,7 +21,7 @@ type Reader interface {
 type Joiner interface {
 	Reader
 	// IterateChunkAddresses is used to iterate over chunks addresses of some root hash.
-	IterateChunkAddresses(swarm.AddressIterFunc) error
+	IterateChunkAddresses(penguin.AddressIterFunc) error
 	// Size returns the span of the hash trie represented by the joiner's root hash.
 	Size() int64
 }
@@ -30,7 +30,7 @@ type Joiner interface {
 //
 // Data is read from the provided reader.
 // If the dataLength parameter is 0, data is read until io.EOF is encountered.
-// When EOF is received and splitting is done, the resulting Swarm Address is returned.
+// When EOF is received and splitting is done, the resulting Penguin Address is returned.
 type Splitter interface {
-	Split(ctx context.Context, dataIn io.ReadCloser, dataLength int64, toEncrypt bool) (addr swarm.Address, err error)
+	Split(ctx context.Context, dataIn io.ReadCloser, dataLength int64, toEncrypt bool) (addr penguin.Address, err error)
 }

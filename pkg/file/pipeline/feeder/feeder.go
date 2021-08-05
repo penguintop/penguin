@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,10 +8,10 @@ import (
 	"encoding/binary"
 
 	"github.com/penguintop/penguin/pkg/file/pipeline"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
-const span = swarm.SpanSize
+const span = penguin.SpanSize
 
 type chunkFeeder struct {
 	size      int

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,14 +11,14 @@
 // The number of segments on the base must be a power of 2 so that the resulting tree is balanced.
 // Chunks with data shorter than the fixed size are hashed as if they had zero padding.
 //
-// BMT hash is used as the chunk hash function in swarm which in turn is the basis for the
-// 128 branching swarm hash used to represent files.
+// BMT hash is used as the chunk hash function in penguin which in turn is the basis for the
+// 128 branching penguin hash used to represent files.
 //
 // The BMT is optimal for providing compact inclusion proofs, i.e. prove that a
 // segment is a substring of a chunk starting at a particular offset.
 // The size of the underlying segments is fixed to the size of the base hash (called the resolution
 // of the BMT hash), Using Keccak256 SHA3 hash is 32 bytes, the EVM word size to optimize for on-chain BMT verification
-// as well as the hash size optimal for inclusion proofs in the merkle tree of the swarm hash.
+// as well as the hash size optimal for inclusion proofs in the merkle tree of the penguin hash.
 //
 // Two implementations are provided:
 //

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	test "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -68,8 +68,8 @@ func testSplitThenJoin(t *testing.T) {
 
 	// read from joiner
 	var resultData []byte
-	for i := 0; i < len(data); i += swarm.ChunkSize {
-		readData := make([]byte, swarm.ChunkSize)
+	for i := 0; i < len(data); i += penguin.ChunkSize {
+		readData := make([]byte, penguin.ChunkSize)
 		_, err := r.Read(readData)
 		if err != nil {
 			if err == io.EOF {

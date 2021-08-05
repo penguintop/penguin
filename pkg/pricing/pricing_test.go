@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,16 +18,16 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/streamtest"
 	"github.com/penguintop/penguin/pkg/pricing"
 	"github.com/penguintop/penguin/pkg/pricing/pb"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type testThresholdObserver struct {
 	called           bool
-	peer             swarm.Address
+	peer             penguin.Address
 	paymentThreshold *big.Int
 }
 
-func (t *testThresholdObserver) NotifyPaymentThreshold(peerAddr swarm.Address, paymentThreshold *big.Int) error {
+func (t *testThresholdObserver) NotifyPaymentThreshold(peerAddr penguin.Address, paymentThreshold *big.Int) error {
 	t.called = true
 	t.peer = peerAddr
 	t.paymentThreshold = paymentThreshold
@@ -42,7 +42,7 @@ func TestAnnouncePaymentThreshold(t *testing.T) {
 	recipient := pricing.New(nil, logger, testThreshold, big.NewInt(1000))
 	recipient.SetPaymentThresholdObserver(observer)
 
-	peerID := swarm.MustParseHexAddress("9ee7add7")
+	peerID := penguin.MustParseHexAddress("9ee7add7")
 
 	recorder := streamtest.New(
 		streamtest.WithProtocols(recipient.Protocol()),
@@ -109,7 +109,7 @@ func TestAnnouncePaymentWithInsufficientThreshold(t *testing.T) {
 	recipient := pricing.New(nil, logger, testThreshold, minThreshold)
 	recipient.SetPaymentThresholdObserver(observer)
 
-	peerID := swarm.MustParseHexAddress("9ee7add7")
+	peerID := penguin.MustParseHexAddress("9ee7add7")
 
 	recorder := streamtest.New(
 		streamtest.WithProtocols(recipient.Protocol()),

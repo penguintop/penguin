@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	test "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestPartialWrites(t *testing.T) {
@@ -30,7 +30,7 @@ func TestPartialWrites(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	exp := swarm.MustParseHexAddress("92672a471f4419b255d7cb0cf313474a6f5856fb347c5ece85fb706d644b630f")
+	exp := penguin.MustParseHexAddress("92672a471f4419b255d7cb0cf313474a6f5856fb347c5ece85fb706d644b630f")
 	if !bytes.Equal(exp.Bytes(), sum) {
 		t.Fatalf("expected %s got %s", exp.String(), hex.EncodeToString(sum))
 	}
@@ -50,7 +50,7 @@ func TestHelloWorld(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	exp := swarm.MustParseHexAddress("92672a471f4419b255d7cb0cf313474a6f5856fb347c5ece85fb706d644b630f")
+	exp := penguin.MustParseHexAddress("92672a471f4419b255d7cb0cf313474a6f5856fb347c5ece85fb706d644b630f")
 	if !bytes.Equal(exp.Bytes(), sum) {
 		t.Fatalf("expected %s got %s", exp.String(), hex.EncodeToString(sum))
 	}
@@ -71,7 +71,7 @@ func TestEmpty(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	exp := swarm.MustParseHexAddress("b34ca8c22b9e982354f9c7f50b470d66db428d880c8a904d5fe4ec9713171526")
+	exp := penguin.MustParseHexAddress("b34ca8c22b9e982354f9c7f50b470d66db428d880c8a904d5fe4ec9713171526")
 	if !bytes.Equal(exp.Bytes(), sum) {
 		t.Fatalf("expected %s got %s", exp.String(), hex.EncodeToString(sum))
 	}
@@ -92,7 +92,7 @@ func TestAllVectors(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			a := swarm.NewAddress(sum)
+			a := penguin.NewAddress(sum)
 			if !a.Equal(expect) {
 				t.Fatalf("failed run %d, expected address %s but got %s", i, expect.String(), a.String())
 			}

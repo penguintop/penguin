@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/pss"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestWrap(t *testing.T) {
@@ -35,8 +35,8 @@ func TestWrap(t *testing.T) {
 		t.Fatal("trojan address was expected to match one of the targets with prefix")
 	}
 
-	if len(chunk.Data()) != swarm.ChunkWithSpanSize {
-		t.Fatalf("expected trojan data size to be %d, was %d", swarm.ChunkWithSpanSize, len(chunk.Data()))
+	if len(chunk.Data()) != penguin.ChunkWithSpanSize {
+		t.Fatalf("expected trojan data size to be %d, was %d", penguin.ChunkWithSpanSize, len(chunk.Data()))
 	}
 }
 

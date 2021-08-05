@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,13 +7,13 @@ package file
 import (
 	"math"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var Spans []int64
 
 func init() {
-	Spans = GenerateSpanSizes(9, swarm.Branches)
+	Spans = GenerateSpanSizes(9, penguin.Branches)
 }
 
 // GenerateSpanSizes generates a dictionary of maximum span lengths per level represented by one SectionSize() of data

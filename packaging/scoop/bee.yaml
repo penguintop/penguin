@@ -1,19 +1,19 @@
-## Bee configuration -
+## Pen configuration -
 ## HTTP API listen address (default ":1633")
 # api-addr: :1633
 ## chain block time (default 15)
 # block-time: 15
-## initial nodes to connect to (default [/dnsaddr/bootnode.ethswarm.org])
-# bootnode: [/dnsaddr/bootnode.ethswarm.org]
+## initial nodes to connect to
+# bootnode:
 ## enable clef signer
 # clef-signer-enable: false
 ## clef signer endpoint
-# clef-signer-endpoint: /usr/local/var/lib/swarm-clef/clef.ipc
-## config file (default is /home/<user>/.bee.yaml)
-config: ./bee.yaml
+# clef-signer-endpoint: /usr/local/var/lib/penguin-clef/clef.ipc
+## config file (default is /home/<user>/.pen.yaml)
+config: ./pen.yaml
 ## origins with CORS headers enabled
 # cors-allowed-origins: []
-## data directory (default "/home/<user>/.bee")
+## data directory (default "/home/<user>/.pen")
 data-dir: ./data
 ## cache capacity in chunks, multiply by 4096 to get approximate capacity in bytes
 # cache-capacity: 1000000
@@ -29,7 +29,7 @@ data-dir: ./data
 # full-node: false
 ## NAT exposed address
 # nat-addr: ""
-## ID of the Swarm network (default 1)
+## ID of the Penguin network (default 1)
 # network-id: 1
 ## P2P listen address (default ":1634")
 # p2p-addr: :1634
@@ -69,8 +69,8 @@ password-file: ./password
 # tracing-enable: false
 ## endpoint to send tracing data (default "127.0.0.1:6831")
 # tracing-endpoint: 127.0.0.1:6831
-## service name identifier for tracing (default "bee")
-# tracing-service-name: bee
+## service name identifier for tracing (default "pen")
+# tracing-service-name: pen
 ## proof-of-identity transaction hash
 # transaction: ""
 ## log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace (default "info")

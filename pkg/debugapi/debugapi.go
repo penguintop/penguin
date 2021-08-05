@@ -1,10 +1,10 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Package debugapi exposes the debug API used to
 // control and analyze low-level and runtime
-// features and functionalities of Bee.
+// features and functionalities of Pen.
 package debugapi
 
 import (
@@ -22,7 +22,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement/swap"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
@@ -32,7 +32,7 @@ import (
 
 // Service implements http.Handler interface to be used in HTTP server.
 type Service struct {
-	overlay      swarm.Address
+	overlay      penguin.Address
 	publicKey    ecdsa.PublicKey
 	pssPublicKey ecdsa.PublicKey
 	//ethereumAddress    common.Address
@@ -62,8 +62,8 @@ type Service struct {
 // to expose /addresses, /health endpoints, Go metrics and pprof. It is useful to expose
 // these endpoints before all dependencies are configured and injected to have
 // access to basic debugging tools and /health endpoint.
-//func New(overlay swarm.Address, publicKey, pssPublicKey ecdsa.PublicKey, ethereumAddress common.Address, logger logging.Logger, tracer *tracing.Tracer, corsAllowedOrigins []string) *Service {
-func New(overlay swarm.Address, publicKey, pssPublicKey ecdsa.PublicKey, xwcAddress common.Address, logger logging.Logger, tracer *tracing.Tracer, corsAllowedOrigins []string) *Service {
+//func New(overlay penguin.Address, publicKey, pssPublicKey ecdsa.PublicKey, ethereumAddress common.Address, logger logging.Logger, tracer *tracing.Tracer, corsAllowedOrigins []string) *Service {
+func New(overlay penguin.Address, publicKey, pssPublicKey ecdsa.PublicKey, xwcAddress common.Address, logger logging.Logger, tracer *tracing.Tracer, corsAllowedOrigins []string) *Service {
 	s := new(Service)
 	s.overlay = overlay
 	s.publicKey = publicKey

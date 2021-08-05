@@ -1,23 +1,23 @@
-## Bee configuration -
+## Pen configuration -
 
 ## HTTP API listen address (default ":1633")
 # api-addr: :1633
 ## chain block time (default 15)
 # block-time: 15
-## initial nodes to connect to (default [/dnsaddr/bootnode.ethswarm.org])
-# bootnode: [/dnsaddr/bootnode.ethswarm.org]
+## initial nodes to connect to (default [/dnsaddr/bootnode.ethpenguin.org])
+# bootnode: [/dnsaddr/bootnode.ethpenguin.org]
 ## cause the node to always accept incoming connections
 # bootnode-mode: false
 ## enable clef signer
 clef-signer-enable: true
 ## clef signer endpoint
-clef-signer-endpoint: /usr/local/var/lib/swarm-clef/clef.ipc
-## config file (default is /home/<user>/.bee.yaml)
-config: /usr/local/etc/swarm-bee/bee.yaml
+clef-signer-endpoint: /usr/local/var/lib/penguin-clef/clef.ipc
+## config file (default is /home/<user>/.pen.yaml)
+config: /usr/local/etc/penguin-pen/pen.yaml
 ## origins with CORS headers enabled
 # cors-allowed-origins: []
-## data directory (default "/home/<user>/.bee")
-data-dir: /usr/local/var/lib/swarm-bee
+## data directory (default "/home/<user>/.pen")
+data-dir: /usr/local/var/lib/penguin-pen
 ## cache capacity in chunks, multiply by 4096 to get approximate capacity in bytes
 # cache-capacity: 1000000
 ## number of open files allowed by database
@@ -40,7 +40,7 @@ debug-api-enable: true
 # full-node: false
 ## NAT exposed address
 # nat-addr: ""
-## ID of the Swarm network (default 1)
+## ID of the Penguin network (default 1)
 # network-id: 1
 ## P2P listen address (default ":1634")
 # p2p-addr: :1634
@@ -51,7 +51,7 @@ debug-api-enable: true
 ## password for decrypting keys
 # password: ""
 ## path to a file that contains password for decrypting keys
-password-file: /usr/local/var/lib/swarm-bee/password
+password-file: /usr/local/var/lib/penguin-pen/password
 ## amount in PEN below the peers payment threshold when we initiate settlement (default 1000000000000)
 # payment-early: 1000000000000
 ## threshold in PEN where you expect to get paid from your peers (default 10000000000000)
@@ -80,8 +80,8 @@ password-file: /usr/local/var/lib/swarm-bee/password
 # tracing-enable: false
 ## endpoint to send tracing data (default "127.0.0.1:6831")
 # tracing-endpoint: 127.0.0.1:6831
-## service name identifier for tracing (default "bee")
-# tracing-service-name: bee
+## service name identifier for tracing (default "pen")
+# tracing-service-name: pen
 ## proof-of-identity transaction hash
 # transaction: ""
 ## log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace (default "info")

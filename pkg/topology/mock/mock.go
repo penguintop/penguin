@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,22 +8,22 @@ import (
 	"context"
 	"sync"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
 type mock struct {
-	peers           []swarm.Address
-	closestPeer     swarm.Address
+	peers           []penguin.Address
+	closestPeer     penguin.Address
 	closestPeerErr  error
 	peersErr        error
 	addPeersErr     error
-	isWithinFunc    func(c swarm.Address) bool
+	isWithinFunc    func(c penguin.Address) bool
 	marshalJSONFunc func() ([]byte, error)
 	mtx             sync.Mutex
 }
 
-func WithPeers(peers ...swarm.Address) Option {
+func WithPeers(peers ...penguin.Address) Option {
 	return optionFunc(func(d *mock) {
 		d.peers = peers
 	})
@@ -35,7 +35,7 @@ func WithAddPeersErr(err error) Option {
 	})
 }
 
-func WithClosestPeer(addr swarm.Address) Option {
+func WithClosestPeer(addr penguin.Address) Option {
 	return optionFunc(func(d *mock) {
 		d.closestPeer = addr
 	})
@@ -53,7 +53,7 @@ func WithMarshalJSONFunc(f func() ([]byte, error)) Option {
 	})
 }
 
-func WithIsWithinFunc(f func(swarm.Address) bool) Option {
+func WithIsWithinFunc(f func(penguin.Address) bool) Option {
 	return optionFunc(func(d *mock) {
 		d.isWithinFunc = f
 	})
@@ -67,32 +67,32 @@ func NewTopologyDriver(opts ...Option) topology.Driver {
 	return d
 }
 
-func (d *mock) AddPeers(addrs ...swarm.Address) {
+func (d *mock) AddPeers(addrs ...penguin.Address) {
 	d.mtx.Lock()
 	defer d.mtx.Unlock()
 
 	d.peers = append(d.peers, addrs...)
 }
 
-func (d *mock) Connected(ctx context.Context, addr swarm.Address) error {
+func (d *mock) Connected(ctx context.Context, addr penguin.Address) error {
 	d.AddPeers(addr)
 	return nil
 }
 
-func (d *mock) Disconnected(swarm.Address) {
+func (d *mock) Disconnected(penguin.Address) {
 	panic("todo")
 }
 
-func (d *mock) Peers() []swarm.Address {
+func (d *mock) Peers() []penguin.Address {
 	return d.peers
 }
 
-func (d *mock) ClosestPeer(addr swarm.Address, _ bool, skipPeers ...swarm.Address) (peerAddr swarm.Address, err error) {
+func (d *mock) ClosestPeer(addr penguin.Address, _ bool, skipPeers ...penguin.Address) (peerAddr penguin.Address, err error) {
 	if len(skipPeers) == 0 {
 		if d.closestPeerErr != nil {
 			return d.closestPeer, d.closestPeerErr
 		}
-		if !d.closestPeer.Equal(swarm.ZeroAddress) {
+		if !d.closestPeer.Equal(penguin.ZeroAddress) {
 			return d.closestPeer, nil
 		}
 	}
@@ -121,7 +121,7 @@ func (d *mock) ClosestPeer(addr swarm.Address, _ bool, skipPeers ...swarm.Addres
 			peerAddr = p
 		}
 
-		if cmp, _ := swarm.DistanceCmp(addr.Bytes(), p.Bytes(), peerAddr.Bytes()); cmp == 1 {
+		if cmp, _ := penguin.DistanceCmp(addr.Bytes(), p.Bytes(), peerAddr.Bytes()); cmp == 1 {
 			peerAddr = p
 		}
 	}
@@ -140,7 +140,7 @@ func (*mock) NeighborhoodDepth() uint8 {
 	return 0
 }
 
-func (m *mock) IsWithinDepth(addr swarm.Address) bool {
+func (m *mock) IsWithinDepth(addr penguin.Address) bool {
 	if m.isWithinFunc != nil {
 		return m.isWithinFunc(addr)
 	}

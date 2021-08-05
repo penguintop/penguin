@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/settlement"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -90,7 +90,7 @@ func (s *Service) settlementsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) peerSettlementsHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
-	peer, err := swarm.ParseHexAddress(addr)
+	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
 		s.logger.Debugf("debug api: settlements peer: invalid peer address %s: %v", addr, err)
 		s.logger.Errorf("debug api: settlements peer: invalid peer address %s", addr)

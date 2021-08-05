@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/kademlia/internal/metrics"
 	"github.com/penguintop/penguin/pkg/topology/kademlia/internal/waitnext"
@@ -55,9 +55,9 @@ var (
 )
 
 type binSaturationFunc func(bin uint8, peers, connected *pslice.PSlice) (saturated bool, oversaturated bool)
-type sanctionedPeerFunc func(peer swarm.Address) bool
+type sanctionedPeerFunc func(peer penguin.Address) bool
 
-var noopSanctionedPeerFn = func(_ swarm.Address) bool { return false }
+var noopSanctionedPeerFn = func(_ penguin.Address) bool { return false }
 
 // Options for injecting services to Kademlia.
 type Options struct {
@@ -68,15 +68,15 @@ type Options struct {
 	BitSuffixLength int
 }
 
-// Kad is the Swarm forwarding kademlia implementation.
+// Kad is the Penguin forwarding kademlia implementation.
 type Kad struct {
-	base              swarm.Address         // this node's overlay address
+	base              penguin.Address       // this node's overlay address
 	discovery         discovery.Driver      // the discovery driver
 	addressBook       addressbook.Interface // address book to get underlays
 	p2p               p2p.Service           // p2p service to connect to nodes with
 	saturationFunc    binSaturationFunc     // pluggable saturation function
 	bitSuffixLength   int                   // additional depth of common prefix for bin
-	commonBinPrefixes [][]swarm.Address     // list of address prefixes for each bin
+	commonBinPrefixes [][]penguin.Address   // list of address prefixes for each bin
 	connectedPeers    *pslice.PSlice        // a slice of peers sorted and indexed by po, indexes kept in `bins`
 	knownPeers        *pslice.PSlice        // both are po aware slice of addresses
 	bootnodes         []ma.Multiaddr
@@ -99,7 +99,7 @@ type Kad struct {
 
 // New returns a new Kademlia.
 func New(
-	base swarm.Address,
+	base penguin.Address,
 	addressbook addressbook.Interface,
 	discovery discovery.Driver,
 	p2p p2p.Service,
@@ -125,9 +125,9 @@ func New(
 		p2p:               p2p,
 		saturationFunc:    o.SaturationFunc,
 		bitSuffixLength:   o.BitSuffixLength,
-		commonBinPrefixes: make([][]swarm.Address, int(swarm.MaxBins)),
-		connectedPeers:    pslice.New(int(swarm.MaxBins), base),
-		knownPeers:        pslice.New(int(swarm.MaxBins), base),
+		commonBinPrefixes: make([][]penguin.Address, int(penguin.MaxBins)),
+		connectedPeers:    pslice.New(int(penguin.MaxBins), base),
+		knownPeers:        pslice.New(int(penguin.MaxBins), base),
 		bootnodes:         o.Bootnodes,
 		manageC:           make(chan struct{}, 1),
 		waitNext:          waitnext.New(),
@@ -156,7 +156,7 @@ func (k *Kad) generateCommonBinPrefixes() {
 		bitSufixes[i] = uint8(i)
 	}
 
-	addr := swarm.MustParseHexAddress(k.base.String())
+	addr := penguin.MustParseHexAddress(k.base.String())
 	addrBytes := addr.Bytes()
 	_ = addrBytes
 
@@ -164,14 +164,14 @@ func (k *Kad) generateCommonBinPrefixes() {
 
 	// copy base address
 	for i := range binPrefixes {
-		binPrefixes[i] = make([]swarm.Address, bitCombinationsCount)
+		binPrefixes[i] = make([]penguin.Address, bitCombinationsCount)
 	}
 
 	for i := range binPrefixes {
 		for j := range binPrefixes[i] {
 			pseudoAddrBytes := make([]byte, len(k.base.Bytes()))
 			copy(pseudoAddrBytes, k.base.Bytes())
-			binPrefixes[i][j] = swarm.NewAddress(pseudoAddrBytes)
+			binPrefixes[i][j] = penguin.NewAddress(pseudoAddrBytes)
 		}
 	}
 
@@ -229,12 +229,12 @@ func hasBit(n, pos uint8) bool {
 // peerConnInfo groups necessary fields needed to create a connection.
 type peerConnInfo struct {
 	po   uint8
-	addr swarm.Address
+	addr penguin.Address
 }
 
 // connectBalanced attempts to connect to the balanced peers first.
 func (k *Kad) connectBalanced(wg *sync.WaitGroup, peerConnChan chan<- *peerConnInfo) {
-	skipPeers := func(peer swarm.Address) bool {
+	skipPeers := func(peer penguin.Address) bool {
 		return k.waitNext.Waiting(peer)
 	}
 
@@ -251,7 +251,7 @@ func (k *Kad) connectBalanced(wg *sync.WaitGroup, peerConnChan chan<- *peerConnI
 				continue
 			}
 
-			closestConnectedPO := swarm.ExtendedProximity(closestConnectedPeer.Bytes(), pseudoAddr.Bytes())
+			closestConnectedPO := penguin.ExtendedProximity(closestConnectedPeer.Bytes(), pseudoAddr.Bytes())
 			if int(closestConnectedPO) >= i+k.bitSuffixLength+1 {
 				continue
 			}
@@ -270,7 +270,7 @@ func (k *Kad) connectBalanced(wg *sync.WaitGroup, peerConnChan chan<- *peerConnI
 				continue
 			}
 
-			closestKnownPeerPO := swarm.ExtendedProximity(closestKnownPeer.Bytes(), pseudoAddr.Bytes())
+			closestKnownPeerPO := penguin.ExtendedProximity(closestKnownPeer.Bytes(), pseudoAddr.Bytes())
 			if int(closestKnownPeerPO) < i+k.bitSuffixLength+1 {
 				continue
 			}
@@ -281,7 +281,7 @@ func (k *Kad) connectBalanced(wg *sync.WaitGroup, peerConnChan chan<- *peerConnI
 			default:
 				wg.Add(1)
 				peerConnChan <- &peerConnInfo{
-					po:   swarm.Proximity(k.base.Bytes(), closestKnownPeer.Bytes()),
+					po:   penguin.Proximity(k.base.Bytes(), closestKnownPeer.Bytes()),
 					addr: closestKnownPeer,
 				}
 			}
@@ -296,7 +296,7 @@ func (k *Kad) connectNeighbours(wg *sync.WaitGroup, peerConnChan chan<- *peerCon
 	// The topology.EachPeerFunc doesn't return an error
 	// so we ignore the error returned from EachBinRev.
 
-	_ = k.knownPeers.EachBinRev(func(addr swarm.Address, po uint8) (bool, bool, error) {
+	_ = k.knownPeers.EachBinRev(func(addr penguin.Address, po uint8) (bool, bool, error) {
 
 		depth := k.NeighborhoodDepth()
 
@@ -388,7 +388,7 @@ func (k *Kad) connectionAttemptsHandler(ctx context.Context, wg *sync.WaitGroup,
 		inProgress   = make(map[string]bool)
 		inProgressMu sync.Mutex
 	)
-	for i := 0; i < int(swarm.MaxBins); i++ {
+	for i := 0; i < int(penguin.MaxBins); i++ {
 		go func() {
 			for {
 				select {
@@ -562,7 +562,7 @@ func (k *Kad) connectBootnodes(ctx context.Context) {
 // initiate connections to other peers in the bin.
 func binSaturated(oversaturationAmount int) binSaturationFunc {
 	return func(bin uint8, peers, connected *pslice.PSlice) (bool, bool) {
-		potentialDepth := recalcDepth(peers, swarm.MaxPO)
+		potentialDepth := recalcDepth(peers, penguin.MaxPO)
 
 		// short circuit for bins which are >= depth
 		if bin >= potentialDepth {
@@ -577,7 +577,7 @@ func binSaturated(oversaturationAmount int) binSaturationFunc {
 		// gaps measurement)
 
 		size := 0
-		_ = connected.EachBin(func(_ swarm.Address, po uint8) (bool, bool, error) {
+		_ = connected.EachBin(func(_ penguin.Address, po uint8) (bool, bool, error) {
 			if po == bin {
 				size++
 			}
@@ -602,7 +602,7 @@ func recalcDepth(peers *pslice.PSlice, radius uint8) uint8 {
 
 	shallowestUnsaturated := uint8(0)
 	binCount := 0
-	_ = peers.EachBinRev(func(_ swarm.Address, bin uint8) (bool, bool, error) {
+	_ = peers.EachBinRev(func(_ penguin.Address, bin uint8) (bool, bool, error) {
 		if bin == shallowestUnsaturated {
 			binCount++
 			return false, false, nil
@@ -625,7 +625,7 @@ func recalcDepth(peers *pslice.PSlice, radius uint8) uint8 {
 		shallowestUnsaturated = shallowestEmpty
 	}
 
-	_ = peers.EachBin(func(_ swarm.Address, po uint8) (bool, bool, error) {
+	_ = peers.EachBin(func(_ penguin.Address, po uint8) (bool, bool, error) {
 		peersCtr++
 		if peersCtr >= nnLowWatermark {
 			candidate = po
@@ -648,7 +648,7 @@ func recalcDepth(peers *pslice.PSlice, radius uint8) uint8 {
 
 // connect connects to a peer and gossips its address to our connected peers,
 // as well as sends the peers we are connected to to the newly connected peer
-func (k *Kad) connect(ctx context.Context, peer swarm.Address, ma ma.Multiaddr) error {
+func (k *Kad) connect(ctx context.Context, peer penguin.Address, ma ma.Multiaddr) error {
 	k.logger.Infof("attempting to connect to peer %q", peer)
 
 	ctx, cancel := context.WithTimeout(ctx, peerConnectionAttemptTimeout)
@@ -706,10 +706,10 @@ func (k *Kad) connect(ctx context.Context, peer swarm.Address, ma ma.Multiaddr) 
 
 // Announce a newly connected peer to our connected peers, but also
 // notify the peer about our already connected peers
-func (k *Kad) Announce(ctx context.Context, peer swarm.Address, fullnode bool) error {
-	addrs := []swarm.Address{}
+func (k *Kad) Announce(ctx context.Context, peer penguin.Address, fullnode bool) error {
+	addrs := []penguin.Address{}
 
-	for bin := uint8(0); bin < swarm.MaxBins; bin++ {
+	for bin := uint8(0); bin < penguin.MaxBins; bin++ {
 
 		connectedPeers, err := randomSubset(k.connectedPeers.BinPeers(bin), broadcastBinSize)
 		if err != nil {
@@ -728,7 +728,7 @@ func (k *Kad) Announce(ctx context.Context, peer swarm.Address, fullnode bool) e
 				// about lightnodes to others.
 				continue
 			}
-			go func(connectedPeer swarm.Address) {
+			go func(connectedPeer penguin.Address) {
 				if err := k.discovery.BroadcastPeers(ctx, connectedPeer, peer); err != nil {
 					k.logger.Debugf("could not gossip peer %s to peer %s: %v", peer, connectedPeer, err)
 				}
@@ -752,7 +752,7 @@ func (k *Kad) Announce(ctx context.Context, peer swarm.Address, fullnode bool) e
 // AddPeers adds peers to the knownPeers list.
 // This does not guarantee that a connection will immediately
 // be made to the peer.
-func (k *Kad) AddPeers(addrs ...swarm.Address) {
+func (k *Kad) AddPeers(addrs ...penguin.Address) {
 	k.knownPeers.Add(addrs...)
 	k.notifyManageLoop()
 }
@@ -763,7 +763,7 @@ func (k *Kad) Pick(peer p2p.Peer) bool {
 		// at least until we find a better solution.
 		return true
 	}
-	po := swarm.Proximity(k.base.Bytes(), peer.Address.Bytes())
+	po := penguin.Proximity(k.base.Bytes(), peer.Address.Bytes())
 	_, oversaturated := k.saturationFunc(po, k.knownPeers, k.connectedPeers)
 	// pick the peer if we are not oversaturated
 	return !oversaturated
@@ -773,7 +773,7 @@ func (k *Kad) Pick(peer p2p.Peer) bool {
 func (k *Kad) Connected(ctx context.Context, peer p2p.Peer) error {
 
 	address := peer.Address
-	po := swarm.Proximity(k.base.Bytes(), address.Bytes())
+	po := penguin.Proximity(k.base.Bytes(), address.Bytes())
 
 	if _, overSaturated := k.saturationFunc(po, k.knownPeers, k.connectedPeers); overSaturated {
 
@@ -797,7 +797,7 @@ connected:
 	return nil
 }
 
-func (k *Kad) connected(ctx context.Context, addr swarm.Address) error {
+func (k *Kad) connected(ctx context.Context, addr penguin.Address) error {
 	if err := k.Announce(ctx, addr, true); err != nil {
 		return err
 	}
@@ -852,9 +852,9 @@ func (k *Kad) notifyPeerSig() {
 	}
 }
 
-func closestPeer(peers *pslice.PSlice, addr swarm.Address, spf sanctionedPeerFunc) (swarm.Address, error) {
-	closest := swarm.ZeroAddress
-	err := peers.EachBinRev(func(peer swarm.Address, po uint8) (bool, bool, error) {
+func closestPeer(peers *pslice.PSlice, addr penguin.Address, spf sanctionedPeerFunc) (penguin.Address, error) {
+	closest := penguin.ZeroAddress
+	err := peers.EachBinRev(func(peer penguin.Address, po uint8) (bool, bool, error) {
 		// check whether peer is sanctioned
 		if spf(peer) {
 			return false, false, nil
@@ -863,7 +863,7 @@ func closestPeer(peers *pslice.PSlice, addr swarm.Address, spf sanctionedPeerFun
 			closest = peer
 			return false, false, nil
 		}
-		dcmp, err := swarm.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
+		dcmp, err := penguin.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
 		if err != nil {
 			return false, false, err
 		}
@@ -880,18 +880,18 @@ func closestPeer(peers *pslice.PSlice, addr swarm.Address, spf sanctionedPeerFun
 		return false, false, nil
 	})
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 
 	// check if found
 	if closest.IsZero() {
-		return swarm.ZeroAddress, topology.ErrNotFound
+		return penguin.ZeroAddress, topology.ErrNotFound
 	}
 
 	return closest, nil
 }
 
-func isIn(a swarm.Address, addresses []p2p.Peer) bool {
+func isIn(a penguin.Address, addresses []p2p.Peer) bool {
 	for _, v := range addresses {
 		if v.Address.Equal(a) {
 			return true
@@ -901,20 +901,20 @@ func isIn(a swarm.Address, addresses []p2p.Peer) bool {
 }
 
 // ClosestPeer returns the closest peer to a given address.
-func (k *Kad) ClosestPeer(addr swarm.Address, includeSelf bool, skipPeers ...swarm.Address) (swarm.Address, error) {
+func (k *Kad) ClosestPeer(addr penguin.Address, includeSelf bool, skipPeers ...penguin.Address) (penguin.Address, error) {
 	if k.connectedPeers.Length() == 0 {
-		return swarm.Address{}, topology.ErrNotFound
+		return penguin.Address{}, topology.ErrNotFound
 	}
 
 	peers := k.p2p.Peers()
-	var peersToDisconnect []swarm.Address
-	var closest = swarm.ZeroAddress
+	var peersToDisconnect []penguin.Address
+	var closest = penguin.ZeroAddress
 
 	if includeSelf {
 		closest = k.base
 	}
 
-	err := k.connectedPeers.EachBinRev(func(peer swarm.Address, po uint8) (bool, bool, error) {
+	err := k.connectedPeers.EachBinRev(func(peer penguin.Address, po uint8) (bool, bool, error) {
 		if closest.IsZero() {
 			closest = peer
 		}
@@ -927,12 +927,12 @@ func (k *Kad) ClosestPeer(addr swarm.Address, includeSelf bool, skipPeers ...swa
 
 		// kludge: hotfix for topology peer inconsistencies bug
 		if !isIn(peer, peers) {
-			a := swarm.NewAddress(peer.Bytes())
+			a := penguin.NewAddress(peer.Bytes())
 			peersToDisconnect = append(peersToDisconnect, a)
 			return false, false, nil
 		}
 
-		dcmp, err := swarm.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
+		dcmp, err := penguin.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
 		if err != nil {
 			return false, false, err
 		}
@@ -949,11 +949,11 @@ func (k *Kad) ClosestPeer(addr swarm.Address, includeSelf bool, skipPeers ...swa
 		return false, false, nil
 	})
 	if err != nil {
-		return swarm.Address{}, err
+		return penguin.Address{}, err
 	}
 
 	if closest.IsZero() { //no peers
-		return swarm.Address{}, topology.ErrNotFound // only for light nodes
+		return penguin.Address{}, topology.ErrNotFound // only for light nodes
 	}
 
 	for _, v := range peersToDisconnect {
@@ -962,21 +962,21 @@ func (k *Kad) ClosestPeer(addr swarm.Address, includeSelf bool, skipPeers ...swa
 
 	// check if self
 	if closest.Equal(k.base) {
-		return swarm.Address{}, topology.ErrWantSelf
+		return penguin.Address{}, topology.ErrWantSelf
 	}
 
 	return closest, nil
 }
 
 // IsWithinDepth returns if an address is within the neighborhood depth of a node.
-func (k *Kad) IsWithinDepth(addr swarm.Address) bool {
-	return swarm.Proximity(k.base.Bytes(), addr.Bytes()) >= k.NeighborhoodDepth()
+func (k *Kad) IsWithinDepth(addr penguin.Address) bool {
+	return penguin.Proximity(k.base.Bytes(), addr.Bytes()) >= k.NeighborhoodDepth()
 }
 
 // // EachNeighbor iterates from closest bin to farthest of the neighborhood peers.
 func (k *Kad) EachNeighbor(f topology.EachPeerFunc) error {
 	depth := k.NeighborhoodDepth()
-	fn := func(a swarm.Address, po uint8) (bool, bool, error) {
+	fn := func(a penguin.Address, po uint8) (bool, bool, error) {
 		if po < depth {
 			return true, false, nil
 		}
@@ -988,7 +988,7 @@ func (k *Kad) EachNeighbor(f topology.EachPeerFunc) error {
 // EachNeighborRev iterates from farthest bin to closest of the neighborhood peers.
 func (k *Kad) EachNeighborRev(f topology.EachPeerFunc) error {
 	depth := k.NeighborhoodDepth()
-	fn := func(a swarm.Address, po uint8) (bool, bool, error) {
+	fn := func(a penguin.Address, po uint8) (bool, bool, error) {
 		if po < depth {
 			return false, true, nil
 		}
@@ -1060,7 +1060,7 @@ func (k *Kad) IsBalanced(bin uint8) bool {
 			return false
 		}
 
-		closestConnectedPO := swarm.ExtendedProximity(closestConnectedPeer.Bytes(), pseudoAddr.Bytes())
+		closestConnectedPO := penguin.ExtendedProximity(closestConnectedPeer.Bytes(), pseudoAddr.Bytes())
 		if int(closestConnectedPO) < int(bin)+k.bitSuffixLength+1 {
 			return false
 		}
@@ -1085,13 +1085,13 @@ func (k *Kad) SetRadius(r uint8) {
 
 func (k *Kad) Snapshot() *topology.KadParams {
 	var infos []topology.BinInfo
-	for i := int(swarm.MaxPO); i >= 0; i-- {
+	for i := int(penguin.MaxPO); i >= 0; i-- {
 		infos = append(infos, topology.BinInfo{})
 	}
 
 	ss := k.collector.Snapshot(time.Now())
 
-	_ = k.connectedPeers.EachBin(func(addr swarm.Address, po uint8) (bool, bool, error) {
+	_ = k.connectedPeers.EachBin(func(addr penguin.Address, po uint8) (bool, bool, error) {
 		infos[po].BinConnected++
 		infos[po].ConnectedPeers = append(
 			infos[po].ConnectedPeers,
@@ -1104,7 +1104,7 @@ func (k *Kad) Snapshot() *topology.KadParams {
 	})
 
 	// output (k.knownPeers ¬ k.connectedPeers) here to not repeat the peers we already have in the connected peers list
-	_ = k.knownPeers.EachBin(func(addr swarm.Address, po uint8) (bool, bool, error) {
+	_ = k.knownPeers.EachBin(func(addr penguin.Address, po uint8) (bool, bool, error) {
 		infos[po].BinPopulation++
 
 		for _, v := range infos[po].ConnectedPeers {
@@ -1217,7 +1217,7 @@ func (k *Kad) Close() error {
 	return nil
 }
 
-func randomSubset(addrs []swarm.Address, count int) ([]swarm.Address, error) {
+func randomSubset(addrs []penguin.Address, count int) ([]penguin.Address, error) {
 
 	if count >= len(addrs) {
 		return addrs, nil
@@ -1235,17 +1235,17 @@ func randomSubset(addrs []swarm.Address, count int) ([]swarm.Address, error) {
 	return addrs[:count], nil
 }
 
-func (k *Kad) randomPeer(bin uint8) (swarm.Address, error) {
+func (k *Kad) randomPeer(bin uint8) (penguin.Address, error) {
 
 	peers := k.connectedPeers.BinPeers(bin)
 
 	if len(peers) == 0 {
-		return swarm.ZeroAddress, errEmptyBin
+		return penguin.ZeroAddress, errEmptyBin
 	}
 
 	rndIndx, err := random.Int(random.Reader, big.NewInt(int64(len(peers))))
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 
 	return peers[rndIndx.Int64()], nil

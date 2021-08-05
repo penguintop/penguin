@@ -26,7 +26,7 @@ type Auditor struct {
 	LocalDB *localstore.DB
 
 	// node address
-	SwarmAddress string
+	PenguinAddress string
 	// signer
 	Signer crypto.Signer
 	// signer pubkey (hex)
@@ -45,8 +45,8 @@ func CreateNewAuditor(endpoint string, localDB *localstore.DB, signer crypto.Sig
 	r.SignerPubKey, _ = signer.CompressedPubKeyHex()
 
 	publicKey, _ := signer.PublicKey()
-	swarmAddr, _ := crypto.NewOverlayAddress(*publicKey, uint64(property.CHAIN_ID_NUM))
-	r.SwarmAddress = swarmAddr.String()
+	penguinAddr, _ := crypto.NewOverlayAddress(*publicKey, uint64(property.CHAIN_ID_NUM))
+	r.PenguinAddress = penguinAddr.String()
 
 	xwcAcctAddr, _ := signer.XwcAddress()
 	r.XwcAcctAddress, _ = xwcfmt.HexAddrToXwcAddr(hex.EncodeToString(xwcAcctAddr[:]))
@@ -104,7 +104,7 @@ func (r *Auditor) Run() {
 			continue
 		}
 
-		taskId, err := RequestTask(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, adjustTimestamp, r.XwcAcctAddress, r.SignerPubKey, r.SwarmAddress, hex.EncodeToString(signature))
+		taskId, err := RequestTask(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, adjustTimestamp, r.XwcAcctAddress, r.SignerPubKey, r.PenguinAddress, hex.EncodeToString(signature))
 		if err != nil {
 			r.logger.Errorf("RequestTask: %s", err.Error())
 			continue
@@ -131,7 +131,7 @@ func (r *Auditor) Run() {
 			r.logger.Errorf("SignForAudit: %s", err.Error())
 			continue
 		}
-		taskId, pathInt, err := RequestReportMerkleRoot(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.SwarmAddress, hex.EncodeToString(signature), pathData)
+		taskId, pathInt, err := RequestReportMerkleRoot(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.PenguinAddress, hex.EncodeToString(signature), pathData)
 		if err != nil {
 			r.logger.Errorf("RequestReportMerkleRoot: %s", err.Error())
 			continue
@@ -177,7 +177,7 @@ func (r *Auditor) Run() {
 			r.logger.Errorf("SignForAudit: %s", err.Error())
 			continue
 		}
-		err = RequestReportPathData(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.SwarmAddress, hex.EncodeToString(signature), pathData,
+		err = RequestReportPathData(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.PenguinAddress, hex.EncodeToString(signature), pathData,
 			hex.EncodeToString(item.Data))
 		if err != nil {
 			r.logger.Errorf("RequestReportPathData: %s", err.Error())

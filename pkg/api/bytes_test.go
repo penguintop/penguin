@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	mockpost "github.com/penguintop/penguin/pkg/postage/mock"
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"gitlab.com/nolash/go-mockbytes"
 )
@@ -47,15 +47,15 @@ func TestBytes(t *testing.T) {
 	)
 
 	g := mockbytes.New(0, mockbytes.MockTypeStandard).WithModulus(255)
-	content, err := g.SequentialBytes(swarm.ChunkSize * 2)
+	content, err := g.SequentialBytes(penguin.ChunkSize * 2)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Run("upload", func(t *testing.T) {
-		chunkAddr := swarm.MustParseHexAddress(expHash)
+		chunkAddr := penguin.MustParseHexAddress(expHash)
 		jsonhttptest.Request(t, client, http.MethodPost, resource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(content)),
 			jsonhttptest.WithExpectedJSONResponse(api.BytesPostResponse{
 				Reference: chunkAddr,
@@ -82,9 +82,9 @@ func TestBytes(t *testing.T) {
 	t.Run("upload-with-pinning", func(t *testing.T) {
 		var res api.BytesPostResponse
 		jsonhttptest.Request(t, client, http.MethodPost, resource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(content)),
-			jsonhttptest.WithRequestHeader(api.SwarmPinHeader, "true"),
+			jsonhttptest.WithRequestHeader(api.PenguinPinHeader, "true"),
 			jsonhttptest.WithUnmarshalJSONResponse(&res),
 		)
 		reference := res.Reference

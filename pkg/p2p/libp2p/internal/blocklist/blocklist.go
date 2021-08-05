@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var keyPrefix = "blocklist-"
@@ -31,7 +31,7 @@ type entry struct {
 	Duration  string    `json:"duration"` // Duration is string because the time.Duration does not implement MarshalJSON/UnmarshalJSON methods.
 }
 
-func (b *Blocklist) Exists(overlay swarm.Address) (bool, error) {
+func (b *Blocklist) Exists(overlay penguin.Address) (bool, error) {
 	key := generateKey(overlay)
 	timestamp, duration, err := b.get(key)
 	if err != nil {
@@ -51,7 +51,7 @@ func (b *Blocklist) Exists(overlay swarm.Address) (bool, error) {
 	return true, nil
 }
 
-func (b *Blocklist) Add(overlay swarm.Address, duration time.Duration) (err error) {
+func (b *Blocklist) Add(overlay penguin.Address, duration time.Duration) (err error) {
 	key := generateKey(overlay)
 	_, d, err := b.get(key)
 	if err != nil {
@@ -117,11 +117,11 @@ func (b *Blocklist) get(key string) (timestamp time.Time, duration time.Duration
 	return e.Timestamp, duration, nil
 }
 
-func generateKey(overlay swarm.Address) string {
+func generateKey(overlay penguin.Address) string {
 	return keyPrefix + overlay.String()
 }
 
-func unmarshalKey(s string) (swarm.Address, error) {
+func unmarshalKey(s string) (penguin.Address, error) {
 	addr := strings.TrimPrefix(s, keyPrefix)
-	return swarm.ParseHexAddress(addr)
+	return penguin.ParseHexAddress(addr)
 }

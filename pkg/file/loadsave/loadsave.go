@@ -8,7 +8,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/joiner"
 	"github.com/penguintop/penguin/pkg/file/pipeline/builder"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type PutGetter interface {
@@ -35,7 +35,7 @@ func New(storer PutGetter, mode storage.ModePut, enc bool) file.LoadSaver {
 }
 
 func (ls *loadSave) Load(ctx context.Context, ref []byte) ([]byte, error) {
-	j, _, err := joiner.New(ctx, ls.storer, swarm.NewAddress(ref))
+	j, _, err := joiner.New(ctx, ls.storer, penguin.NewAddress(ref))
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (ls *loadSave) Save(ctx context.Context, data []byte) ([]byte, error) {
 	pipe := builder.NewPipelineBuilder(ctx, ls.storer, ls.mode, ls.encrypted)
 	address, err := builder.FeedPipeline(ctx, pipe, bytes.NewReader(data))
 	if err != nil {
-		return swarm.ZeroAddress.Bytes(), err
+		return penguin.ZeroAddress.Bytes(), err
 	}
 
 	return address.Bytes(), nil

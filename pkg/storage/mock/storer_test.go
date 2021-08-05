@@ -7,17 +7,17 @@ import (
 
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestMockStorer(t *testing.T) {
 	s := mock.NewStorer()
 
-	keyFound, err := swarm.ParseHexAddress("aabbcc")
+	keyFound, err := penguin.ParseHexAddress("aabbcc")
 	if err != nil {
 		t.Fatal(err)
 	}
-	keyNotFound, err := swarm.ParseHexAddress("bbccdd")
+	keyNotFound, err := penguin.ParseHexAddress("bbccdd")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func TestMockStorer(t *testing.T) {
 		t.Fatalf("expected ErrNotFound, got %v", err)
 	}
 
-	if _, err := s.Put(ctx, storage.ModePutUpload, swarm.NewChunk(keyFound, valueFound)); err != nil {
+	if _, err := s.Put(ctx, storage.ModePutUpload, penguin.NewChunk(keyFound, valueFound)); err != nil {
 		t.Fatalf("expected not error but got: %v", err)
 	}
 

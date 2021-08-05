@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/soc"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var ErrFeedTypeNotFound = errors.New("no such feed type")
@@ -102,7 +102,7 @@ func (f *Feed) Update(index Index) *Update {
 }
 
 // NewUpdate creates an update from an index, timestamp, payload and signature
-func NewUpdate(f *Feed, idx Index, timestamp int64, payload, sig []byte) (swarm.Chunk, error) {
+func NewUpdate(f *Feed, idx Index, timestamp int64, payload, sig []byte) (penguin.Chunk, error) {
 	id, err := f.Update(idx).Id()
 	if err != nil {
 		return nil, fmt.Errorf("update: %w", err)
@@ -144,8 +144,8 @@ func Id(topic []byte, index Index) ([]byte, error) {
 }
 
 // Address calculates the soc address of a feed update
-func (u *Update) Address() (swarm.Address, error) {
-	var addr swarm.Address
+func (u *Update) Address() (penguin.Address, error) {
+	var addr penguin.Address
 	i, err := u.Id()
 	if err != nil {
 		return addr, err

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/splitter"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	mockbytes "gitlab.com/nolash/go-mockbytes"
 )
 
@@ -38,7 +38,7 @@ func TestSplitIncomplete(t *testing.T) {
 // that that corresponding chunk exist in the store afterwards.
 func TestSplitSingleChunk(t *testing.T) {
 	g := mockbytes.New(0, mockbytes.MockTypeStandard).WithModulus(255)
-	testData, err := g.SequentialBytes(swarm.ChunkSize)
+	testData, err := g.SequentialBytes(penguin.ChunkSize)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestSplitSingleChunk(t *testing.T) {
 	}
 
 	testHashHex := "c10090961e7682a10890c334d759a28426647141213abda93b096b892824d2ef"
-	testHashAddress := swarm.MustParseHexAddress(testHashHex)
+	testHashAddress := penguin.MustParseHexAddress(testHashHex)
 	if !testHashAddress.Equal(resultAddress) {
 		t.Fatalf("expected %v, got %v", testHashAddress, resultAddress)
 	}
@@ -70,7 +70,7 @@ func TestSplitSingleChunk(t *testing.T) {
 func TestSplitThreeLevels(t *testing.T) {
 	// edge case selected from internal/job_test.go
 	g := mockbytes.New(0, mockbytes.MockTypeStandard).WithModulus(255)
-	testData, err := g.SequentialBytes(swarm.ChunkSize * 128)
+	testData, err := g.SequentialBytes(penguin.ChunkSize * 128)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +85,7 @@ func TestSplitThreeLevels(t *testing.T) {
 	}
 
 	testHashHex := "3047d841077898c26bbe6be652a2ec590a5d9bd7cd45d290ea42511b48753c09"
-	testHashAddress := swarm.MustParseHexAddress(testHashHex)
+	testHashAddress := penguin.MustParseHexAddress(testHashHex)
 	if !testHashAddress.Equal(resultAddress) {
 		t.Fatalf("expected %v, got %v", testHashAddress, resultAddress)
 	}
@@ -101,9 +101,9 @@ func TestSplitThreeLevels(t *testing.T) {
 	}
 
 	rootData := rootChunk.Data()[8:]
-	for i := 0; i < swarm.ChunkSize; i += swarm.SectionSize {
-		dataAddressBytes := rootData[i : i+swarm.SectionSize]
-		dataAddress := swarm.NewAddress(dataAddressBytes)
+	for i := 0; i < penguin.ChunkSize; i += penguin.SectionSize {
+		dataAddressBytes := rootData[i : i+penguin.SectionSize]
+		dataAddress := penguin.NewAddress(dataAddressBytes)
 		_, err := store.Get(context.Background(), storage.ModeGetRequest, dataAddress)
 		if err != nil {
 			t.Fatal(err)
@@ -121,7 +121,7 @@ func TestUnalignedSplit(t *testing.T) {
 
 	// test vector taken from pkg/file/testing/vector.go
 	var (
-		dataLen       int64 = swarm.ChunkSize*2 + 32
+		dataLen       int64 = penguin.ChunkSize*2 + 32
 		expectAddrHex       = "61416726988f77b874435bdd89a419edc3861111884fd60e8adf54e2f299efd6"
 		g                   = mockbytes.New(0, mockbytes.MockTypeStandard).WithModulus(255)
 	)
@@ -135,7 +135,7 @@ func TestUnalignedSplit(t *testing.T) {
 	// perform the split in a separate thread
 	sp := splitter.NewSimpleSplitter(storer, storage.ModePutUpload)
 	ctx := context.Background()
-	doneC := make(chan swarm.Address)
+	doneC := make(chan penguin.Address)
 	errC := make(chan error)
 	go func() {
 		addr, err := sp.Split(ctx, chunkPipe, dataLen, false)
@@ -149,7 +149,7 @@ func TestUnalignedSplit(t *testing.T) {
 	}()
 
 	// perform the writes in unaligned bursts
-	writeSizes := []int{swarm.ChunkSize - 40, 40 + 32, swarm.ChunkSize}
+	writeSizes := []int{penguin.ChunkSize - 40, 40 + 32, penguin.ChunkSize}
 	contentBuf := bytes.NewReader(content)
 	cursor := 0
 	for _, writeSize := range writeSizes {
@@ -173,7 +173,7 @@ func TestUnalignedSplit(t *testing.T) {
 	timer := time.NewTimer(time.Millisecond * 100)
 	select {
 	case addr := <-doneC:
-		expectAddr := swarm.MustParseHexAddress(expectAddrHex)
+		expectAddr := penguin.MustParseHexAddress(expectAddrHex)
 		if !expectAddr.Equal(addr) {
 			t.Fatalf("addr mismatch, expected %s, got %s", expectAddr, addr)
 		}

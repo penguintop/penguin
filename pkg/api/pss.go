@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/pss"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
@@ -100,8 +100,8 @@ func (s *server) pssPostHandler(w http.ResponseWriter, r *http.Request) {
 func (s *server) pssWsHandler(w http.ResponseWriter, r *http.Request) {
 
 	upgrader := websocket.Upgrader{
-		ReadBufferSize:  swarm.ChunkSize,
-		WriteBufferSize: swarm.ChunkSize,
+		ReadBufferSize:  penguin.ChunkSize,
+		WriteBufferSize: penguin.ChunkSize,
 		CheckOrigin:     s.checkOrigin,
 	}
 

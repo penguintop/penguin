@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,7 +28,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	storemock "github.com/penguintop/penguin/pkg/storage/mock"
 	chunktesting "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
@@ -131,9 +131,9 @@ func TestNewRepairHandler(t *testing.T) {
 
 		// create a mock pushsync service to push the chunk to its destination
 		var receipt *pushsync.Receipt
-		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 			receipt = &pushsync.Receipt{
-				Address: swarm.NewAddress(chunk.Address().Bytes()),
+				Address: penguin.NewAddress(chunk.Address().Bytes()),
 			}
 			return receipt, nil
 		})
@@ -165,7 +165,7 @@ func TestNewRepairHandler(t *testing.T) {
 
 		// create a mock pushsync service
 		pushServiceCalled := false
-		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 			pushServiceCalled = true
 			return nil, nil
 		})
@@ -195,7 +195,7 @@ func TestNewRepairHandler(t *testing.T) {
 
 		// create a mock pushsync service
 		var receiptError error
-		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+		pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 			receiptError = errors.New("invalid receipt")
 			return nil, receiptError
 		})
@@ -222,17 +222,17 @@ func newTestNetStore(t *testing.T, recoveryFunc recovery.Callback) storage.Store
 	serverMockAccounting := accountingmock.NewAccounting()
 
 	pricerMock := pricermock.NewMockService(10, 10)
-	peerID := swarm.MustParseHexAddress("deadbeef")
+	peerID := penguin.MustParseHexAddress("deadbeef")
 	ps := mockPeerSuggester{eachPeerRevFunc: func(f topology.EachPeerFunc) error {
 		_, _, _ = f(peerID, 0)
 		return nil
 	}}
-	server := retrieval.New(swarm.ZeroAddress, mockStorer, nil, ps, logger, serverMockAccounting, pricerMock, nil)
+	server := retrieval.New(penguin.ZeroAddress, mockStorer, nil, ps, logger, serverMockAccounting, pricerMock, nil)
 	recorder := streamtest.New(
 		streamtest.WithProtocols(server.Protocol()),
 	)
-	retrieve := retrieval.New(swarm.ZeroAddress, mockStorer, recorder, ps, logger, serverMockAccounting, pricerMock, nil)
-	validStamp := func(ch swarm.Chunk, stamp []byte) (swarm.Chunk, error) {
+	retrieve := retrieval.New(penguin.ZeroAddress, mockStorer, recorder, ps, logger, serverMockAccounting, pricerMock, nil)
+	validStamp := func(ch penguin.Chunk, stamp []byte) (penguin.Chunk, error) {
 		return ch.WithStamp(postage.NewStamp(nil, nil)), nil
 	}
 

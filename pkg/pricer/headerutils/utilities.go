@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"github.com/penguintop/penguin/pkg/p2p"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -30,7 +30,7 @@ var (
 
 // Headers, utility functions
 
-func MakePricingHeaders(chunkPrice uint64, addr swarm.Address) (p2p.Headers, error) {
+func MakePricingHeaders(chunkPrice uint64, addr penguin.Address) (p2p.Headers, error) {
 
 	chunkPriceInBytes := make([]byte, 8)
 
@@ -44,7 +44,7 @@ func MakePricingHeaders(chunkPrice uint64, addr swarm.Address) (p2p.Headers, err
 	return headers, nil
 }
 
-func MakePricingResponseHeaders(chunkPrice uint64, addr swarm.Address, index uint8) (p2p.Headers, error) {
+func MakePricingResponseHeaders(chunkPrice uint64, addr penguin.Address, index uint8) (p2p.Headers, error) {
 
 	chunkPriceInBytes := make([]byte, 8)
 	chunkIndexInBytes := make([]byte, 1)
@@ -63,33 +63,33 @@ func MakePricingResponseHeaders(chunkPrice uint64, addr swarm.Address, index uin
 
 // ParsePricingHeaders used by responder to read address and price from stream headers
 // Returns an error if no target field attached or the contents of it are not readable
-func ParsePricingHeaders(receivedHeaders p2p.Headers) (swarm.Address, uint64, error) {
+func ParsePricingHeaders(receivedHeaders p2p.Headers) (penguin.Address, uint64, error) {
 
 	target, err := ParseTargetHeader(receivedHeaders)
 	if err != nil {
-		return swarm.ZeroAddress, 0, err
+		return penguin.ZeroAddress, 0, err
 	}
 	price, err := ParsePriceHeader(receivedHeaders)
 	if err != nil {
-		return swarm.ZeroAddress, 0, err
+		return penguin.ZeroAddress, 0, err
 	}
 	return target, price, nil
 }
 
 // ParsePricingResponseHeaders used by requester to read address, price and index from response headers
 // Returns an error if any fields are missing or target is unreadable
-func ParsePricingResponseHeaders(receivedHeaders p2p.Headers) (swarm.Address, uint64, uint8, error) {
+func ParsePricingResponseHeaders(receivedHeaders p2p.Headers) (penguin.Address, uint64, uint8, error) {
 	target, err := ParseTargetHeader(receivedHeaders)
 	if err != nil {
-		return swarm.ZeroAddress, 0, 0, err
+		return penguin.ZeroAddress, 0, 0, err
 	}
 	price, err := ParsePriceHeader(receivedHeaders)
 	if err != nil {
-		return swarm.ZeroAddress, 0, 0, err
+		return penguin.ZeroAddress, 0, 0, err
 	}
 	index, err := ParseIndexHeader(receivedHeaders)
 	if err != nil {
-		return swarm.ZeroAddress, 0, 0, err
+		return penguin.ZeroAddress, 0, 0, err
 	}
 
 	return target, price, index, nil
@@ -108,12 +108,12 @@ func ParseIndexHeader(receivedHeaders p2p.Headers) (uint8, error) {
 	return index, nil
 }
 
-func ParseTargetHeader(receivedHeaders p2p.Headers) (swarm.Address, error) {
+func ParseTargetHeader(receivedHeaders p2p.Headers) (penguin.Address, error) {
 	if receivedHeaders[targetFieldName] == nil {
-		return swarm.ZeroAddress, ErrNoTargetHeader
+		return penguin.ZeroAddress, ErrNoTargetHeader
 	}
 
-	target := swarm.NewAddress(receivedHeaders[targetFieldName])
+	target := penguin.NewAddress(receivedHeaders[targetFieldName])
 
 	return target, nil
 }

@@ -2,33 +2,33 @@ openapi: 3.0.3
 
 info:
   version: 0.6.0
-  title: Swarm API
-  description: "A list of the currently provided Interfaces to interact with the swarm, implementing file operations and sending messages"
+  title: Penguin API
+  description: "A list of the currently provided Interfaces to interact with the penguin, implementing file operations and sending messages"
 
 security:
   - {}
 
 externalDocs:
-  description: Browse the documentation @ the Swarm Docs
-  url: "https://docs.swarm.eth"
+  description: Browse the documentation @ the Penguin Docs
+  url: "https://docs.penguin.eth"
 
 servers:
   - url: "http://{apiRoot}:{port}/v1"
     variables:
       apiRoot:
         default: "localhost"
-        description: Base address of the local bee node main API
+        description: Base address of the local pen node main API
       port:
         default: "1633"
-        description: Service port provided in bee node config
+        description: Service port provided in pen node config
   - url: "http://{apiRoot}:{port}"
     variables:
       apiRoot:
         default: "localhost"
-        description: Base address of the local bee node main API
+        description: Base address of the local pen node main API
       port:
         default: "1633"
-        description: Service port provided in bee node config
+        description: Service port provided in pen node config
 
 paths:
   "/bytes":
@@ -37,10 +37,10 @@ paths:
       tags:
         - Bytes
       parameters:
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmTagParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPinParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmEncryptParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPostageBatchId"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinTagParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPinParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinEncryptParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPostageBatchId"
       requestBody:
         content:
           application/octet-stream:
@@ -51,18 +51,18 @@ paths:
         "201":
           description: Ok
           headers:
-            "swarm-tag":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmTag"
+            "penguin-tag":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinTag"
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReferenceResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReferenceResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -75,9 +75,9 @@ paths:
         - in: path
           name: reference
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmReference"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinReference"
           required: true
-          description: Swarm address reference to content
+          description: Penguin address reference to content
       responses:
         "200":
           description: Retrieved content specified by reference
@@ -87,7 +87,7 @@ paths:
                 type: string
                 format: binary
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         default:
           description: Default response
 
@@ -100,16 +100,16 @@ paths:
         - in: path
           name: reference
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmReference"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinReference"
           required: true
-          description: Swarm address of chunk
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmRecoveryTargetsParameter"
+          description: Penguin address of chunk
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinRecoveryTargetsParameter"
       responses:
         "200":
           description: Retrieved chunk content
           headers:
-            "swarm-recovery-targets":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmRecoveryTargets"
+            "penguin-recovery-targets":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinRecoveryTargets"
           content:
             application/octet-stream:
               schema:
@@ -118,11 +118,11 @@ paths:
         "202":
           description: chunk recovery initiated. retry after sometime.
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -132,9 +132,9 @@ paths:
       tags:
         - Chunk
       parameters:
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmTagParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPinParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPostageBatchId"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinTagParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPinParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPostageBatchId"
       requestBody:
         content:
           application/octet-stream:
@@ -145,16 +145,16 @@ paths:
         "201":
           description: Ok
           headers:
-            "swarm-tag":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmTag"
+            "penguin-tag":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinTag"
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Status"
+                $ref: "PenguinCommon.yaml#/components/schemas/Status"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -162,10 +162,10 @@ paths:
     post:
       summary: "Upload file or a collection of files"
       description: "In order to upload a collection, user can send a multipart request with all the files populated in the form data with appropriate headers.\n\n
-        User can also upload a tar file along with the swarm-collection header. This will upload the tar file after extracting the entire directory structure.\n\n
-        If the swarm-collection header is absent, all requests (including tar files) are considered as single file uploads.\n\n
-        A multipart request is treated as a collection regardless of whether the swarm-collection header is present. This means in order to serve single files
-        uploaded as a multipart request, the swarm-index-document header should be used with the name of the file."
+        User can also upload a tar file along with the penguin-collection header. This will upload the tar file after extracting the entire directory structure.\n\n
+        If the penguin-collection header is absent, all requests (including tar files) are considered as single file uploads.\n\n
+        A multipart request is treated as a collection regardless of whether the penguin-collection header is present. This means in order to serve single files
+        uploaded as a multipart request, the penguin-index-document header should be used with the name of the file."
       tags:
         - File
         - Collection
@@ -173,17 +173,17 @@ paths:
         - in: query
           name: name
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/FileName"
+            $ref: "PenguinCommon.yaml#/components/schemas/FileName"
           required: false
           description: Filename when uploading single file
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmTagParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPinParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmEncryptParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/ContentTypePreserved"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmCollection"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmIndexDocumentParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmErrorDocumentParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPostageBatchId"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinTagParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPinParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinEncryptParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/ContentTypePreserved"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinCollection"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinIndexDocumentParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinErrorDocumentParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPostageBatchId"
       requestBody:
         content:
           multipart/form-data:
@@ -206,20 +206,20 @@ paths:
         "201":
           description: Ok
           headers:
-            "swarm-tag":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmTag"
+            "penguin-tag":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinTag"
             "etag":
-              $ref: "SwarmCommon.yaml#/components/headers/ETag" 
+              $ref: "PenguinCommon.yaml#/components/headers/ETag"
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReferenceResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReferenceResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -233,14 +233,14 @@ paths:
         - in: path
           name: reference
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmReference"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinReference"
           required: true
           description: Root hash of content
       responses:
         "200":
           description: Ok
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     get:
@@ -251,29 +251,29 @@ paths:
         - in: path
           name: reference
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmReference"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinReference"
           required: true
-          description: Swarm address of content
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmRecoveryTargetsParameter"
+          description: Penguin address of content
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinRecoveryTargetsParameter"
       responses:
         "200":
           description: Ok
           headers:
-            "swarm-recovery-targets":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmRecoveryTargets"
-          # "swarm-feed-index":
-          #   $ref: "SwarmCommon.yaml#/components/headers/SwarmFeedIndex"
+            "penguin-recovery-targets":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinRecoveryTargets"
+          # "penguin-feed-index":
+          #   $ref: "PenguinCommon.yaml#/components/headers/PenguinFeedIndex"
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: binary
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -286,22 +286,22 @@ paths:
         - in: path
           name: reference
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmReference"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinReference"
           required: true
-          description: Swarm address of content
+          description: Penguin address of content
         - in: path
           name: path
           schema:
             type: string
           required: true
           description: Path to the file in the collection.
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmRecoveryTargetsParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinRecoveryTargetsParameter"
       responses:
         "200":
           description: Ok
           headers:
-            "swarm-recovery-targets":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmRecoveryTargets"
+            "penguin-recovery-targets":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinRecoveryTargets"
           content:
             application/octet-stream:
               schema:
@@ -309,11 +309,11 @@ paths:
                 format: binary
 
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -346,11 +346,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/TagsList"
+                $ref: "PenguinCommon.yaml#/components/schemas/TagsList"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     post:
@@ -362,18 +362,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "SwarmCommon.yaml#/components/schemas/NewTagRequest"
+              $ref: "PenguinCommon.yaml#/components/schemas/NewTagRequest"
       responses:
         "201":
           description: New Tag Info
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/NewTagResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/NewTagResponse"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -386,7 +386,7 @@ paths:
         - in: path
           name: uid
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+            $ref: "PenguinCommon.yaml#/components/schemas/Uid"
           required: true
           description: Uid
       responses:
@@ -395,15 +395,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/NewTagResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/NewTagResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"    
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     delete:
@@ -414,53 +414,53 @@ paths:
         - in: path
           name: uid
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+            $ref: "PenguinCommon.yaml#/components/schemas/Uid"
           required: true
           description: Uid
       responses:
         "204":
-          $ref: "SwarmCommon.yaml#/components/responses/204"
+          $ref: "PenguinCommon.yaml#/components/responses/204"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     patch:
-      summary: "Update Total Count and swarm hash for a tag of an input stream of unknown size using Uid"
+      summary: "Update Total Count and penguin hash for a tag of an input stream of unknown size using Uid"
       tags:
         - Tag
       parameters:
         - in: path
           name: uid
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+            $ref: "PenguinCommon.yaml#/components/schemas/Uid"
           required: true
           description: Uid
       requestBody:
-        description: Can contain swarm hash to use for the tag
+        description: Can contain penguin hash to use for the tag
         required: false
         content:
           application/json:
             schema:
-              $ref: "SwarmCommon.yaml#/components/schemas/Address"
+              $ref: "PenguinCommon.yaml#/components/schemas/Address"
       responses:
         "200":
           description: Ok
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Status"
+                $ref: "PenguinCommon.yaml#/components/schemas/Status"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -469,9 +469,9 @@ paths:
       - in: path
         name: reference
         schema:
-          $ref: "SwarmCommon.yaml#/components/schemas/SwarmOnlyReference"
+          $ref: "PenguinCommon.yaml#/components/schemas/PenguinOnlyReference"
         required: true
-        description: Swarm reference of the root hash
+        description: Penguin reference of the root hash
     post:
       summary: Pin the root hash with the given reference
       tags:
@@ -482,21 +482,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "201":
           description: New pin with root reference was created
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     delete:
@@ -509,13 +509,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     get:
@@ -528,15 +528,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/SwarmOnlyReference"
+                $ref: "PenguinCommon.yaml#/components/schemas/PenguinOnlyReference"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -551,46 +551,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/SwarmOnlyReferencesList"
+                $ref: "PenguinCommon.yaml#/components/schemas/PenguinOnlyReferencesList"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
   "/pss/send/{topic}/{targets}":
     post:
-      summary: Send to recipient or target with Postal Service for Swarm
+      summary: Send to recipient or target with Postal Service for Penguin
       tags:
-        - Postal Service for Swarm
+        - Postal Service for Penguin
       parameters:
         - in: path
           name: topic
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/PssTopic"
+            $ref: "PenguinCommon.yaml#/components/schemas/PssTopic"
           required: true
           description: Topic name
         - in: path
           name: targets
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/PssTargets"
+            $ref: "PenguinCommon.yaml#/components/schemas/PssTargets"
           required: true
           description: Target message address prefix. If multiple targets are specified, only one would be matched.
         - in: query
           name: recipient
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/PssRecipient"
+            $ref: "PenguinCommon.yaml#/components/schemas/PssRecipient"
           required: false
           description: Recipient publickey
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPostageBatchId"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPostageBatchId"
       responses:
         "201":
           description: Subscribed to topic
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -598,19 +598,19 @@ paths:
     get:
       summary: Subscribe for messages on the given topic.
       tags:
-        - Postal Service for Swarm
+        - Postal Service for Penguin
       parameters:
         - in: path
           name: topic
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/PssTopic"
+            $ref: "PenguinCommon.yaml#/components/schemas/PssTopic"
           required: true
           description: Topic name
       responses:
         "200":
           description: Returns a WebSocket with a subscription for incoming message data on the requested topic.
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -623,35 +623,35 @@ paths:
         - in: path
           name: owner
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/EthereumAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/EthereumAddress"
           required: true
           description: Owner
         - in: path
           name: id
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/HexString"
+            $ref: "PenguinCommon.yaml#/components/schemas/HexString"
           required: true
           description: Id
         - in: query
           name: sig
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/HexString"
+            $ref: "PenguinCommon.yaml#/components/schemas/HexString"
           required: true
           description: Signature
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPinParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPinParameter"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReferenceResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReferenceResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "401":
-          $ref: "SwarmCommon.yaml#/components/responses/401"
+          $ref: "PenguinCommon.yaml#/components/responses/401"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -664,36 +664,36 @@ paths:
         - in: path
           name: owner
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/EthereumAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/EthereumAddress"
           required: true
           description: Owner
         - in: path
           name: topic
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/HexString"
+            $ref: "PenguinCommon.yaml#/components/schemas/HexString"
           required: true
           description: Topic
         - in: query
           name: type
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/FeedType"
+            $ref: "PenguinCommon.yaml#/components/schemas/FeedType"
           required: false
           description: "Feed indexing scheme (default: sequence)"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPinParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/SwarmPostageBatchId"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPinParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/PenguinPostageBatchId"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReferenceResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReferenceResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "401":
-          $ref: "SwarmCommon.yaml#/components/responses/401"
+          $ref: "PenguinCommon.yaml#/components/responses/401"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     get:
@@ -704,13 +704,13 @@ paths:
         - in: path
           name: owner
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/EthereumAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/EthereumAddress"
           required: true
           description: Owner
         - in: path
           name: topic
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/HexString"
+            $ref: "PenguinCommon.yaml#/components/schemas/HexString"
           required: true
           description: Topic
         - in: query
@@ -722,27 +722,27 @@ paths:
         - in: query
           name: type
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/FeedType"
+            $ref: "PenguinCommon.yaml#/components/schemas/FeedType"
           required: false
           description: "Feed indexing scheme (default: sequence)"
       responses:
         "200":
           description: Latest feed update
           headers:
-            "swarm-feed-index":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmFeedIndex"
-            "swarm-feed-index-next":
-              $ref: "SwarmCommon.yaml#/components/headers/SwarmFeedIndexNext"
+            "penguin-feed-index":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinFeedIndex"
+            "penguin-feed-index-next":
+              $ref: "PenguinCommon.yaml#/components/headers/PenguinFeedIndexNext"
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReferenceResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReferenceResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "401":
-          $ref: "SwarmCommon.yaml#/components/responses/401"
+          $ref: "PenguinCommon.yaml#/components/responses/401"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -757,7 +757,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/PostageBatchesResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/PostageBatchesResponse"
 
         default:
           description: Default response
@@ -767,9 +767,9 @@ paths:
       - in: path
         name: id
         schema:
-          $ref: "SwarmCommon.yaml#/components/schemas/BatchID"
+          $ref: "PenguinCommon.yaml#/components/schemas/BatchID"
         required: true
-        description: Swarm address of the stamp
+        description: Penguin address of the stamp
     get:
       summary: Get an individual postage batch status
       tags:
@@ -780,9 +780,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/PostageBatch"
+                $ref: "PenguinCommon.yaml#/components/schemas/PostageBatch"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         default:
           description: Default response
 
@@ -810,18 +810,18 @@ paths:
             type: string
           required: false
           description: An optional label for this batch
-        - $ref: "SwarmCommon.yaml#/components/parameters/GasPriceParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/GasPriceParameter"
       responses:
         "201":
           description: Returns the newly created postage batch ID
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/BatchIDResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/BatchIDResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 

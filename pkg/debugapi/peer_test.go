@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/mock"
 	"github.com/penguintop/penguin/pkg/pen"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	ma "github.com/multiformats/go-multiaddr"
 )
 
@@ -100,13 +100,13 @@ func TestConnect(t *testing.T) {
 }
 
 func TestDisconnect(t *testing.T) {
-	address := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
-	unknownAdddress := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59e")
-	errorAddress := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59a")
+	address := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	unknownAdddress := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59e")
+	errorAddress := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59a")
 	testErr := errors.New("test error")
 
 	testServer := newTestServer(t, testServerOptions{
-		P2P: mock.New(mock.WithDisconnectFunc(func(addr swarm.Address) error {
+		P2P: mock.New(mock.WithDisconnectFunc(func(addr penguin.Address) error {
 			if addr.Equal(address) {
 				return nil
 			}
@@ -157,7 +157,7 @@ func TestDisconnect(t *testing.T) {
 }
 
 func TestPeer(t *testing.T) {
-	overlay := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	overlay := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
 	testServer := newTestServer(t, testServerOptions{
 		P2P: mock.New(mock.WithPeersFunc(func() []p2p.Peer {
 			return []p2p.Peer{{Address: overlay}}
@@ -183,7 +183,7 @@ func TestPeer(t *testing.T) {
 }
 
 func TestBlocklistedPeers(t *testing.T) {
-	overlay := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	overlay := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
 	testServer := newTestServer(t, testServerOptions{
 		P2P: mock.New(mock.WithBlocklistedPeersFunc(func() ([]p2p.Peer, error) {
 			return []p2p.Peer{{Address: overlay}}, nil
@@ -198,7 +198,7 @@ func TestBlocklistedPeers(t *testing.T) {
 }
 
 func TestBlocklistedPeersErr(t *testing.T) {
-	overlay := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	overlay := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
 	testServer := newTestServer(t, testServerOptions{
 		P2P: mock.New(mock.WithBlocklistedPeersFunc(func() ([]p2p.Peer, error) {
 			return []p2p.Peer{{Address: overlay}}, errors.New("some error")

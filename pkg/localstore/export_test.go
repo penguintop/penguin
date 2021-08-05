@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestExportImport constructs two databases, one to put and export
@@ -70,7 +70,7 @@ func TestExportImport(t *testing.T) {
 	}
 
 	for a, want := range chunks {
-		addr := swarm.MustParseHexAddress(a)
+		addr := penguin.MustParseHexAddress(a)
 		ch, err := db2.Get(context.Background(), storage.ModeGetRequest, addr)
 		if err != nil {
 			t.Fatal(err)

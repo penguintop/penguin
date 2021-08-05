@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,17 +16,17 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/p2p"
 	pingpongmock "github.com/penguintop/penguin/pkg/pingpong/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestPingpong(t *testing.T) {
 	rtt := time.Minute
-	peerID := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
-	unknownPeerID := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59e")
-	errorPeerID := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59a")
+	peerID := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	unknownPeerID := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59e")
+	errorPeerID := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59a")
 	testErr := errors.New("test error")
 
-	pingpongService := pingpongmock.New(func(ctx context.Context, address swarm.Address, msgs ...string) (time.Duration, error) {
+	pingpongService := pingpongmock.New(func(ctx context.Context, address penguin.Address, msgs ...string) (time.Duration, error) {
 		if address.Equal(errorPeerID) {
 			return 0, testErr
 		}

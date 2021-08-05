@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/p2p"
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 )
@@ -33,8 +33,8 @@ func TestContainer(t *testing.T) {
 	t.Run("can add peers to container", func(t *testing.T) {
 		c := lightnode.NewContainer(base)
 
-		p1 := swarm.NewAddress([]byte("123"))
-		p2 := swarm.NewAddress([]byte("456"))
+		p1 := penguin.NewAddress([]byte("123"))
+		p2 := penguin.NewAddress([]byte("456"))
 		c.Connected(context.Background(), p2p.Peer{Address: p1})
 		c.Connected(context.Background(), p2p.Peer{Address: p2})
 
@@ -66,7 +66,7 @@ func TestContainer(t *testing.T) {
 	t.Run("empty container after peer disconnect", func(t *testing.T) {
 		c := lightnode.NewContainer(base)
 
-		peer := p2p.Peer{Address: swarm.NewAddress([]byte("123"))}
+		peer := p2p.Peer{Address: penguin.NewAddress([]byte("123"))}
 
 		c.Connected(context.Background(), peer)
 		c.Disconnected(peer)

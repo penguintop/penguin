@@ -29,7 +29,7 @@ import (
 	"github.com/penguintop/penguin/pkg/postage/batchstore"
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -126,7 +126,7 @@ type DB struct {
 
 	// dirtyAddresses are marked while gc is running
 	// in order to avoid the removal of dirty entries.
-	dirtyAddresses []swarm.Address
+	dirtyAddresses []penguin.Address
 
 	// this channel is closed when close function is called
 	// to terminate other goroutines
@@ -199,7 +199,7 @@ func New(path string, baseKey []byte, o *Options, logger logging.Logger) (db *DB
 		db.cacheCapacity = defaultCacheCapacity
 	}
 
-	capacityMB := float64((db.cacheCapacity+uint64(batchstore.Capacity))*swarm.ChunkSize) * 9.5367431640625e-7
+	capacityMB := float64((db.cacheCapacity+uint64(batchstore.Capacity))*penguin.ChunkSize) * 9.5367431640625e-7
 
 	if capacityMB <= 1000 {
 		db.logger.Infof("database capacity: %d chunks (approximately %fMB)", db.cacheCapacity, capacityMB)
@@ -321,7 +321,7 @@ func New(path string, baseKey []byte, o *Options, logger logging.Logger) (db *DB
 	db.pullIndex, err = db.shed.NewIndex("PO|BinID->Hash", shed.IndexFuncs{
 		EncodeKey: func(fields shed.Item) (key []byte, err error) {
 			key = make([]byte, 9)
-			key[0] = db.po(swarm.NewAddress(fields.Address))
+			key[0] = db.po(penguin.NewAddress(fields.Address))
 			binary.BigEndian.PutUint64(key[1:9], fields.BinID)
 			return key, nil
 		},
@@ -439,7 +439,7 @@ func New(path string, baseKey []byte, o *Options, logger logging.Logger) (db *DB
 		EncodeKey: func(fields shed.Item) (key []byte, err error) {
 			key = make([]byte, 65)
 			copy(key[:32], fields.BatchID)
-			key[32] = db.po(swarm.NewAddress(fields.Address))
+			key[32] = db.po(penguin.NewAddress(fields.Address))
 			copy(key[33:], fields.Address)
 			return key, nil
 		},
@@ -539,8 +539,8 @@ func (db *DB) GetRetrievalData(addr []byte) (shed.Item, error) {
 
 // po computes the proximity order between the address
 // and database base key.
-func (db *DB) po(addr swarm.Address) (bin uint8) {
-	return swarm.Proximity(db.baseKey, addr.Bytes())
+func (db *DB) po(addr penguin.Address) (bin uint8) {
+	return penguin.Proximity(db.baseKey, addr.Bytes())
 }
 
 // DebugIndices returns the index sizes for all indexes in localstore
@@ -573,7 +573,7 @@ func (db *DB) DebugIndices() (indexInfo map[string]int, err error) {
 }
 
 // chunkToItem creates new Item with data provided by the Chunk.
-func chunkToItem(ch swarm.Chunk) shed.Item {
+func chunkToItem(ch penguin.Chunk) shed.Item {
 	return shed.Item{
 		Address: ch.Address().Bytes(),
 		Data:    ch.Data(),
@@ -586,7 +586,7 @@ func chunkToItem(ch swarm.Chunk) shed.Item {
 }
 
 // addressToItem creates new Item with a provided address.
-func addressToItem(addr swarm.Address) shed.Item {
+func addressToItem(addr penguin.Address) shed.Item {
 	return shed.Item{
 		Address: addr.Bytes(),
 	}
@@ -594,7 +594,7 @@ func addressToItem(addr swarm.Address) shed.Item {
 
 // addressesToItems constructs a slice of Items with only
 // addresses set on them.
-func addressesToItems(addrs ...swarm.Address) []shed.Item {
+func addressesToItems(addrs ...penguin.Address) []shed.Item {
 	items := make([]shed.Item, len(addrs))
 	for i, addr := range addrs {
 		items[i] = shed.Item{

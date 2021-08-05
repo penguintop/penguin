@@ -24,17 +24,17 @@ import (
 	"github.com/penguintop/penguin/pkg/flipflop"
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // SubscribePush returns a channel that provides storage chunks with ordering from push syncing index.
 // Returned stop function will terminate current and further iterations, and also it will close
 // the returned channel without any errors. Make sure that you check the second returned parameter
 // from the channel to stop iteration when its value is false.
-func (db *DB) SubscribePush(ctx context.Context) (c <-chan swarm.Chunk, stop func()) {
+func (db *DB) SubscribePush(ctx context.Context) (c <-chan penguin.Chunk, stop func()) {
 	db.metrics.SubscribePush.Inc()
 
-	chunks := make(chan swarm.Chunk)
+	chunks := make(chan penguin.Chunk)
 	in, out, clean := flipflop.NewFallingEdge(flipFlopBufferDuration, flipFlopWorstCaseDuration)
 
 	db.pushTriggersMu.Lock()
@@ -78,7 +78,7 @@ func (db *DB) SubscribePush(ctx context.Context) (c <-chan swarm.Chunk, stop fun
 
 					stamp := postage.NewStamp(dataItem.BatchID, dataItem.Sig)
 					select {
-					case chunks <- swarm.NewChunk(swarm.NewAddress(dataItem.Address), dataItem.Data).WithTagID(item.Tag).WithStamp(stamp):
+					case chunks <- penguin.NewChunk(penguin.NewAddress(dataItem.Address), dataItem.Data).WithTagID(item.Tag).WithStamp(stamp):
 						count++
 						// set next iteration start item
 						// when its chunk is successfully sent to channel

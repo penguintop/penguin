@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -29,7 +29,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	mocks "github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/mock"
@@ -58,8 +58,8 @@ func TestPushClosest(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110 -> po 1
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110 -> po 1
 
 	// peer is the node responding to the chunk receipt message
 	// mock should return ErrWantSelf since there's no one to forward to
@@ -116,10 +116,10 @@ func TestReplicateBeforeReceipt(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000") // base 0111
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110
-	secondPeer := swarm.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")  // binary 0100
-	emptyPeer := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")   // binary 0101, this peer should not get the chunk
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110
+	secondPeer := penguin.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")  // binary 0100
+	emptyPeer := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")   // binary 0101, this peer should not get the chunk
 
 	// node that is connected to secondPeer
 	// it's address is closer to the chunk than secondPeer but it will not receive the chunk
@@ -127,7 +127,7 @@ func TestReplicateBeforeReceipt(t *testing.T) {
 	defer storerEmpty.Close()
 	emptyRecorder := streamtest.New(streamtest.WithProtocols(psEmpty.Protocol()), streamtest.WithBaseAddr(secondPeer))
 
-	wFunc := func(addr swarm.Address) bool {
+	wFunc := func(addr penguin.Address) bool {
 		return true
 	}
 
@@ -216,17 +216,17 @@ func TestFailToReplicateBeforeReceipt(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000") // base 0111
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110
-	secondPeer := swarm.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")  // binary 0100
-	emptyPeer := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")   // binary 0101, this peer should not get the chunk
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110
+	secondPeer := penguin.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")  // binary 0100
+	emptyPeer := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")   // binary 0101, this peer should not get the chunk
 
 	// node that is connected to secondPeer
 	// it's address is closer to the chunk than secondPeer but it will not receive the chunk
 	_, storerEmpty, _, _ := createPushSyncNode(t, emptyPeer, defaultPrices, nil, nil, defaultSigner)
 	defer storerEmpty.Close()
 
-	wFunc := func(addr swarm.Address) bool {
+	wFunc := func(addr penguin.Address) bool {
 		return false
 	}
 
@@ -316,8 +316,8 @@ func TestPushChunkToClosest(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110 -> po 1
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")   // base is 0000
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000") // binary 0110 -> po 1
 	callbackC := make(chan struct{}, 1)
 	// peer is the node responding to the chunk receipt message
 	// mock should return ErrWantSelf since there's no one to forward to
@@ -403,10 +403,10 @@ func TestPushChunkToNextClosest(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
 
-	peer1 := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	peer2 := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
+	peer1 := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	peer2 := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
 
 	// peer is the node responding to the chunk receipt message
 	// mock should return ErrWantSelf since there's no one to forward to
@@ -526,12 +526,12 @@ func TestPushChunkToClosestFailedAttemptRetry(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
 
-	peer1 := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	peer2 := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
-	peer3 := swarm.MustParseHexAddress("9000000000000000000000000000000000000000000000000000000000000000")
-	peer4 := swarm.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
+	peer1 := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	peer2 := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
+	peer3 := penguin.MustParseHexAddress("9000000000000000000000000000000000000000000000000000000000000000")
+	peer4 := penguin.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
 
 	// peer is the node responding to the chunk receipt message
 	// mock should return ErrWantSelf since there's no one to forward to
@@ -558,7 +558,7 @@ func TestPushChunkToClosestFailedAttemptRetry(t *testing.T) {
 	)
 
 	pivotAccounting := accountingmock.NewAccounting(
-		accountingmock.WithReserveFunc(func(ctx context.Context, peer swarm.Address, price uint64) error {
+		accountingmock.WithReserveFunc(func(ctx context.Context, peer penguin.Address, price uint64) error {
 			if peer.String() == peer4.String() {
 				return nil
 			}
@@ -629,7 +629,7 @@ func TestPushChunkToClosestFailedAttemptRetry(t *testing.T) {
 	}
 
 	for _, p := range []struct {
-		addr swarm.Address
+		addr penguin.Address
 		acct accounting.Interface
 	}{
 		{peer1, peerAccounting1},
@@ -658,9 +658,9 @@ func TestHandler(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	triggerPeer := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
-	pivotPeer := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
+	pivotPeer := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
 
 	// Create the closest peer
 	psClosestPeer, closestStorerPeerDB, _, closestAccounting := createPushSyncNode(t, closestPeer, defaultPrices, nil, nil, defaultSigner, mock.WithClosestPeerErr(topology.ErrWantSelf))
@@ -747,8 +747,8 @@ func TestSignsReceipt(t *testing.T) {
 	}))
 
 	// create a pivot node and a mocked closest node
-	pivotPeer := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	pivotPeer := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
 
 	// Create the closest peer
 	psClosestPeer, closestStorerPeerDB, _, _ := createPushSyncNode(t, closestPeer, defaultPrices, nil, nil, signer, mock.WithClosestPeerErr(topology.ErrWantSelf))
@@ -778,14 +778,14 @@ func TestSignsReceipt(t *testing.T) {
 	}
 }
 
-func createPushSyncNode(t *testing.T, addr swarm.Address, prices pricerParameters, recorder *streamtest.Recorder, unwrap func(swarm.Chunk), signer crypto.Signer, mockOpts ...mock.Option) (*pushsync.PushSync, *mocks.MockStorer, *tags.Tags, accounting.Interface) {
+func createPushSyncNode(t *testing.T, addr penguin.Address, prices pricerParameters, recorder *streamtest.Recorder, unwrap func(penguin.Chunk), signer crypto.Signer, mockOpts ...mock.Option) (*pushsync.PushSync, *mocks.MockStorer, *tags.Tags, accounting.Interface) {
 	t.Helper()
 	mockAccounting := accountingmock.NewAccounting()
 	ps, mstorer, ts := createPushSyncNodeWithAccounting(t, addr, prices, recorder, unwrap, signer, mockAccounting, mockOpts...)
 	return ps, mstorer, ts, mockAccounting
 }
 
-func createPushSyncNodeWithAccounting(t *testing.T, addr swarm.Address, prices pricerParameters, recorder *streamtest.Recorder, unwrap func(swarm.Chunk), signer crypto.Signer, acct accounting.Interface, mockOpts ...mock.Option) (*pushsync.PushSync, *mocks.MockStorer, *tags.Tags) {
+func createPushSyncNodeWithAccounting(t *testing.T, addr penguin.Address, prices pricerParameters, recorder *streamtest.Recorder, unwrap func(penguin.Chunk), signer crypto.Signer, acct accounting.Interface, mockOpts ...mock.Option) (*pushsync.PushSync, *mocks.MockStorer, *tags.Tags) {
 	t.Helper()
 	logger := logging.New(ioutil.Discard, 0)
 	storer := mocks.NewStorer()
@@ -798,16 +798,16 @@ func createPushSyncNodeWithAccounting(t *testing.T, addr swarm.Address, prices p
 
 	recorderDisconnecter := streamtest.NewRecorderDisconnecter(recorder)
 	if unwrap == nil {
-		unwrap = func(swarm.Chunk) {}
+		unwrap = func(penguin.Chunk) {}
 	}
-	validStamp := func(ch swarm.Chunk, stamp []byte) (swarm.Chunk, error) {
+	validStamp := func(ch penguin.Chunk, stamp []byte) (penguin.Chunk, error) {
 		return ch.WithStamp(postage.NewStamp(nil, nil)), nil
 	}
 
 	return pushsync.New(addr, recorderDisconnecter, storer, mockTopology, mtag, true, unwrap, validStamp, logger, acct, mockPricer, signer, nil), storer, mtag
 }
 
-func waitOnRecordAndTest(t *testing.T, peer swarm.Address, recorder *streamtest.Recorder, add swarm.Address, data []byte) {
+func waitOnRecordAndTest(t *testing.T, peer penguin.Address, recorder *streamtest.Recorder, add penguin.Address, data []byte) {
 	t.Helper()
 	records := recorder.WaitRecords(t, peer, pushsync.ProtocolName, pushsync.ProtocolVersion, pushsync.StreamName, 1, 5)
 
@@ -849,7 +849,7 @@ func waitOnRecordAndTest(t *testing.T, peer swarm.Address, recorder *streamtest.
 			t.Fatal("too many messages")
 		}
 		receipt := messages[0].(*pb.Receipt)
-		receiptAddress := swarm.NewAddress(receipt.Address)
+		receiptAddress := penguin.NewAddress(receipt.Address)
 
 		if !receiptAddress.Equal(add) {
 			t.Fatalf("receipt address mismatch")
@@ -859,8 +859,8 @@ func waitOnRecordAndTest(t *testing.T, peer swarm.Address, recorder *streamtest.
 
 func TestFailureRequestCache(t *testing.T) {
 	cache := pushsync.FailedRequestCache()
-	peer := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
-	chunk := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	peer := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000")
+	chunk := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
 
 	t.Run("not useful after threshold", func(t *testing.T) {
 		if !cache.Useful(peer, chunk) {
@@ -915,12 +915,12 @@ func TestPushChunkToClosestSkipFailed(t *testing.T) {
 	chunk := testingc.FixtureChunk("7000")
 
 	// create a pivot node and a mocked closest node
-	pivotNode := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
+	pivotNode := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000000") // base is 0000
 
-	peer1 := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	peer2 := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
-	peer3 := swarm.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
-	peer4 := swarm.MustParseHexAddress("9000000000000000000000000000000000000000000000000000000000000000")
+	peer1 := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	peer2 := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
+	peer3 := penguin.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
+	peer4 := penguin.MustParseHexAddress("9000000000000000000000000000000000000000000000000000000000000000")
 
 	// peer is the node responding to the chunk receipt message
 	// mock should return ErrWantSelf since there's no one to forward to
@@ -936,7 +936,7 @@ func TestPushChunkToClosestSkipFailed(t *testing.T) {
 	psPeer4, storerPeer4, _, peerAccounting4 := createPushSyncNode(
 		t, peer4, defaultPrices, nil, nil, defaultSigner,
 		mock.WithClosestPeerErr(topology.ErrWantSelf),
-		mock.WithIsWithinFunc(func(_ swarm.Address) bool { return true }),
+		mock.WithIsWithinFunc(func(_ penguin.Address) bool { return true }),
 	)
 	defer storerPeer4.Close()
 
@@ -955,7 +955,7 @@ func TestPushChunkToClosestSkipFailed(t *testing.T) {
 			},
 		),
 		streamtest.WithStreamError(
-			func(addr swarm.Address, _, _, _ string) error {
+			func(addr penguin.Address, _, _, _ string) error {
 				lock.Lock()
 				defer lock.Unlock()
 				if fail && addr.String() != peer4.String() {
@@ -1038,7 +1038,7 @@ func TestPushChunkToClosestSkipFailed(t *testing.T) {
 	}
 
 	for _, p := range []struct {
-		addr swarm.Address
+		addr penguin.Address
 		acct accounting.Interface
 	}{
 		{peer1, peerAccounting1},
@@ -1056,8 +1056,8 @@ func TestPushChunkToClosestSkipFailed(t *testing.T) {
 	}
 }
 
-func chanFunc(c chan<- struct{}) func(swarm.Chunk) {
-	return func(_ swarm.Chunk) {
+func chanFunc(c chan<- struct{}) func(penguin.Chunk) {
+	return func(_ penguin.Chunk) {
 		c <- struct{}{}
 	}
 }

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,31 +21,31 @@ func TestCORSHeaders(t *testing.T) {
 		},
 		{
 			name:           "no origin",
-			allowedOrigins: []string{"https://gateway.ethswarm.org"},
+			allowedOrigins: []string{"https://gateway.ethpenguin.org"},
 			wantCORS:       false,
 		},
 		{
 			name:           "single explicit",
-			origin:         "https://gateway.ethswarm.org",
-			allowedOrigins: []string{"https://gateway.ethswarm.org"},
+			origin:         "https://gateway.ethpenguin.org",
+			allowedOrigins: []string{"https://gateway.ethpenguin.org"},
 			wantCORS:       true,
 		},
 		{
 			name:           "single explicit blocked",
 			origin:         "http://a-hacker.me",
-			allowedOrigins: []string{"https://gateway.ethswarm.org"},
+			allowedOrigins: []string{"https://gateway.ethpenguin.org"},
 			wantCORS:       false,
 		},
 		{
 			name:           "multiple explicit",
-			origin:         "https://staging.gateway.ethswarm.org",
-			allowedOrigins: []string{"https://gateway.ethswarm.org", "https://staging.gateway.ethswarm.org"},
+			origin:         "https://staging.gateway.ethpenguin.org",
+			allowedOrigins: []string{"https://gateway.ethpenguin.org", "https://staging.gateway.ethpenguin.org"},
 			wantCORS:       true,
 		},
 		{
 			name:           "multiple explicit blocked",
 			origin:         "http://a-hacker.me",
-			allowedOrigins: []string{"https://gateway.ethswarm.org", "https://staging.gateway.ethswarm.org"},
+			allowedOrigins: []string{"https://gateway.ethpenguin.org", "https://staging.gateway.ethpenguin.org"},
 			wantCORS:       false,
 		},
 		{
@@ -56,19 +56,19 @@ func TestCORSHeaders(t *testing.T) {
 		},
 		{
 			name:           "wildcard",
-			origin:         "https://gateway.ethswarm.org",
+			origin:         "https://gateway.ethpenguin.org",
 			allowedOrigins: []string{"*"},
 			wantCORS:       true,
 		},
 		{
 			name:           "with origin only",
-			origin:         "https://gateway.ethswarm.org",
+			origin:         "https://gateway.ethpenguin.org",
 			allowedOrigins: nil,
 			wantCORS:       false,
 		},
 		{
 			name:           "with origin only not nil",
-			origin:         "https://gateway.ethswarm.org",
+			origin:         "https://gateway.ethpenguin.org",
 			allowedOrigins: []string{},
 			wantCORS:       false,
 		},

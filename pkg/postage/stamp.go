@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // StampSize is the number of bytes in the serialisation of a stamp
@@ -29,7 +29,7 @@ var (
 // - authorisation - the batch owner is the stamp signer
 // the validity  check is only meaningful in its association of a chunk
 // this chunk address needs to be given as argument
-func (s *Stamp) Valid(chunkAddr swarm.Address, ownerAddr []byte) error {
+func (s *Stamp) Valid(chunkAddr penguin.Address, ownerAddr []byte) error {
 	toSign, err := toSignDigest(chunkAddr, s.batchID)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (s *Stamp) Valid(chunkAddr swarm.Address, ownerAddr []byte) error {
 	return nil
 }
 
-var _ swarm.Stamp = (*Stamp)(nil)
+var _ penguin.Stamp = (*Stamp)(nil)
 
 // Stamp represents a postage stamp as attached to a chunk.
 type Stamp struct {
@@ -96,8 +96,8 @@ func (s *Stamp) UnmarshalBinary(buf []byte) error {
 
 // toSignDigest creates a digest to represent the stamp which is to be signed by
 // the owner.
-func toSignDigest(addr swarm.Address, id []byte) ([]byte, error) {
-	h := swarm.NewHasher()
+func toSignDigest(addr penguin.Address, id []byte) ([]byte, error) {
+	h := penguin.NewHasher()
 	_, err := h.Write(addr.Bytes())
 	if err != nil {
 		return nil, err
@@ -110,8 +110,8 @@ func toSignDigest(addr swarm.Address, id []byte) ([]byte, error) {
 }
 
 // ValidStamp returns a stampvalidator function passed to protocols with chunk entrypoints.
-func ValidStamp(batchStore Storer) func(chunk swarm.Chunk, stampBytes []byte) (swarm.Chunk, error) {
-	return func(chunk swarm.Chunk, stampBytes []byte) (swarm.Chunk, error) {
+func ValidStamp(batchStore Storer) func(chunk penguin.Chunk, stampBytes []byte) (penguin.Chunk, error) {
+	return func(chunk penguin.Chunk, stampBytes []byte) (penguin.Chunk, error) {
 		stamp := new(Stamp)
 		err := stamp.UnmarshalBinary(stampBytes)
 		if err != nil {

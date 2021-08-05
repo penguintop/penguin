@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -93,7 +93,7 @@ func (s *Service) chequebookAddressHandler(w http.ResponseWriter, r *http.Reques
 
 func (s *Service) chequebookLastPeerHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
-	peer, err := swarm.ParseHexAddress(addr)
+	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
 		s.logger.Debugf("debug api: chequebook cheque peer: invalid peer address %s: %v", addr, err)
 		s.logger.Errorf("debug api: chequebook cheque peer: invalid peer address %s", addr)
@@ -214,7 +214,7 @@ type swapCashoutResponse struct {
 
 func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
-	peer, err := swarm.ParseHexAddress(addr)
+	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
 		s.logger.Debugf("debug api: cashout peer: invalid peer address %s: %v", addr, err)
 		s.logger.Errorf("debug api: cashout peer: invalid peer address %s", addr)
@@ -262,7 +262,7 @@ type swapCashoutStatusResult struct {
 }
 
 type swapCashoutStatusResponse struct {
-	Peer            swarm.Address                     `json:"peer"`
+	Peer            penguin.Address                   `json:"peer"`
 	Cheque          *chequebookLastChequePeerResponse `json:"lastCashedCheque"`
 	TransactionHash *common.Hash                      `json:"transactionHash"`
 	Result          *swapCashoutStatusResult          `json:"result"`
@@ -271,7 +271,7 @@ type swapCashoutStatusResponse struct {
 
 func (s *Service) swapCashoutStatusHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
-	peer, err := swarm.ParseHexAddress(addr)
+	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
 		s.logger.Debugf("debug api: cashout status peer: invalid peer address %s: %v", addr, err)
 		s.logger.Errorf("debug api: cashout status peer: invalid peer address %s", addr)

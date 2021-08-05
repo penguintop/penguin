@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 	"github.com/multiformats/go-multiaddr"
 )
@@ -35,15 +35,15 @@ type libp2pServiceOpts struct {
 }
 
 // newService constructs a new libp2p service.
-func newService(t *testing.T, networkID uint64, o libp2pServiceOpts) (s *libp2p.Service, overlay swarm.Address) {
+func newService(t *testing.T, networkID uint64, o libp2pServiceOpts) (s *libp2p.Service, overlay penguin.Address) {
 	t.Helper()
 
-	swarmKey, err := crypto.GenerateSecp256k1Key()
+	penguinKey, err := crypto.GenerateSecp256k1Key()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	overlay, err = crypto.NewOverlayAddress(swarmKey.PublicKey, networkID)
+	overlay, err = crypto.NewOverlayAddress(penguinKey.PublicKey, networkID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func newService(t *testing.T, networkID uint64, o libp2pServiceOpts) (s *libp2p.
 
 	senderMatcher := &MockSenderMatcher{}
 
-	s, err = libp2p.New(ctx, crypto.NewDefaultSigner(swarmKey), networkID, overlay, addr, o.Addressbook, statestore, o.lightNodes, senderMatcher, o.Logger, nil, opts)
+	s, err = libp2p.New(ctx, crypto.NewDefaultSigner(penguinKey), networkID, overlay, addr, o.Addressbook, statestore, o.lightNodes, senderMatcher, o.Logger, nil, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func newService(t *testing.T, networkID uint64, o libp2pServiceOpts) (s *libp2p.
 }
 
 // expectPeers validates that peers with addresses are connected.
-func expectPeers(t *testing.T, s *libp2p.Service, addrs ...swarm.Address) {
+func expectPeers(t *testing.T, s *libp2p.Service, addrs ...penguin.Address) {
 	t.Helper()
 
 	peers := s.Peers()
@@ -119,7 +119,7 @@ func expectPeers(t *testing.T, s *libp2p.Service, addrs ...swarm.Address) {
 // expectPeersEventually validates that peers with addresses are connected with
 // retries. It is supposed to be used to validate asynchronous connecting on the
 // peer that is connected to.
-func expectPeersEventually(t *testing.T, s *libp2p.Service, addrs ...swarm.Address) {
+func expectPeersEventually(t *testing.T, s *libp2p.Service, addrs ...penguin.Address) {
 	t.Helper()
 
 	var peers []p2p.Peer
@@ -162,6 +162,6 @@ func serviceUnderlayAddress(t *testing.T, s *libp2p.Service) multiaddr.Multiaddr
 
 type MockSenderMatcher struct{}
 
-func (m MockSenderMatcher) Matches(context.Context, []byte, uint64, swarm.Address) (bool, error) {
+func (m MockSenderMatcher) Matches(context.Context, []byte, uint64, penguin.Address) (bool, error) {
 	return true, nil
 }

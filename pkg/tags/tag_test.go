@@ -25,7 +25,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/logging"
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -223,7 +223,7 @@ func TestMarshallingWithAddr(t *testing.T) {
 	mockStatestore := statestore.NewStateStore()
 	logger := logging.New(ioutil.Discard, 0)
 	tg := NewTag(context.Background(), 111, 10, nil, mockStatestore, logger)
-	tg.Address = swarm.NewAddress([]byte{0, 1, 2, 3, 4, 5, 6})
+	tg.Address = penguin.NewAddress([]byte{0, 1, 2, 3, 4, 5, 6})
 
 	for _, f := range allStates {
 		err := tg.Inc(f)

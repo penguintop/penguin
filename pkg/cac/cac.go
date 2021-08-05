@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/penguintop/penguin/pkg/bmtpool"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -15,9 +15,9 @@ var (
 )
 
 // New creates a new content address chunk by initializing a span and appending the data to it.
-func New(data []byte) (swarm.Chunk, error) {
+func New(data []byte) (penguin.Chunk, error) {
 	dataLength := len(data)
-	if dataLength > swarm.ChunkSize {
+	if dataLength > penguin.ChunkSize {
 		return nil, errTooLargeChunkData
 	}
 
@@ -25,26 +25,26 @@ func New(data []byte) (swarm.Chunk, error) {
 		return nil, errTooShortChunkData
 	}
 
-	span := make([]byte, swarm.SpanSize)
+	span := make([]byte, penguin.SpanSize)
 	binary.LittleEndian.PutUint64(span, uint64(dataLength))
 	return newWithSpan(data, span)
 }
 
 // NewWithDataSpan creates a new chunk assuming that the span precedes the actual data.
-func NewWithDataSpan(data []byte) (swarm.Chunk, error) {
+func NewWithDataSpan(data []byte) (penguin.Chunk, error) {
 	dataLength := len(data)
-	if dataLength > swarm.ChunkSize+swarm.SpanSize {
+	if dataLength > penguin.ChunkSize+penguin.SpanSize {
 		return nil, errTooLargeChunkData
 	}
 
-	if dataLength < swarm.SpanSize {
+	if dataLength < penguin.SpanSize {
 		return nil, errTooShortChunkData
 	}
-	return newWithSpan(data[swarm.SpanSize:], data[:swarm.SpanSize])
+	return newWithSpan(data[penguin.SpanSize:], data[:penguin.SpanSize])
 }
 
 // newWithSpan creates a new chunk prepending the given span to the data.
-func newWithSpan(data, span []byte) (swarm.Chunk, error) {
+func newWithSpan(data, span []byte) (penguin.Chunk, error) {
 	h := hasher(data)
 	hash, err := h(span)
 	if err != nil {
@@ -52,9 +52,9 @@ func newWithSpan(data, span []byte) (swarm.Chunk, error) {
 	}
 
 	cdata := make([]byte, len(data)+len(span))
-	copy(cdata[:swarm.SpanSize], span)
-	copy(cdata[swarm.SpanSize:], data)
-	return swarm.NewChunk(swarm.NewAddress(hash), cdata), nil
+	copy(cdata[:penguin.SpanSize], span)
+	copy(cdata[penguin.SpanSize:], data)
+	return penguin.NewChunk(penguin.NewAddress(hash), cdata), nil
 }
 
 // hasher is a helper function to hash a given data based on the given span.
@@ -72,17 +72,17 @@ func hasher(data []byte) func([]byte) ([]byte, error) {
 }
 
 // Valid checks whether the given chunk is a valid content-addressed chunk.
-func Valid(c swarm.Chunk) bool {
+func Valid(c penguin.Chunk) bool {
 	data := c.Data()
-	if len(data) < swarm.SpanSize {
+	if len(data) < penguin.SpanSize {
 		return false
 	}
 
-	if len(data) > swarm.ChunkSize+swarm.SpanSize {
+	if len(data) > penguin.ChunkSize+penguin.SpanSize {
 		return false
 	}
 
-	h := hasher(data[swarm.SpanSize:])
-	hash, _ := h(data[:swarm.SpanSize])
+	h := hasher(data[penguin.SpanSize:])
+	hash, _ := h(data[:penguin.SpanSize])
 	return bytes.Equal(hash, c.Address().Bytes())
 }

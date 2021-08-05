@@ -1,8 +1,8 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package swarm
+package penguin
 
 // Proximity returns the proximity order of the MSB distance between x and y
 //

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,34 +7,34 @@ package testing
 import (
 	"testing"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	mockbytes "gitlab.com/nolash/go-mockbytes"
 )
 
 var (
 	fileByteMod int = 255
 	fileLengths     = []int{
-		31,                           // 0
-		32,                           // 1
-		33,                           // 2
-		63,                           // 3
-		64,                           // 4
-		65,                           // 5
-		swarm.ChunkSize,              // 6
-		swarm.ChunkSize + 31,         // 7
-		swarm.ChunkSize + 32,         // 8
-		swarm.ChunkSize + 63,         // 9
-		swarm.ChunkSize + 64,         // 10
-		swarm.ChunkSize * 2,          // 11
-		swarm.ChunkSize*2 + 32,       // 12
-		swarm.ChunkSize * 128,        // 13
-		swarm.ChunkSize*128 + 31,     // 14
-		swarm.ChunkSize*128 + 32,     // 15
-		swarm.ChunkSize*128 + 64,     // 16
-		swarm.ChunkSize * 129,        // 17
-		swarm.ChunkSize * 130,        // 18
-		swarm.ChunkSize * 128 * 128,  // 19
-		swarm.ChunkSize*128*128 + 32, // 20
+		31,                             // 0
+		32,                             // 1
+		33,                             // 2
+		63,                             // 3
+		64,                             // 4
+		65,                             // 5
+        penguin.ChunkSize,              // 6
+        penguin.ChunkSize + 31,         // 7
+        penguin.ChunkSize + 32,         // 8
+        penguin.ChunkSize + 63,         // 9
+        penguin.ChunkSize + 64,         // 10
+        penguin.ChunkSize * 2,          // 11
+        penguin.ChunkSize*2 + 32,       // 12
+        penguin.ChunkSize * 128,        // 13
+        penguin.ChunkSize*128 + 31,     // 14
+        penguin.ChunkSize*128 + 32,     // 15
+        penguin.ChunkSize*128 + 64,     // 16
+        penguin.ChunkSize * 129,        // 17
+        penguin.ChunkSize * 130,        // 18
+        penguin.ChunkSize * 128 * 128,  // 19
+        penguin.ChunkSize*128*128 + 32, // 20
 	}
 	fileExpectHashHex = []string{
 		"ece86edb20669cc60d142789d464d57bdf5e33cb789d443f608cbd81cfa5697d", // 0
@@ -63,7 +63,7 @@ var (
 
 // GetVector returns test data corresponding to the test vector index,
 // and the expected result address.
-func GetVector(t *testing.T, idx int) ([]byte, swarm.Address) {
+func GetVector(t *testing.T, idx int) ([]byte, penguin.Address) {
 	t.Helper()
 	if idx > fileLengths[idx] {
 		t.Fatalf("idx %d out of bound for count %d", idx, GetVectorCount())
@@ -73,7 +73,7 @@ func GetVector(t *testing.T, idx int) ([]byte, swarm.Address) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return data, swarm.MustParseHexAddress(fileExpectHashHex[idx])
+	return data, penguin.MustParseHexAddress(fileExpectHashHex[idx])
 }
 
 // GetVectorCount returns the number of available test vectors.

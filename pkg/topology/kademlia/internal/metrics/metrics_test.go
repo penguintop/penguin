@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology/kademlia/internal/metrics"
 	"github.com/google/go-cmp/cmp"
 )
 
-func snapshot(t *testing.T, mc *metrics.Collector, sst time.Time, addr swarm.Address) *metrics.Snapshot {
+func snapshot(t *testing.T, mc *metrics.Collector, sst time.Time, addr penguin.Address) *metrics.Snapshot {
 	t.Helper()
 
 	ss := mc.Snapshot(sst, addr)
@@ -41,7 +41,7 @@ func TestPeerMetricsCollector(t *testing.T) {
 
 	var (
 		mc   = metrics.NewCollector(db)
-		addr = swarm.MustParseHexAddress("0123456789")
+		addr = penguin.MustParseHexAddress("0123456789")
 
 		t1 = time.Now()               // Login time.
 		t2 = t1.Add(10 * time.Second) // Snapshot time.

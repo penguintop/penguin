@@ -1,18 +1,18 @@
-// Copyright 2019 The Swarm Authors
-// This file is part of the Swarm library.
+// Copyright 2019 The Penguin Authors
+// This file is part of the Penguin library.
 //
-// The Swarm library is free software: you can redistribute it and/or modify
+// The Penguin library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The Swarm library is distributed in the hope that it will be useful,
+// The Penguin library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the Swarm library. If not, see <http://www.gnu.org/licenses/>.
+// along with the Penguin library. If not, see <http://www.gnu.org/licenses/>.
 
 package localstore
 
@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -195,7 +195,7 @@ func migrateYuj(db *DB) error {
 	pullIndex, err := db.shed.NewIndex("PO|BinID->Hash|Tag", shed.IndexFuncs{
 		EncodeKey: func(fields shed.Item) (key []byte, err error) {
 			key = make([]byte, 41)
-			key[0] = db.po(swarm.NewAddress(fields.Address))
+			key[0] = db.po(penguin.NewAddress(fields.Address))
 			binary.BigEndian.PutUint64(key[1:9], fields.BinID)
 			return key, nil
 		},
@@ -360,7 +360,7 @@ func migrateYuj(db *DB) error {
 		return fmt.Errorf("put gcsize: %w", err)
 	}
 
-	for i := 0; i < int(swarm.MaxBins); i++ {
+	for i := 0; i < int(penguin.MaxBins); i++ {
 		if err := binIDs.Put(uint64(i), 0); err != nil {
 			return fmt.Errorf("zero binsIDs: %w", err)
 		}

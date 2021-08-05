@@ -24,7 +24,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestDB_pullIndex validates the ordering of keys in pull index.
@@ -57,8 +57,8 @@ func TestDB_pullIndex(t *testing.T) {
 	}
 
 	testItemsOrder(t, db.pullIndex, chunks, func(i, j int) (less bool) {
-		poi := swarm.Proximity(db.baseKey, chunks[i].Address().Bytes())
-		poj := swarm.Proximity(db.baseKey, chunks[j].Address().Bytes())
+		poi := penguin.Proximity(db.baseKey, chunks[i].Address().Bytes())
+		poj := penguin.Proximity(db.baseKey, chunks[j].Address().Bytes())
 		if poi < poj {
 			return true
 		}

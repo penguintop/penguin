@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -31,13 +31,13 @@ var (
 )
 
 type paymentCall struct {
-	peer   swarm.Address
+	peer   penguin.Address
 	amount *big.Int
 }
 
 // booking represents an accounting action and the expected result afterwards
 type booking struct {
-	peer            swarm.Address
+	peer            penguin.Address
 	price           int64 // Credit if <0, Debit otherwise
 	expectedBalance int64
 }
@@ -54,12 +54,12 @@ func TestAccountingAddBalance(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	peer2Addr, err := swarm.ParseHexAddress("00112244")
+	peer2Addr, err := penguin.ParseHexAddress("00112244")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,12 +117,12 @@ func TestAccountingAdd_persistentBalances(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	peer2Addr, err := swarm.ParseHexAddress("00112244")
+	peer2Addr, err := penguin.ParseHexAddress("00112244")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,7 +177,7 @@ func TestAccountingReserve(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +205,7 @@ func TestAccountingDisconnect(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,18 +246,18 @@ func TestAccountingCallSettlement(t *testing.T) {
 
 	refreshchan := make(chan paymentCall, 1)
 
-	f := func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	f := func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return amount, 0, nil
 	}
 
-	pay := func(ctx context.Context, peer swarm.Address, amount *big.Int) {
+	pay := func(ctx context.Context, peer penguin.Address, amount *big.Int) {
 	}
 
 	acc.SetRefreshFunc(f)
 	acc.SetPayFunc(pay)
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -372,16 +372,16 @@ func TestAccountingCallSettlementMonetary(t *testing.T) {
 
 	notTimeSettledAmount := big.NewInt(testRefreshRate * 2)
 
-	acc.SetRefreshFunc(func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	acc.SetRefreshFunc(func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return new(big.Int).Sub(amount, notTimeSettledAmount), 0, nil
 	})
 
-	acc.SetPayFunc(func(ctx context.Context, peer swarm.Address, amount *big.Int) {
+	acc.SetPayFunc(func(ctx context.Context, peer penguin.Address, amount *big.Int) {
 		paychan <- paymentCall{peer: peer, amount: amount}
 	})
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -441,7 +441,7 @@ func TestAccountingCallSettlementMonetary(t *testing.T) {
 		t.Fatalf("expected balance to be adjusted. got %d", balance)
 	}
 
-	acc.SetRefreshFunc(func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	acc.SetRefreshFunc(func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return big.NewInt(0), 0, nil
 	})
@@ -489,16 +489,16 @@ func TestAccountingCallSettlementTooSoon(t *testing.T) {
 
 	ts := int64(1000)
 
-	acc.SetRefreshFunc(func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	acc.SetRefreshFunc(func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return amount, ts, nil
 	})
 
-	acc.SetPayFunc(func(ctx context.Context, peer swarm.Address, amount *big.Int) {
+	acc.SetPayFunc(func(ctx context.Context, peer penguin.Address, amount *big.Int) {
 		paychan <- paymentCall{peer: peer, amount: amount}
 	})
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -626,14 +626,14 @@ func TestAccountingCallSettlementEarly(t *testing.T) {
 
 	refreshchan := make(chan paymentCall, 1)
 
-	f := func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	f := func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return amount, 0, nil
 	}
 
 	acc.SetRefreshFunc(f)
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -682,7 +682,7 @@ func TestAccountingSurplusBalance(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -795,7 +795,7 @@ func TestAccountingNotifyPaymentReceived(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -828,18 +828,18 @@ func TestAccountingNotifyPaymentReceived(t *testing.T) {
 
 type pricingMock struct {
 	called           bool
-	peer             swarm.Address
+	peer             penguin.Address
 	paymentThreshold *big.Int
 }
 
-func (p *pricingMock) AnnouncePaymentThreshold(ctx context.Context, peer swarm.Address, paymentThreshold *big.Int) error {
+func (p *pricingMock) AnnouncePaymentThreshold(ctx context.Context, peer penguin.Address, paymentThreshold *big.Int) error {
 	p.called = true
 	p.peer = peer
 	p.paymentThreshold = paymentThreshold
 	return nil
 }
 
-func (p *pricingMock) AnnouncePaymentThresholdAndPriceTable(ctx context.Context, peer swarm.Address, paymentThreshold *big.Int) error {
+func (p *pricingMock) AnnouncePaymentThresholdAndPriceTable(ctx context.Context, peer penguin.Address, paymentThreshold *big.Int) error {
 	p.called = true
 	p.peer = peer
 	p.paymentThreshold = paymentThreshold
@@ -859,7 +859,7 @@ func TestAccountingConnected(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -897,14 +897,14 @@ func TestAccountingNotifyPaymentThreshold(t *testing.T) {
 
 	refreshchan := make(chan paymentCall, 1)
 
-	f := func(ctx context.Context, peer swarm.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
+	f := func(ctx context.Context, peer penguin.Address, amount *big.Int, shadowBalance *big.Int) (*big.Int, int64, error) {
 		refreshchan <- paymentCall{peer: peer, amount: amount}
 		return amount, 0, nil
 	}
 
 	acc.SetRefreshFunc(f)
 
-	peer1Addr, err := swarm.ParseHexAddress("00112233")
+	peer1Addr, err := penguin.ParseHexAddress("00112233")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -957,7 +957,7 @@ func TestAccountingPeerDebt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	peer1Addr := swarm.MustParseHexAddress("00112233")
+	peer1Addr := penguin.MustParseHexAddress("00112233")
 	debt := uint64(1000)
 	debitAction := acc.PrepareDebit(peer1Addr, debt)
 	err = debitAction.Apply()
@@ -973,7 +973,7 @@ func TestAccountingPeerDebt(t *testing.T) {
 		t.Fatalf("wrong actual debt. got %d wanted %d", actualDebt, debt)
 	}
 
-	peer2Addr := swarm.MustParseHexAddress("11112233")
+	peer2Addr := penguin.MustParseHexAddress("11112233")
 	err = acc.Credit(peer2Addr, 500)
 	if err != nil {
 		t.Fatal(err)
@@ -986,7 +986,7 @@ func TestAccountingPeerDebt(t *testing.T) {
 		t.Fatalf("wrong actual debt. got %d wanted 0", actualDebt)
 	}
 
-	peer3Addr := swarm.MustParseHexAddress("22112233")
+	peer3Addr := penguin.MustParseHexAddress("22112233")
 	actualDebt, err = acc.PeerDebt(peer3Addr)
 	if err != nil {
 		t.Fatal(err)

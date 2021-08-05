@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/pipeline"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
@@ -35,15 +35,15 @@ func (w *storeWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
 		return errInvalidData
 	}
 	tag := sctx.GetTag(w.ctx)
-	var c swarm.Chunk
+	var c penguin.Chunk
 	if tag != nil {
 		err := tag.Inc(tags.StateSplit)
 		if err != nil {
 			return err
 		}
-		c = swarm.NewChunk(swarm.NewAddress(p.Ref), p.Data).WithTagID(tag.Uid)
+		c = penguin.NewChunk(penguin.NewAddress(p.Ref), p.Data).WithTagID(tag.Uid)
 	} else {
-		c = swarm.NewChunk(swarm.NewAddress(p.Ref), p.Data)
+		c = penguin.NewChunk(penguin.NewAddress(p.Ref), p.Data)
 	}
 	seen, err := w.l.Put(w.ctx, w.mode, c)
 	if err != nil {

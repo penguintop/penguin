@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/pricing/pb"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -33,17 +33,17 @@ var _ Interface = (*Service)(nil)
 
 // Interface is the main interface of the pricing protocol
 type Interface interface {
-	AnnouncePaymentThreshold(ctx context.Context, peer swarm.Address, paymentThreshold *big.Int) error
+	AnnouncePaymentThreshold(ctx context.Context, peer penguin.Address, paymentThreshold *big.Int) error
 }
 
 // PriceTableObserver is used for being notified of price table updates
 type PriceTableObserver interface {
-	NotifyPriceTable(peer swarm.Address, priceTable []uint64) error
+	NotifyPriceTable(peer penguin.Address, priceTable []uint64) error
 }
 
 // PaymentThresholdObserver is used for being notified of payment threshold updates
 type PaymentThresholdObserver interface {
-	NotifyPaymentThreshold(peer swarm.Address, paymentThreshold *big.Int) error
+	NotifyPaymentThreshold(peer penguin.Address, paymentThreshold *big.Int) error
 }
 
 type Service struct {
@@ -117,7 +117,7 @@ func (s *Service) init(ctx context.Context, p p2p.Peer) error {
 }
 
 // AnnouncePaymentThreshold announces the payment threshold to per
-func (s *Service) AnnouncePaymentThreshold(ctx context.Context, peer swarm.Address, paymentThreshold *big.Int) error {
+func (s *Service) AnnouncePaymentThreshold(ctx context.Context, peer penguin.Address, paymentThreshold *big.Int) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 

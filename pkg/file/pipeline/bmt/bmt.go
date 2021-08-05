@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/bmtpool"
 	"github.com/penguintop/penguin/pkg/file/pipeline"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -31,12 +31,12 @@ func NewBmtWriter(next pipeline.ChainWriter) pipeline.ChainWriter {
 // ChainWrite writes data in chain. It assumes span has been prepended to the data.
 // The span can be encrypted or unencrypted.
 func (w *bmtWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
-	if len(p.Data) < swarm.SpanSize {
+	if len(p.Data) < penguin.SpanSize {
 		return errInvalidData
 	}
 	hasher := bmtpool.Get()
-	hasher.SetHeader(p.Data[:swarm.SpanSize])
-	_, err := hasher.Write(p.Data[swarm.SpanSize:])
+	hasher.SetHeader(p.Data[:penguin.SpanSize])
+	_, err := hasher.Write(p.Data[penguin.SpanSize:])
 	if err != nil {
 		bmtpool.Put(hasher)
 		return err

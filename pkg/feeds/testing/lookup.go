@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/feeds"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Timeout struct {
@@ -29,7 +29,7 @@ type Timeout struct {
 var searchTimeout = 30 * time.Millisecond
 
 // Get overrides the mock storer and introduces latency
-func (t *Timeout) Get(ctx context.Context, mode storage.ModeGet, addr swarm.Address) (swarm.Chunk, error) {
+func (t *Timeout) Get(ctx context.Context, mode storage.ModeGet, addr penguin.Address) (penguin.Chunk, error) {
 	ch, err := t.Storer.Get(ctx, mode, addr)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {

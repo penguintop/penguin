@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/penguintop/penguin/pkg/logging"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -87,8 +87,8 @@ type option func(*command)
 func newCommand(opts ...option) (c *command, err error) {
 	c = &command{
 		root: &cobra.Command{
-			Use:           "bee",
-			Short:         "XWC Swarm Bee",
+			Use:           "pen",
+			Short:         "XWC Penguin Pen",
 			SilenceErrors: true,
 			SilenceUsage:  true,
 			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
@@ -152,23 +152,23 @@ func Execute() (err error) {
 
 func (c *command) initGlobalFlags() {
 	globalFlags := c.root.PersistentFlags()
-	globalFlags.StringVar(&c.cfgFile, "config", "", "config file (default is $HOME/.bee.yaml)")
+	globalFlags.StringVar(&c.cfgFile, "config", "", "config file (default is $HOME/.pen.yaml)")
 }
 
 func (c *command) initConfig() (err error) {
 	config := viper.New()
-	configName := ".bee"
+	configName := ".pen"
 	if c.cfgFile != "" {
 		// Use config file from the flag.
 		config.SetConfigFile(c.cfgFile)
 	} else {
-		// Search config in home directory with name ".bee" (without extension).
+		// Search config in home directory with name ".pen" (without extension).
 		config.AddConfigPath(c.homeDir)
 		config.SetConfigName(configName)
 	}
 
 	// Environment
-	config.SetEnvPrefix("bee")
+	config.SetEnvPrefix("pen")
 	config.AutomaticEnv() // read in environment variables that match
 	config.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
@@ -200,8 +200,8 @@ func (c *command) setHomeDir() (err error) {
 }
 
 func (c *command) setAllFlags(cmd *cobra.Command) {
-	cmd.Flags().String(optionNameDataDir, filepath.Join(c.homeDir, ".bee"), "data directory")
-	cmd.Flags().Uint64(optionNameCacheCapacity, 1000000, fmt.Sprintf("cache capacity in chunks, multiply by %d to get approximate capacity in bytes", swarm.ChunkSize))
+	cmd.Flags().String(optionNameDataDir, filepath.Join(c.homeDir, ".pen"), "data directory")
+	cmd.Flags().Uint64(optionNameCacheCapacity, 1000000, fmt.Sprintf("cache capacity in chunks, multiply by %d to get approximate capacity in bytes", penguin.ChunkSize))
 	cmd.Flags().Uint64(optionNameDBOpenFilesLimit, 200, "number of open files allowed by database")
 	cmd.Flags().Uint64(optionNameDBBlockCacheCapacity, 32*1024*1024, "size of block cache of the database in bytes")
 	cmd.Flags().Uint64(optionNameDBWriteBufferSize, 32*1024*1024, "size of the database write buffer in bytes")
@@ -213,15 +213,15 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().String(optionNameNATAddr, "", "NAT exposed address")
 	cmd.Flags().Bool(optionNameP2PWSEnable, false, "enable P2P WebSocket transport")
 	cmd.Flags().Bool(optionNameP2PQUICEnable, false, "enable P2P QUIC transport")
-	cmd.Flags().StringSlice(optionNameBootnodes, []string{"/dnsaddr/bootnode.ethswarm.org"}, "initial nodes to connect to")
+	cmd.Flags().StringSlice(optionNameBootnodes, []string{"/dnsaddr/bootnode.ethpenguin.org"}, "initial nodes to connect to")
 	cmd.Flags().Bool(optionNameDebugAPIEnable, false, "enable debug HTTP API")
 	cmd.Flags().String(optionNameDebugAPIAddr, ":1635", "debug HTTP API listen address")
-	//cmd.Flags().Uint64(optionNameNetworkID, 1, "ID of the Swarm network")
+	//cmd.Flags().Uint64(optionNameNetworkID, 1, "ID of the Penguin network")
 	cmd.Flags().StringSlice(optionCORSAllowedOrigins, []string{}, "origins with CORS headers enabled")
 	cmd.Flags().Bool(optionNameStandalone, false, "whether we want the node to start with no listen addresses for p2p")
 	cmd.Flags().Bool(optionNameTracingEnabled, false, "enable tracing")
 	cmd.Flags().String(optionNameTracingEndpoint, "127.0.0.1:6831", "endpoint to send tracing data")
-	cmd.Flags().String(optionNameTracingServiceName, "bee", "service name identifier for tracing")
+	cmd.Flags().String(optionNameTracingServiceName, "pen", "service name identifier for tracing")
 	cmd.Flags().String(optionNameVerbosity, "info", "log verbosity level 0=silent, 1=error, 2=warn, 3=info, 4=debug, 5=trace")
 	cmd.Flags().String(optionWelcomeMessage, "", "send a welcome message string during handshakes")
 	cmd.Flags().Bool(optionNameGlobalPinningEnabled, false, "enable global pinning")

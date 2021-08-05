@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/ripemd160"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -26,36 +26,36 @@ const (
 	AddressSize = 20
 )
 
-// NewOverlayAddress constructs a Swarm Address from ECDSA public key.
-//func NewOverlayAddress(p ecdsa.PublicKey, networkID uint64) (swarm.Address, error) {
+// NewOverlayAddress constructs a Penguin Address from ECDSA public key.
+//func NewOverlayAddress(p ecdsa.PublicKey, networkID uint64) (penguin.Address, error) {
 //	ethAddr, err := NewEthereumAddress(p)
 //	if err != nil {
-//		return swarm.ZeroAddress, err
+//		return penguin.ZeroAddress, err
 //	}
 //	return NewOverlayFromEthereumAddress(ethAddr, networkID), nil
 //}
 
-func NewOverlayAddress(p ecdsa.PublicKey, networkID uint64) (swarm.Address, error) {
+func NewOverlayAddress(p ecdsa.PublicKey, networkID uint64) (penguin.Address, error) {
 	xwcAddr, err := NewXwcAddress(p)
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 	return NewOverlayFromXwcAddress(xwcAddr, networkID), nil
 }
 
-// NewOverlayFromEthereumAddress constructs a Swarm Address for an Ethereum address.
-func NewOverlayFromEthereumAddress(ethAddr []byte, networkID uint64) swarm.Address {
+// NewOverlayFromEthereumAddress constructs a Penguin Address for an Ethereum address.
+func NewOverlayFromEthereumAddress(ethAddr []byte, networkID uint64) penguin.Address {
 	netIDBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(netIDBytes, networkID)
 	h := sha3.Sum256(append(ethAddr, netIDBytes...))
-	return swarm.NewAddress(h[:])
+	return penguin.NewAddress(h[:])
 }
 
-func NewOverlayFromXwcAddress(xwcAddr []byte, networkID uint64) swarm.Address {
+func NewOverlayFromXwcAddress(xwcAddr []byte, networkID uint64) penguin.Address {
 	netIDBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(netIDBytes, networkID)
 	h := sha3.Sum256(append(xwcAddr, netIDBytes...))
-	return swarm.NewAddress(h[:])
+	return penguin.NewAddress(h[:])
 }
 
 // GenerateSecp256k1Key generates an ECDSA private key using

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -27,8 +27,8 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/streamtest"
 	"github.com/penguintop/penguin/pkg/pen"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 )
 
 func TestHandlerRateLimit(t *testing.T) {
@@ -51,7 +51,7 @@ func TestHandlerRateLimit(t *testing.T) {
 		streamtest.WithBaseAddr(serverAddress),
 	)
 
-	peers := make([]swarm.Address, hive.LimitBurst+1)
+	peers := make([]penguin.Address, hive.LimitBurst+1)
 	for i := range peers {
 
 		underlay, err := ma.NewMultiaddr("/ip4/127.0.0.1/udp/" + strconv.Itoa(i))
@@ -108,7 +108,7 @@ func TestBroadcastPeers(t *testing.T) {
 	// populate all expected and needed random resources for 2 full batches
 	// tests cases that uses fewer resources can use sub-slices of this data
 	var penAddresses []pen.Address
-	var overlays []swarm.Address
+	var overlays []penguin.Address
 	var wantMsgs []pb.Peers
 
 	for i := 0; i < 2; i++ {
@@ -149,42 +149,42 @@ func TestBroadcastPeers(t *testing.T) {
 	}
 
 	testCases := map[string]struct {
-		addresee         swarm.Address
-		peers            []swarm.Address
+		addresee         penguin.Address
+		peers            []penguin.Address
 		wantMsgs         []pb.Peers
-		wantOverlays     []swarm.Address
+		wantOverlays     []penguin.Address
 		wantPenAddresses []pen.Address
 	}{
 		"OK - single record": {
-			addresee:         swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
-			peers:            []swarm.Address{overlays[0]},
+			addresee:         penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
+			peers:            []penguin.Address{overlays[0]},
 			wantMsgs:         []pb.Peers{{Peers: wantMsgs[0].Peers[:1]}},
-			wantOverlays:     []swarm.Address{overlays[0]},
+			wantOverlays:     []penguin.Address{overlays[0]},
 			wantPenAddresses: []pen.Address{penAddresses[0]},
 		},
 		"OK - single batch - multiple records": {
-			addresee:         swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
+			addresee:         penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
 			peers:            overlays[:15],
 			wantMsgs:         []pb.Peers{{Peers: wantMsgs[0].Peers[:15]}},
 			wantOverlays:     overlays[:15],
 			wantPenAddresses: penAddresses[:15],
 		},
 		"OK - single batch - max number of records": {
-			addresee:         swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
+			addresee:         penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
 			peers:            overlays[:hive.MaxBatchSize],
 			wantMsgs:         []pb.Peers{{Peers: wantMsgs[0].Peers[:hive.MaxBatchSize]}},
 			wantOverlays:     overlays[:hive.MaxBatchSize],
 			wantPenAddresses: penAddresses[:hive.MaxBatchSize],
 		},
 		"OK - multiple batches": {
-			addresee:         swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
+			addresee:         penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
 			peers:            overlays[:hive.MaxBatchSize+10],
 			wantMsgs:         []pb.Peers{{Peers: wantMsgs[0].Peers}, {Peers: wantMsgs[1].Peers[:10]}},
 			wantOverlays:     overlays[:hive.MaxBatchSize+10],
 			wantPenAddresses: penAddresses[:hive.MaxBatchSize+10],
 		},
 		"OK - multiple batches - max number of records": {
-			addresee:         swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
+			addresee:         penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c"),
 			peers:            overlays[:2*hive.MaxBatchSize],
 			wantMsgs:         []pb.Peers{{Peers: wantMsgs[0].Peers}, {Peers: wantMsgs[1].Peers}},
 			wantOverlays:     overlays[:2*hive.MaxBatchSize],
@@ -237,11 +237,11 @@ func TestBroadcastPeers(t *testing.T) {
 	}
 }
 
-func expectOverlaysEventually(t *testing.T, exporter ab.Interface, wantOverlays []swarm.Address) {
+func expectOverlaysEventually(t *testing.T, exporter ab.Interface, wantOverlays []penguin.Address) {
 	var (
-		overlays []swarm.Address
+		overlays []penguin.Address
 		err      error
-		isIn     = func(a swarm.Address, addrs []swarm.Address) bool {
+		isIn     = func(a penguin.Address, addrs []penguin.Address) bool {
 			for _, v := range addrs {
 				if a.Equal(v) {
 					return true

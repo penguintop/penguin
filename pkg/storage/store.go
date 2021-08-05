@@ -1,9 +1,9 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Package storage provides implementation contracts and notions
-// used across storage-aware components in Bee.
+// used across storage-aware components in Pen.
 package storage
 
 import (
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -123,7 +123,7 @@ const (
 // Descriptor holds information required for Pull syncing. This struct
 // is provided by subscribing to pull index.
 type Descriptor struct {
-	Address swarm.Address
+	Address penguin.Address
 	BinID   uint64
 }
 
@@ -137,30 +137,30 @@ func (d *Descriptor) String() string {
 type Storer interface {
 	Getter
 	Putter
-	GetMulti(ctx context.Context, mode ModeGet, addrs ...swarm.Address) (ch []swarm.Chunk, err error)
+	GetMulti(ctx context.Context, mode ModeGet, addrs ...penguin.Address) (ch []penguin.Chunk, err error)
 	Hasser
 	Setter
 	LastPullSubscriptionBinID(bin uint8) (id uint64, err error)
 	PullSubscriber
-	SubscribePush(ctx context.Context) (c <-chan swarm.Chunk, stop func())
+	SubscribePush(ctx context.Context) (c <-chan penguin.Chunk, stop func())
 	io.Closer
 }
 
 type Putter interface {
-	Put(ctx context.Context, mode ModePut, chs ...swarm.Chunk) (exist []bool, err error)
+	Put(ctx context.Context, mode ModePut, chs ...penguin.Chunk) (exist []bool, err error)
 }
 
 type Getter interface {
-	Get(ctx context.Context, mode ModeGet, addr swarm.Address) (ch swarm.Chunk, err error)
+	Get(ctx context.Context, mode ModeGet, addr penguin.Address) (ch penguin.Chunk, err error)
 }
 
 type Setter interface {
-	Set(ctx context.Context, mode ModeSet, addrs ...swarm.Address) (err error)
+	Set(ctx context.Context, mode ModeSet, addrs ...penguin.Address) (err error)
 }
 
 type Hasser interface {
-	Has(ctx context.Context, addr swarm.Address) (yes bool, err error)
-	HasMulti(ctx context.Context, addrs ...swarm.Address) (yes []bool, err error)
+	Has(ctx context.Context, addr penguin.Address) (yes bool, err error)
+	HasMulti(ctx context.Context, addrs ...penguin.Address) (yes []bool, err error)
 }
 
 type PullSubscriber interface {

@@ -1,4 +1,4 @@
-# Configuration for bee daemon
+# Configuration for pen daemon
 
-#BEE_SWAP_ENDPOINT=ws://localhost:8546
-#BEE_RESOLVER_OPTIONS=
+#PEN_SWAP_ENDPOINT=ws://localhost:8546
+#PEN_RESOLVER_OPTIONS=

@@ -1,33 +1,32 @@
 if [ $1 -eq 1 ] ; then
     # initial installation
-    if [ ! -f /var/lib/bee/keys/libp2p.key ]; then
-        /usr/bin/bee init --config /etc/bee/bee.yaml >/dev/null 2>&1
-        chown -R bee:bee /var/lib/bee
+    if [ ! -f /var/lib/pen/keys/libp2p.key ]; then
+        /usr/bin/pen init --config /etc/pen/pen.yaml >/dev/null 2>&1
+        chown -R pen:pen /var/lib/pen
     fi
-    systemctl --no-reload preset bee.service &>/dev/null || :
-    systemctl --no-reload enable bee.service &>/dev/null || :
+    systemctl --no-reload preset pen.service &>/dev/null || :
+    systemctl --no-reload enable pen.service &>/dev/null || :
     echo " 
-Logs:   journalctl -f -u bee.service
-Config: /etc/bee/bee.yaml
+Logs:   journalctl -f -u pen.service
+Config: /etc/pen/pen.yaml
 
-Bee requires an Ethereum endpoint to function. By default is using ws://localhost:8546 ethereum endpoint.
+Pen requires an Ethereum endpoint to function. By default is using ws://localhost:8546 ethereum endpoint.
 If needed obtain a free Infura account and set:
 `swap-endpoint: wss://goerli.infura.io/ws/v3/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
-It is recommended to use external signer with bee.
+It is recommended to use external signer with pen.
 Check documentation for more info:
-- SWAP https://docs.ethswarm.org/docs/installation/manual#swap-bandwidth-incentives
-- External signer https://docs.ethswarm.org/docs/installation/bee-clef
+- SWAP https://docs.ethpenguin.org/docs/installation/manual#swap-bandwidth-incentives
 
-After you finish configuration run 'sudo bee-get-addr'.
+After you finish configuration run 'sudo pen-get-addr'.
     "
 fi
 
-# allow group members (bee user) to use clef's socket
-if [ -S /var/lib/bee-clef/clef.ipc ]; then
-    chmod 660 /var/lib/bee-clef/clef.ipc
+# allow group members (pen user) to use clef's socket
+if [ -S /var/lib/pen-clef/clef.ipc ]; then
+    chmod 660 /var/lib/pen-clef/clef.ipc
 fi
 
 if [ $1 -eq 2 ] ; then
     # upgrade
-    systemctl --no-reload start bee.service &>/dev/null || :
+    systemctl --no-reload start pen.service &>/dev/null || :
 fi

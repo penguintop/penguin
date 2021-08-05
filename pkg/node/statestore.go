@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 	"github.com/penguintop/penguin/pkg/statestore/leveldb"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // InitStateStore will initialize the stateStore with the given path to the
@@ -31,8 +31,8 @@ func InitStateStore(log logging.Logger, dataDir string) (ret storage.StateStorer
 const overlayKey = "overlay"
 
 // CheckOverlayWithStore checks the overlay is the same as stored in the statestore
-func CheckOverlayWithStore(overlay swarm.Address, storer storage.StateStorer) error {
-	var storedOverlay swarm.Address
+func CheckOverlayWithStore(overlay penguin.Address, storer storage.StateStorer) error {
+	var storedOverlay penguin.Address
 	err := storer.Get(overlayKey, &storedOverlay)
 	if err != nil {
 		if !errors.Is(err, storage.ErrNotFound) {

@@ -1,18 +1,18 @@
-// Copyright 2019 The Swarm Authors
-// This file is part of the Swarm library.
+// Copyright 2019 The Penguin Authors
+// This file is part of the Penguin library.
 //
-// The Swarm library is free software: you can redistribute it and/or modify
+// The Penguin library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The Swarm library is distributed in the hope that it will be useful,
+// The Penguin library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the Swarm library. If not, see <http://www.gnu.org/licenses/>.
+// along with the Penguin library. If not, see <http://www.gnu.org/licenses/>.
 
 package localstore
 
@@ -24,7 +24,7 @@ import (
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -32,7 +32,7 @@ import (
 // storage.ErrNotFound will be returned. All required indexes will be updated
 // required by the Getter Mode. GetMulti is required to implement chunk.Store
 // interface.
-func (db *DB) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...swarm.Address) (chunks []swarm.Chunk, err error) {
+func (db *DB) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...penguin.Address) (chunks []penguin.Chunk, err error) {
 	db.metrics.ModeGetMulti.Inc()
 	defer totalTimeMetric(db.metrics.TotalTimeGetMulti, time.Now())
 
@@ -49,9 +49,9 @@ func (db *DB) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...swarm
 		}
 		return nil, err
 	}
-	chunks = make([]swarm.Chunk, len(out))
+	chunks = make([]penguin.Chunk, len(out))
 	for i, ch := range out {
-		chunks[i] = swarm.NewChunk(swarm.NewAddress(ch.Address), ch.Data).
+		chunks[i] = penguin.NewChunk(penguin.NewAddress(ch.Address), ch.Data).
 			WithStamp(postage.NewStamp(ch.BatchID, ch.Sig))
 	}
 	return chunks, nil
@@ -59,7 +59,7 @@ func (db *DB) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...swarm
 
 // getMulti returns Items from the retrieval index
 // and updates other indexes.
-func (db *DB) getMulti(mode storage.ModeGet, addrs ...swarm.Address) (out []shed.Item, err error) {
+func (db *DB) getMulti(mode storage.ModeGet, addrs ...penguin.Address) (out []shed.Item, err error) {
 	out = make([]shed.Item, len(addrs))
 	for i, addr := range addrs {
 		out[i].Address = addr.Bytes()

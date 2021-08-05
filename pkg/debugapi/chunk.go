@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,12 +9,12 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
 func (s *Service) hasChunkHandler(w http.ResponseWriter, r *http.Request) {
-	addr, err := swarm.ParseHexAddress(mux.Vars(r)["address"])
+	addr, err := penguin.ParseHexAddress(mux.Vars(r)["address"])
 	if err != nil {
 		s.logger.Debugf("debug api: parse chunk address: %v", err)
 		jsonhttp.BadRequest(w, "bad address")
@@ -36,7 +36,7 @@ func (s *Service) hasChunkHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) removeChunk(w http.ResponseWriter, r *http.Request) {
-	addr, err := swarm.ParseHexAddress(mux.Vars(r)["address"])
+	addr, err := penguin.ParseHexAddress(mux.Vars(r)["address"])
 	if err != nil {
 		s.logger.Debugf("debug api: parse chunk address: %v", err)
 		jsonhttp.BadRequest(w, "bad address")

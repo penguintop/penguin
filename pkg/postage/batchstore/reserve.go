@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -33,7 +33,7 @@ import (
 	"math/big"
 
 	"github.com/penguintop/penguin/pkg/postage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // ErrBatchNotFound is returned when the postage batch is not found or expired
@@ -112,7 +112,7 @@ func (s *store) evictExpired() error {
 		}
 
 		// unreserve batch fully
-		err = s.unreserve(b, swarm.MaxPO+1)
+		err = s.unreserve(b, penguin.MaxPO+1)
 		if err != nil {
 			return true, err
 		}
@@ -207,7 +207,7 @@ func (rs *reserveState) tier(x *big.Int) tier {
 func (rs *reserveState) radius(t tier) uint8 {
 	switch t {
 	case unreserved:
-		return swarm.MaxPO
+		return penguin.MaxPO
 	case inner:
 		return rs.Radius
 	default:

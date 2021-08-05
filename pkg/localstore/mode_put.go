@@ -23,7 +23,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -31,7 +31,7 @@ import (
 // on the Putter mode, it updates required indexes.
 // Put is required to implement storage.Store
 // interface.
-func (db *DB) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) (exist []bool, err error) {
+func (db *DB) Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) (exist []bool, err error) {
 
 	db.metrics.ModePut.Inc()
 	defer totalTimeMetric(db.metrics.TotalTimePut, time.Now())
@@ -51,7 +51,7 @@ func (db *DB) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk)
 // and following ones will have exist set to true for their index in exist
 // slice. This is the same behaviour as if the same chunks are passed one by one
 // in multiple put method calls.
-func (db *DB) put(mode storage.ModePut, chs ...swarm.Chunk) (exist []bool, err error) {
+func (db *DB) put(mode storage.ModePut, chs ...penguin.Chunk) (exist []bool, err error) {
 	// this is an optimization that tries to optimize on already existing chunks
 	// not needing to acquire batchMu. This is in order to reduce lock contention
 	// when chunks are retried across the network for whatever reason.
@@ -197,7 +197,7 @@ func (db *DB) putRequest(batch *leveldb.Batch, binIDs map[uint8]uint64, item she
 	}
 
 	item.StoreTimestamp = now()
-	item.BinID, err = db.incBinID(binIDs, db.po(swarm.NewAddress(item.Address)))
+	item.BinID, err = db.incBinID(binIDs, db.po(penguin.NewAddress(item.Address)))
 	if err != nil {
 		return false, 0, err
 	}
@@ -247,7 +247,7 @@ func (db *DB) putUpload(batch *leveldb.Batch, binIDs map[uint8]uint64, item shed
 	}
 
 	item.StoreTimestamp = now()
-	item.BinID, err = db.incBinID(binIDs, db.po(swarm.NewAddress(item.Address)))
+	item.BinID, err = db.incBinID(binIDs, db.po(penguin.NewAddress(item.Address)))
 	if err != nil {
 		return false, 0, err
 	}
@@ -285,7 +285,7 @@ func (db *DB) putSync(batch *leveldb.Batch, binIDs map[uint8]uint64, item shed.I
 	}
 
 	item.StoreTimestamp = now()
-	item.BinID, err = db.incBinID(binIDs, db.po(swarm.NewAddress(item.Address)))
+	item.BinID, err = db.incBinID(binIDs, db.po(penguin.NewAddress(item.Address)))
 	if err != nil {
 		return false, 0, err
 	}
@@ -372,7 +372,7 @@ func (db *DB) incBinID(binIDs map[uint8]uint64, po uint8) (id uint64, err error)
 
 // containsChunk returns true if the chunk with a specific address
 // is present in the provided chunk slice.
-func containsChunk(addr swarm.Address, chs ...swarm.Chunk) bool {
+func containsChunk(addr penguin.Address, chs ...penguin.Chunk) bool {
 	for _, c := range chs {
 		if addr.Equal(c.Address()) {
 			return true

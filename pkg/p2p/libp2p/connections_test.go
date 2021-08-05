@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,8 +17,8 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/libp2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/handshake"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 	"github.com/libp2p/go-libp2p-core/mux"
 	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
@@ -730,16 +730,16 @@ func expectFullNode(t *testing.T, p p2p.Peer) {
 	}
 }
 
-func expectZeroAddress(t *testing.T, addrs ...swarm.Address) {
+func expectZeroAddress(t *testing.T, addrs ...penguin.Address) {
 	t.Helper()
 	for i, a := range addrs {
-		if !a.Equal(swarm.ZeroAddress) {
+		if !a.Equal(penguin.ZeroAddress) {
 			t.Fatalf("address did not equal zero address. index %d", i)
 		}
 	}
 }
 
-func waitAddrSet(t *testing.T, addr *swarm.Address, mtx *sync.Mutex, exp swarm.Address) {
+func waitAddrSet(t *testing.T, addr *penguin.Address, mtx *sync.Mutex, exp penguin.Address) {
 	t.Helper()
 	for i := 0; i < 20; i++ {
 		mtx.Lock()
@@ -753,7 +753,7 @@ func waitAddrSet(t *testing.T, addr *swarm.Address, mtx *sync.Mutex, exp swarm.A
 	t.Fatal("timed out waiting for address to be set")
 }
 
-func checkAddressbook(t *testing.T, ab addressbook.Getter, overlay swarm.Address, underlay ma.Multiaddr) {
+func checkAddressbook(t *testing.T, ab addressbook.Getter, overlay penguin.Address, underlay ma.Multiaddr) {
 	t.Helper()
 	addr, err := ab.Get(overlay)
 	if err != nil {
@@ -786,7 +786,7 @@ func (n *notifiee) Pick(p p2p.Peer) bool {
 	return n.pick
 }
 
-func (n *notifiee) Announce(context.Context, swarm.Address, bool) error {
+func (n *notifiee) Announce(context.Context, penguin.Address, bool) error {
 	return nil
 }
 

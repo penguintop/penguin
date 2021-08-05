@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"resenje.org/singleflight"
 )
 
@@ -29,17 +29,17 @@ var (
 // currently present in the local store.
 type Storer interface {
 	// IntervalChunks collects chunk for a requested interval.
-	IntervalChunks(ctx context.Context, bin uint8, from, to uint64, limit int) (chunks []swarm.Address, topmost uint64, err error)
+	IntervalChunks(ctx context.Context, bin uint8, from, to uint64, limit int) (chunks []penguin.Address, topmost uint64, err error)
 	// Cursors gets the last BinID for every bin in the local storage
 	Cursors(ctx context.Context) ([]uint64, error)
 	// Get chunks.
-	Get(ctx context.Context, mode storage.ModeGet, addrs ...swarm.Address) ([]swarm.Chunk, error)
+	Get(ctx context.Context, mode storage.ModeGet, addrs ...penguin.Address) ([]penguin.Chunk, error)
 	// Put chunks.
-	Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) error
+	Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) error
 	// Set chunks.
-	Set(ctx context.Context, mode storage.ModeSet, addrs ...swarm.Address) error
+	Set(ctx context.Context, mode storage.ModeSet, addrs ...penguin.Address) error
 	// Has chunks.
-	Has(ctx context.Context, addr swarm.Address) (bool, error)
+	Has(ctx context.Context, addr penguin.Address) (bool, error)
 }
 
 // PullStorer wraps storage.Storer.
@@ -58,10 +58,10 @@ func New(storer storage.Storer) *PullStorer {
 }
 
 // IntervalChunks collects chunk for a requested interval.
-func (s *PullStorer) IntervalChunks(ctx context.Context, bin uint8, from, to uint64, limit int) (chs []swarm.Address, topmost uint64, err error) {
+func (s *PullStorer) IntervalChunks(ctx context.Context, bin uint8, from, to uint64, limit int) (chs []penguin.Address, topmost uint64, err error) {
 
 	type result struct {
-		chs     []swarm.Address
+		chs     []penguin.Address
 		topmost uint64
 	}
 	s.metrics.TotalSubscribePullRequests.Inc()
@@ -144,8 +144,8 @@ func (s *PullStorer) IntervalChunks(ctx context.Context, bin uint8, from, to uin
 
 // Cursors gets the last BinID for every bin in the local storage
 func (s *PullStorer) Cursors(ctx context.Context) (curs []uint64, err error) {
-	curs = make([]uint64, swarm.MaxBins)
-	for i := uint8(0); i < swarm.MaxBins; i++ {
+	curs = make([]uint64, penguin.MaxBins)
+	for i := uint8(0); i < penguin.MaxBins; i++ {
 		binID, err := s.Storer.LastPullSubscriptionBinID(i)
 		if err != nil {
 			return nil, err
@@ -156,12 +156,12 @@ func (s *PullStorer) Cursors(ctx context.Context) (curs []uint64, err error) {
 }
 
 // Get chunks.
-func (s *PullStorer) Get(ctx context.Context, mode storage.ModeGet, addrs ...swarm.Address) ([]swarm.Chunk, error) {
+func (s *PullStorer) Get(ctx context.Context, mode storage.ModeGet, addrs ...penguin.Address) ([]penguin.Chunk, error) {
 	return s.Storer.GetMulti(ctx, mode, addrs...)
 }
 
 // Put chunks.
-func (s *PullStorer) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) error {
+func (s *PullStorer) Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) error {
 	_, err := s.Storer.Put(ctx, mode, chs...)
 	return err
 }

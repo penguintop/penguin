@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -14,7 +14,7 @@ import (
 	test "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -23,10 +23,10 @@ var (
 )
 
 type putWrapper struct {
-	putter func(context.Context, swarm.Chunk) ([]bool, error)
+	putter func(context.Context, penguin.Chunk) ([]bool, error)
 }
 
-func (p putWrapper) Put(ctx context.Context, ch swarm.Chunk) ([]bool, error) {
+func (p putWrapper) Put(ctx context.Context, ch penguin.Chunk) ([]bool, error) {
 	return p.putter(ctx, ch)
 }
 
@@ -36,7 +36,7 @@ func (p putWrapper) Put(ctx context.Context, ch swarm.Chunk) ([]bool, error) {
 func TestSplitterJobPartialSingleChunk(t *testing.T) {
 	store := mock.NewStorer()
 	putter := putWrapper{
-		putter: func(ctx context.Context, ch swarm.Chunk) ([]bool, error) {
+		putter: func(ctx context.Context, ch penguin.Chunk) ([]bool, error) {
 			return store.Put(ctx, storage.ModePutUpload, ch)
 		},
 	}
@@ -56,10 +56,10 @@ func TestSplitterJobPartialSingleChunk(t *testing.T) {
 	}
 
 	hashResult := j.Sum(nil)
-	addressResult := swarm.NewAddress(hashResult)
+	addressResult := penguin.NewAddress(hashResult)
 
 	bmtHashOfFoo := "2387e8e7d8a48c2a9339c97c1dc3461a9a7aa07e994c5cb8b38fd7c1b3e6ea48"
-	address := swarm.MustParseHexAddress(bmtHashOfFoo)
+	address := penguin.MustParseHexAddress(bmtHashOfFoo)
 	if !addressResult.Equal(address) {
 		t.Fatalf("expected %v, got %v", address, addressResult)
 	}
@@ -84,7 +84,7 @@ func testSplitterJobVector(t *testing.T) {
 		dataIdx, _  = strconv.ParseInt(paramstring[1], 10, 0)
 		store       = mock.NewStorer()
 		putter      = putWrapper{
-			putter: func(ctx context.Context, ch swarm.Chunk) ([]bool, error) {
+			putter: func(ctx context.Context, ch penguin.Chunk) ([]bool, error) {
 				return store.Put(ctx, storage.ModePutUpload, ch)
 			},
 		}
@@ -95,9 +95,9 @@ func testSplitterJobVector(t *testing.T) {
 	defer cancel()
 	j := internal.NewSimpleSplitterJob(ctx, putter, int64(len(data)), false)
 
-	for i := 0; i < len(data); i += swarm.ChunkSize {
-		l := swarm.ChunkSize
-		if len(data)-i < swarm.ChunkSize {
+	for i := 0; i < len(data); i += penguin.ChunkSize {
+		l := penguin.ChunkSize
+		if len(data)-i < penguin.ChunkSize {
 			l = len(data) - i
 		}
 		c, err := j.Write(data[i : i+l])
@@ -110,7 +110,7 @@ func testSplitterJobVector(t *testing.T) {
 	}
 
 	actualBytes := j.Sum(nil)
-	actual := swarm.NewAddress(actualBytes)
+	actual := penguin.NewAddress(actualBytes)
 
 	if !expect.Equal(actual) {
 		t.Fatalf("expected %v, got %v", expect, actual)

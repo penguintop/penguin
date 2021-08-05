@@ -1,8 +1,8 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package api provides the functionality of the Bee
+// Package api provides the functionality of the Pen
 // client-facing HTTP API.
 package api
 
@@ -32,22 +32,22 @@ import (
 	"github.com/penguintop/penguin/pkg/resolver"
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/penguintop/penguin/pkg/traversal"
 )
 
 const (
-	SwarmPinHeader            = "Swarm-Pin"
-	SwarmTagHeader            = "Swarm-Tag"
-	SwarmEncryptHeader        = "Swarm-Encrypt"
-	SwarmIndexDocumentHeader  = "Swarm-Index-Document"
-	SwarmErrorDocumentHeader  = "Swarm-Error-Document"
-	SwarmFeedIndexHeader      = "Swarm-Feed-Index"
-	SwarmFeedIndexNextHeader  = "Swarm-Feed-Index-Next"
-	SwarmCollectionHeader     = "Swarm-Collection"
-	SwarmPostageBatchIdHeader = "Swarm-Postage-Batch-Id"
+	PenguinPinHeader            = "Penguin-Pin"
+	PenguinTagHeader            = "Penguin-Tag"
+	PenguinEncryptHeader        = "Penguin-Encrypt"
+	PenguinIndexDocumentHeader  = "Penguin-Index-Document"
+	PenguinErrorDocumentHeader  = "Penguin-Error-Document"
+	PenguinFeedIndexHeader      = "Penguin-Feed-Index"
+	PenguinFeedIndexNextHeader  = "Penguin-Feed-Index-Next"
+	PenguinCollectionHeader     = "Penguin-Collection"
+	PenguinPostageBatchIdHeader = "Penguin-Postage-Batch-Id"
 )
 
 // The size of buffer used for prefetching content with Langos.
@@ -115,7 +115,7 @@ type Options struct {
 
 const (
 	// TargetsRecoveryHeader defines the Header for Recovery targets in Global Pinning
-	TargetsRecoveryHeader = "swarm-recovery-targets"
+	TargetsRecoveryHeader = "penguin-recovery-targets"
 )
 
 // New will create a and initialize a new API service.
@@ -187,11 +187,11 @@ func (s *server) getTag(tagUid string) (*tags.Tag, error) {
 	return s.tags.Get(uint32(uid))
 }
 
-func (s *server) resolveNameOrAddress(str string) (swarm.Address, error) {
+func (s *server) resolveNameOrAddress(str string) (penguin.Address, error) {
 	log := s.logger
 
 	// Try and parse the name as a pen address.
-	addr, err := swarm.ParseHexAddress(str)
+	addr, err := penguin.ParseHexAddress(str)
 	if err == nil {
 		log.Tracef("name resolve: valid pen address %q", str)
 		return addr, nil
@@ -199,7 +199,7 @@ func (s *server) resolveNameOrAddress(str string) (swarm.Address, error) {
 
 	// If no resolver is not available, return an error.
 	if s.resolver == nil {
-		return swarm.ZeroAddress, errNoResolver
+		return penguin.ZeroAddress, errNoResolver
 	}
 
 	// Try and resolve the name using the provided resolver.
@@ -210,23 +210,23 @@ func (s *server) resolveNameOrAddress(str string) (swarm.Address, error) {
 		return addr, nil
 	}
 
-	return swarm.ZeroAddress, fmt.Errorf("%w: %v", errInvalidNameOrAddress, err)
+	return penguin.ZeroAddress, fmt.Errorf("%w: %v", errInvalidNameOrAddress, err)
 }
 
 // requestModePut returns the desired storage.ModePut for this request based on the request headers.
 func requestModePut(r *http.Request) storage.ModePut {
-	if h := strings.ToLower(r.Header.Get(SwarmPinHeader)); h == "true" {
+	if h := strings.ToLower(r.Header.Get(PenguinPinHeader)); h == "true" {
 		return storage.ModePutUploadPin
 	}
 	return storage.ModePutUpload
 }
 
 func requestEncrypt(r *http.Request) bool {
-	return strings.ToLower(r.Header.Get(SwarmEncryptHeader)) == "true"
+	return strings.ToLower(r.Header.Get(PenguinEncryptHeader)) == "true"
 }
 
 func requestPostageBatchId(r *http.Request) ([]byte, error) {
-	if h := strings.ToLower(r.Header.Get(SwarmPostageBatchIdHeader)); h != "" {
+	if h := strings.ToLower(r.Header.Get(PenguinPostageBatchIdHeader)); h != "" {
 		if len(h) != 64 {
 			return nil, errInvalidPostageBatch
 		}
@@ -329,9 +329,9 @@ func newStamperPutter(s storage.Storer, post postage.Service, signer crypto.Sign
 	return &stamperPutter{Storer: s, stamper: stamper}, nil
 }
 
-func (p *stamperPutter) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) (exists []bool, err error) {
+func (p *stamperPutter) Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) (exists []bool, err error) {
 	var (
-		ctp []swarm.Chunk
+		ctp []penguin.Chunk
 		idx []int
 	)
 	exists = make([]bool, len(chs))
@@ -364,11 +364,11 @@ func (p *stamperPutter) Put(ctx context.Context, mode storage.ModePut, chs ...sw
 	return exists, nil
 }
 
-type pipelineFunc func(context.Context, io.Reader) (swarm.Address, error)
+type pipelineFunc func(context.Context, io.Reader) (penguin.Address, error)
 
 func requestPipelineFn(s storage.Putter, r *http.Request) pipelineFunc {
 	mode, encrypt := requestModePut(r), requestEncrypt(r)
-	return func(ctx context.Context, r io.Reader) (swarm.Address, error) {
+	return func(ctx context.Context, r io.Reader) (penguin.Address, error) {
 		pipe := builder.NewPipelineBuilder(ctx, s, mode, encrypt)
 		return builder.FeedPipeline(ctx, pipe, r)
 	}
@@ -377,15 +377,15 @@ func requestPipelineFn(s storage.Putter, r *http.Request) pipelineFunc {
 // calculateNumberOfChunks calculates the number of chunks in an arbitrary
 // content length.
 func calculateNumberOfChunks(contentLength int64, isEncrypted bool) int64 {
-	if contentLength <= swarm.ChunkSize {
+	if contentLength <= penguin.ChunkSize {
 		return 1
 	}
-	branchingFactor := swarm.Branches
+	branchingFactor := penguin.Branches
 	if isEncrypted {
-		branchingFactor = swarm.EncryptedBranches
+		branchingFactor = penguin.EncryptedBranches
 	}
 
-	dataChunks := math.Ceil(float64(contentLength) / float64(swarm.ChunkSize))
+	dataChunks := math.Ceil(float64(contentLength) / float64(penguin.ChunkSize))
 	totalChunks := dataChunks
 	intermediate := dataChunks / float64(branchingFactor)
 
@@ -406,7 +406,7 @@ func requestCalculateNumberOfChunks(r *http.Request) int64 {
 
 // containsChunk returns true if the chunk with a specific address
 // is present in the provided chunk slice.
-func containsChunk(addr swarm.Address, chs ...swarm.Chunk) bool {
+func containsChunk(addr penguin.Address, chs ...penguin.Chunk) bool {
 	for _, c := range chs {
 		if addr.Equal(c.Address()) {
 			return true

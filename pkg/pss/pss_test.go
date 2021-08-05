@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/pss"
 	"github.com/penguintop/penguin/pkg/pushsync"
 	pushsyncmock "github.com/penguintop/penguin/pkg/pushsync/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestSend creates a trojan chunk and sends it using push sync
@@ -27,8 +27,8 @@ func TestSend(t *testing.T) {
 	ctx := context.Background()
 
 	// create a mock pushsync service to push the chunk to its destination
-	var storedChunk swarm.Chunk
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	var storedChunk penguin.Chunk
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		storedChunk = chunk
 		return nil, nil
 	})
@@ -234,6 +234,6 @@ func ensureCalls(t *testing.T, calls *int, exp int) {
 
 type stamper struct{}
 
-func (s *stamper) Stamp(_ swarm.Address) (*postage.Stamp, error) {
+func (s *stamper) Stamp(_ penguin.Address) (*postage.Stamp, error) {
 	return postagetesting.MustNewStamp(), nil
 }

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,7 +28,7 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	smock "github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
@@ -54,7 +54,7 @@ func TestPenFiles(t *testing.T) {
 	t.Run("invalid-content-type", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, fileUploadResource,
 			http.StatusBadRequest,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(simpleData)),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: api.InvalidContentType.Error(),
@@ -90,9 +90,9 @@ func TestPenFiles(t *testing.T) {
 				},
 			},
 		})
-		address := swarm.MustParseHexAddress("f30c0aa7e9e2a0ef4c9b1b750ebfeaeb7c7c24da700bb089da19a46e3677824b")
+		address := penguin.MustParseHexAddress("f30c0aa7e9e2a0ef4c9b1b750ebfeaeb7c7c24da700bb089da19a46e3677824b")
 		jsonhttptest.Request(t, client, http.MethodPost, fileUploadResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(tr),
 			jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
@@ -144,10 +144,10 @@ func TestPenFiles(t *testing.T) {
 				},
 			},
 		})
-		reference := swarm.MustParseHexAddress("f30c0aa7e9e2a0ef4c9b1b750ebfeaeb7c7c24da700bb089da19a46e3677824b")
+		reference := penguin.MustParseHexAddress("f30c0aa7e9e2a0ef4c9b1b750ebfeaeb7c7c24da700bb089da19a46e3677824b")
 		jsonhttptest.Request(t, client, http.MethodPost, fileUploadResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
-			jsonhttptest.WithRequestHeader(api.SwarmPinHeader, "true"),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPinHeader, "true"),
 			jsonhttptest.WithRequestBody(tr),
 			jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
@@ -181,9 +181,9 @@ func TestPenFiles(t *testing.T) {
 		var resp api.PenUploadResponse
 		jsonhttptest.Request(t, client, http.MethodPost,
 			fileUploadResource+"?name="+fileName, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(simpleData)),
-			jsonhttptest.WithRequestHeader(api.SwarmEncryptHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "True"),
 			jsonhttptest.WithRequestHeader("Content-Type", "image/jpeg; charset=utf-8"),
 			jsonhttptest.WithUnmarshalJSONResponse(&resp),
 		)
@@ -212,10 +212,10 @@ func TestPenFiles(t *testing.T) {
 
 		jsonhttptest.Request(t, client, http.MethodPost,
 			fileUploadResource+"?name="+fileName, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(simpleData)),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 			jsonhttptest.WithRequestHeader("Content-Type", "image/jpeg; charset=utf-8"),
 		)
@@ -253,10 +253,10 @@ func TestPenFiles(t *testing.T) {
 
 		rcvdHeader := jsonhttptest.Request(t, client, http.MethodPost,
 			fileUploadResource+"?name="+fileName, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(strings.NewReader(sampleHtml)),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 			jsonhttptest.WithRequestHeader("Content-Type", "text/html; charset=utf-8"),
 		)
@@ -292,10 +292,10 @@ func TestPenFiles(t *testing.T) {
 
 		jsonhttptest.Request(t, client, http.MethodPost,
 			fileUploadResource+"?name="+fileName, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(simpleData)),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 			jsonhttptest.WithRequestHeader("Content-Type", "text/html; charset=utf-8"),
 		)
@@ -411,13 +411,13 @@ func TestPenFilesRangeRequests(t *testing.T) {
 			var resp api.PenUploadResponse
 
 			testOpts := []jsonhttptest.Option{
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 				jsonhttptest.WithRequestBody(upload.reader),
 				jsonhttptest.WithRequestHeader("Content-Type", upload.contentType),
 				jsonhttptest.WithUnmarshalJSONResponse(&resp),
 			}
 			if upload.name == "dir" {
-				testOpts = append(testOpts, jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"))
+				testOpts = append(testOpts, jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"))
 			}
 
 			jsonhttptest.Request(t, client, http.MethodPost, upload.uploadEndpoint, http.StatusCreated,
@@ -512,7 +512,7 @@ func parseRangeParts(t *testing.T, contentType string, body []byte) (parts [][]b
 func TestFeedIndirection(t *testing.T) {
 	// first, "upload" some content for the update
 	var (
-		updateData     = []byte("<h1>Swarm Feeds Hello World!</h1>")
+		updateData     = []byte("<h1>Penguin Feeds Hello World!</h1>")
 		mockStatestore = statestore.NewStateStore()
 		logger         = logging.New(ioutil.Discard, 0)
 		storer         = smock.NewStorer()
@@ -536,12 +536,12 @@ func TestFeedIndirection(t *testing.T) {
 	var resp api.PenUploadResponse
 
 	options := []jsonhttptest.Option{
-		jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+		jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 		jsonhttptest.WithRequestBody(tarReader),
 		jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
-		jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+		jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 		jsonhttptest.WithUnmarshalJSONResponse(&resp),
-		jsonhttptest.WithRequestHeader(api.SwarmIndexDocumentHeader, "index.html"),
+		jsonhttptest.WithRequestHeader(api.PenguinIndexDocumentHeader, "index.html"),
 	}
 
 	// verify directory tar upload response
@@ -583,7 +583,7 @@ func TestFeedIndirection(t *testing.T) {
 		t.Fatal(err)
 	}
 	emptyAddr := make([]byte, 32)
-	err = m.Add(ctx, manifest.RootPath, manifest.NewEntry(swarm.NewAddress(emptyAddr), map[string]string{
+	err = m.Add(ctx, manifest.RootPath, manifest.NewEntry(penguin.NewAddress(emptyAddr), map[string]string{
 		api.FeedMetadataEntryOwner: "8d3766440f0d7b949a5e32995d09619a7f86e632",
 		api.FeedMetadataEntryTopic: "abcc",
 		api.FeedMetadataEntryType:  "epoch",
@@ -607,7 +607,7 @@ func TestPenReupload(t *testing.T) {
 		mockStatestore = statestore.NewStateStore()
 		m              = &mockSteward{}
 		storer         = smock.NewStorer()
-		addr           = swarm.NewAddress([]byte{31: 128})
+		addr           = penguin.NewAddress([]byte{31: 128})
 	)
 	client, _, _ := newTestServer(t, testServerOptions{
 		Storer:  storer,
@@ -627,10 +627,10 @@ func TestPenReupload(t *testing.T) {
 }
 
 type mockSteward struct {
-	addr swarm.Address
+	addr penguin.Address
 }
 
-func (m *mockSteward) Reupload(_ context.Context, addr swarm.Address) error {
+func (m *mockSteward) Reupload(_ context.Context, addr penguin.Address) error {
 	m.addr = addr
 	return nil
 }

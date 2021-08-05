@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/traversal"
 )
 
@@ -45,7 +45,7 @@ func newAddressIterator(ignoreDuplicates bool) *addressIterator {
 }
 
 // addressIterator is a simple collector of statistics
-// targeting swarm.AddressIterFunc execution.
+// targeting penguin.AddressIterFunc execution.
 type addressIterator struct {
 	mu   sync.Mutex // mu guards cnt and seen fields.
 	cnt  int
@@ -54,9 +54,9 @@ type addressIterator struct {
 	ignoreDuplicates bool
 }
 
-// Next matches the signature of swarm.AddressIterFunc needed in
+// Next matches the signature of penguin.AddressIterFunc needed in
 // Traverser.Traverse method and collects statistics about it's execution.
-func (i *addressIterator) Next(addr swarm.Address) error {
+func (i *addressIterator) Next(addr penguin.Address) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 
@@ -83,14 +83,14 @@ func TestTraversalBytes(t *testing.T) {
 			},
 		},
 		{
-			dataSize:      swarm.ChunkSize,
+			dataSize:      penguin.ChunkSize,
 			wantHashCount: 1,
 			wantHashes: []string{
 				"f833c17be12d68aec95eca7f9d993f7d7aaa7a9c282eb2c3d79ab26a5aeaf384", // bytes (4096)
 			},
 		},
 		{
-			dataSize:      swarm.ChunkSize + 1,
+			dataSize:      penguin.ChunkSize + 1,
 			wantHashCount: 3,
 			wantHashes: []string{
 				"a1c4483d15167aeb406017942c9625464574cf70bf7e42f237094acbccdb6834", // bytes (joiner)
@@ -99,7 +99,7 @@ func TestTraversalBytes(t *testing.T) {
 			},
 		},
 		{
-			dataSize:      swarm.ChunkSize * 128,
+			dataSize:      penguin.ChunkSize * 128,
 			wantHashCount: 129,
 			wantHashes: []string{
 				"5060cfd2a34df0269b47201e1f202eb2a165d787a0c5043ceb29bb85b7567c61", // bytes (joiner)
@@ -108,7 +108,7 @@ func TestTraversalBytes(t *testing.T) {
 			ignoreDuplicateHashes: true,
 		},
 		{
-			dataSize:      swarm.ChunkSize * 129,
+			dataSize:      penguin.ChunkSize * 129,
 			wantHashCount: 131,
 			wantHashes: []string{
 				"150665dfbd81f80f5ba00a0caa2caa34f8b94e662e1dea769fe9ce7ea170bf25", // root (joiner, chunk)
@@ -118,7 +118,7 @@ func TestTraversalBytes(t *testing.T) {
 			ignoreDuplicateHashes: true,
 		},
 		{
-			dataSize:      swarm.ChunkSize*129 - 1,
+			dataSize:      penguin.ChunkSize*129 - 1,
 			wantHashCount: 131,
 			wantHashes: []string{
 				"895610b2d795e7cc351a8336d46ba9ef37309d83267d272c6e257e46a78ecb7c", // root (joiner, chunk)
@@ -129,7 +129,7 @@ func TestTraversalBytes(t *testing.T) {
 			ignoreDuplicateHashes: true,
 		},
 		{
-			dataSize:      swarm.ChunkSize*129 + 1,
+			dataSize:      penguin.ChunkSize*129 + 1,
 			wantHashCount: 133,
 			wantHashes: []string{
 				"023ee8b901702a999e9ef90ca2bc1c6db1daefb3f178b683a87b0fd613fd8e21", // root (joiner, chunk)
@@ -143,7 +143,7 @@ func TestTraversalBytes(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		chunkCount := int(math.Ceil(float64(tc.dataSize) / swarm.ChunkSize))
+		chunkCount := int(math.Ceil(float64(tc.dataSize) / penguin.ChunkSize))
 		t.Run(fmt.Sprintf("%d-chunk-%d-bytes", chunkCount, tc.dataSize), func(t *testing.T) {
 			var (
 				data       = generateSample(tc.dataSize)
@@ -204,7 +204,7 @@ func TestTraversalFiles(t *testing.T) {
 			},
 		},
 		{
-			filesSize:     swarm.ChunkSize,
+			filesSize:     penguin.ChunkSize,
 			contentType:   "text/plain; charset=utf-8",
 			wantHashCount: 6,
 			wantHashes: []string{
@@ -217,7 +217,7 @@ func TestTraversalFiles(t *testing.T) {
 			},
 		},
 		{
-			filesSize:     swarm.ChunkSize + 1,
+			filesSize:     penguin.ChunkSize + 1,
 			contentType:   "text/plain; charset=utf-8",
 			filename:      "simple.txt",
 			wantHashCount: 6,
@@ -233,7 +233,7 @@ func TestTraversalFiles(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		chunkCount := int(math.Ceil(float64(tc.filesSize) / swarm.ChunkSize))
+		chunkCount := int(math.Ceil(float64(tc.filesSize) / penguin.ChunkSize))
 		t.Run(fmt.Sprintf("%d-chunk-%d-bytes", chunkCount, tc.filesSize), func(t *testing.T) {
 			var (
 				data       = generateSample(tc.filesSize)
@@ -263,7 +263,7 @@ func TestTraversalFiles(t *testing.T) {
 			rootMtdt := map[string]string{
 				manifest.WebsiteIndexDocumentSuffixKey: filename,
 			}
-			err = fManifest.Add(ctx, "/", manifest.NewEntry(swarm.ZeroAddress, rootMtdt))
+			err = fManifest.Add(ctx, "/", manifest.NewEntry(penguin.ZeroAddress, rootMtdt))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -355,7 +355,7 @@ func TestTraversalManifest(t *testing.T) {
 					},
 				},
 				{
-					size: swarm.ChunkSize,
+					size: penguin.ChunkSize,
 					dir:  "",
 					name: "data/1.txt",
 					chunks: fileChunks{
@@ -365,7 +365,7 @@ func TestTraversalManifest(t *testing.T) {
 					},
 				},
 				{
-					size: swarm.ChunkSize,
+					size: penguin.ChunkSize,
 					dir:  "",
 					name: "data/2.txt",
 					chunks: fileChunks{

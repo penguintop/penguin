@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -22,17 +22,17 @@ var (
 // Addressbook maps peers to beneficaries, chequebooks and in reverse.
 type Addressbook interface {
 	// Beneficiary returns the beneficiary for the given peer.
-	Beneficiary(peer swarm.Address) (beneficiary common.Address, known bool, err error)
+	Beneficiary(peer penguin.Address) (beneficiary common.Address, known bool, err error)
 	// Chequebook returns the chequebook for the given peer.
-	Chequebook(peer swarm.Address) (chequebookAddress common.Address, known bool, err error)
+	Chequebook(peer penguin.Address) (chequebookAddress common.Address, known bool, err error)
 	// BeneficiaryPeer returns the peer for a beneficiary.
-	BeneficiaryPeer(beneficiary common.Address) (peer swarm.Address, known bool, err error)
+	BeneficiaryPeer(beneficiary common.Address) (peer penguin.Address, known bool, err error)
 	// ChequebookPeer returns the peer for a beneficiary.
-	ChequebookPeer(chequebook common.Address) (peer swarm.Address, known bool, err error)
+	ChequebookPeer(chequebook common.Address) (peer penguin.Address, known bool, err error)
 	// PutBeneficiary stores the beneficiary for the given peer.
-	PutBeneficiary(peer swarm.Address, beneficiary common.Address) error
+	PutBeneficiary(peer penguin.Address, beneficiary common.Address) error
 	// PutChequebook stores the chequebook for the given peer.
-	PutChequebook(peer swarm.Address, chequebook common.Address) error
+	PutChequebook(peer penguin.Address, chequebook common.Address) error
 }
 
 type addressbook struct {
@@ -47,7 +47,7 @@ func NewAddressbook(store storage.StateStorer) Addressbook {
 }
 
 // Beneficiary returns the beneficiary for the given peer.
-func (a *addressbook) Beneficiary(peer swarm.Address) (beneficiary common.Address, known bool, err error) {
+func (a *addressbook) Beneficiary(peer penguin.Address) (beneficiary common.Address, known bool, err error) {
 	err = a.store.Get(peerBeneficiaryKey(peer), &beneficiary)
 	if err != nil {
 		if err != storage.ErrNotFound {
@@ -59,19 +59,19 @@ func (a *addressbook) Beneficiary(peer swarm.Address) (beneficiary common.Addres
 }
 
 // BeneficiaryPeer returns the peer for a beneficiary.
-func (a *addressbook) BeneficiaryPeer(beneficiary common.Address) (peer swarm.Address, known bool, err error) {
+func (a *addressbook) BeneficiaryPeer(beneficiary common.Address) (peer penguin.Address, known bool, err error) {
 	err = a.store.Get(beneficiaryPeerKey(beneficiary), &peer)
 	if err != nil {
 		if err != storage.ErrNotFound {
-			return swarm.Address{}, false, err
+			return penguin.Address{}, false, err
 		}
-		return swarm.Address{}, false, nil
+		return penguin.Address{}, false, nil
 	}
 	return peer, true, nil
 }
 
 // Chequebook returns the chequebook for the given peer.
-func (a *addressbook) Chequebook(peer swarm.Address) (chequebookAddress common.Address, known bool, err error) {
+func (a *addressbook) Chequebook(peer penguin.Address) (chequebookAddress common.Address, known bool, err error) {
 	err = a.store.Get(peerKey(peer), &chequebookAddress)
 	if err != nil {
 		if err != storage.ErrNotFound {
@@ -83,19 +83,19 @@ func (a *addressbook) Chequebook(peer swarm.Address) (chequebookAddress common.A
 }
 
 // ChequebookPeer returns the peer for a beneficiary.
-func (a *addressbook) ChequebookPeer(chequebook common.Address) (peer swarm.Address, known bool, err error) {
+func (a *addressbook) ChequebookPeer(chequebook common.Address) (peer penguin.Address, known bool, err error) {
 	err = a.store.Get(chequebookPeerKey(chequebook), &peer)
 	if err != nil {
 		if err != storage.ErrNotFound {
-			return swarm.Address{}, false, err
+			return penguin.Address{}, false, err
 		}
-		return swarm.Address{}, false, nil
+		return penguin.Address{}, false, nil
 	}
 	return peer, true, nil
 }
 
 // PutBeneficiary stores the beneficiary for the given peer.
-func (a *addressbook) PutBeneficiary(peer swarm.Address, beneficiary common.Address) error {
+func (a *addressbook) PutBeneficiary(peer penguin.Address, beneficiary common.Address) error {
 	err := a.store.Put(peerBeneficiaryKey(peer), beneficiary)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (a *addressbook) PutBeneficiary(peer swarm.Address, beneficiary common.Addr
 }
 
 // PutChequebook stores the chequebook for the given peer.
-func (a *addressbook) PutChequebook(peer swarm.Address, chequebook common.Address) error {
+func (a *addressbook) PutChequebook(peer penguin.Address, chequebook common.Address) error {
 	err := a.store.Put(peerKey(peer), chequebook)
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func (a *addressbook) PutChequebook(peer swarm.Address, chequebook common.Addres
 }
 
 // peerKey computes the key where to store the chequebook from a peer.
-func peerKey(peer swarm.Address) string {
+func peerKey(peer penguin.Address) string {
 	return fmt.Sprintf("%s%s", peerPrefix, peer)
 }
 
@@ -123,7 +123,7 @@ func chequebookPeerKey(chequebook common.Address) string {
 }
 
 // peerBeneficiaryKey computes the key where to store the beneficiary for a peer.
-func peerBeneficiaryKey(peer swarm.Address) string {
+func peerBeneficiaryKey(peer penguin.Address) string {
 	return fmt.Sprintf("%s%s", peerBeneficiaryPrefix, peer)
 }
 

@@ -1,15 +1,15 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package swarm
+package penguin
 
 import (
 	"errors"
 	"math/big"
 )
 
-// Distance returns the distance between address x and address y as a (comparable) big integer using the distance metric defined in the swarm specification.
+// Distance returns the distance between address x and address y as a (comparable) big integer using the distance metric defined in the penguin specification.
 // Fails if not all addresses are of equal length.
 func Distance(x, y []byte) (*big.Int, error) {
 	distanceBytes, err := DistanceRaw(x, y)
@@ -21,7 +21,7 @@ func Distance(x, y []byte) (*big.Int, error) {
 	return r, nil
 }
 
-// DistanceRaw returns the distance between address x and address y in big-endian binary format using the distance metric defined in the swarm specfication.
+// DistanceRaw returns the distance between address x and address y in big-endian binary format using the distance metric defined in the penguin specfication.
 // Fails if not all addresses are of equal length.
 func DistanceRaw(x, y []byte) ([]byte, error) {
 	if len(x) != len(y) {
@@ -34,7 +34,7 @@ func DistanceRaw(x, y []byte) ([]byte, error) {
 	return c, nil
 }
 
-// DistanceCmp compares x and y to a in terms of the distance metric defined in the swarm specfication.
+// DistanceCmp compares x and y to a in terms of the distance metric defined in the penguin specfication.
 // it returns:
 // 	1 if x is closer to a than y
 // 	0 if x and y are equally far apart from a (this means that x and y are the same address)

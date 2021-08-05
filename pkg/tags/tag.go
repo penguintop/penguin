@@ -27,7 +27,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/opentracing/opentracing-go"
 )
@@ -43,7 +43,7 @@ type State = uint32
 
 const (
 	TotalChunks State = iota // The total no of chunks for the tag
-	StateSplit               // chunk has been processed by filehasher/swarm safe call
+	StateSplit               // chunk has been processed by filehasher/penguin safe call
 	StateStored              // chunk stored locally
 	StateSeen                // chunk previously seen
 	StateSent                // chunk sent to neighbourhood
@@ -59,9 +59,9 @@ type Tag struct {
 	Sent   int64 // number of chunks sent for push syncing
 	Synced int64 // number of chunks synced with proof
 
-	Uid       uint32        // a unique identifier for this tag
-	Address   swarm.Address // the associated swarm hash for this tag
-	StartedAt time.Time     // tag started to calculate ETA
+	Uid       uint32          // a unique identifier for this tag
+	Address   penguin.Address // the associated penguin hash for this tag
+	StartedAt time.Time       // tag started to calculate ETA
 
 	// end-to-end tag tracing
 	ctx        context.Context     // tracing context
@@ -187,13 +187,13 @@ func (t *Tag) Done(s State) bool {
 	return err == nil && n == total
 }
 
-// DoneSplit sets total count to SPLIT count and sets the associated swarm hash for this tag
+// DoneSplit sets total count to SPLIT count and sets the associated penguin hash for this tag
 // is meant to be called when splitter finishes for input streams of unknown size
-func (t *Tag) DoneSplit(address swarm.Address) (int64, error) {
+func (t *Tag) DoneSplit(address penguin.Address) (int64, error) {
 	total := atomic.LoadInt64(&t.Split)
 	atomic.StoreInt64(&t.Total, total)
 
-	if !address.Equal(swarm.ZeroAddress) {
+	if !address.Equal(penguin.ZeroAddress) {
 		t.Address = address
 	}
 
@@ -283,7 +283,7 @@ func (tag *Tag) UnmarshalBinary(buffer []byte) error {
 	t, n = binary.Varint(buffer)
 	buffer = buffer[n:]
 	if t > 0 {
-		tag.Address = swarm.NewAddress(buffer[:t])
+		tag.Address = penguin.NewAddress(buffer[:t])
 	}
 
 	return nil

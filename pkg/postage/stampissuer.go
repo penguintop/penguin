@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"sync"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // StampIssuer is a local extension of a batch issuing stamps for uploads.
@@ -41,7 +41,7 @@ func NewStampIssuer(label, keyID string, batchID []byte, batchDepth, bucketDepth
 
 // inc increments the count in the correct collision bucket for a newly stamped
 // chunk with address addr.
-func (st *StampIssuer) inc(addr swarm.Address) error {
+func (st *StampIssuer) inc(addr penguin.Address) error {
 	st.mu.Lock()
 	defer st.mu.Unlock()
 	b := toBucket(st.bucketDepth, addr)
@@ -52,9 +52,9 @@ func (st *StampIssuer) inc(addr swarm.Address) error {
 	return nil
 }
 
-// toBucket calculates the index of the collision bucket for a swarm address
+// toBucket calculates the index of the collision bucket for a penguin address
 // using depth as collision bucket depth
-func toBucket(depth uint8, addr swarm.Address) uint32 {
+func toBucket(depth uint8, addr penguin.Address) uint32 {
 	i := binary.BigEndian.Uint32(addr.Bytes()[:4])
 	return i >> (32 - depth)
 }

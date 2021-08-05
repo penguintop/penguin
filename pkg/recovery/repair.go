@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"github.com/penguintop/penguin/pkg/pss"
 	"github.com/penguintop/penguin/pkg/pushsync"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -26,13 +26,13 @@ var (
 )
 
 // Callback defines code to be executed upon failing to retrieve chunks.
-type Callback func(chunkAddress swarm.Address, targets pss.Targets)
+type Callback func(chunkAddress penguin.Address, targets pss.Targets)
 
 // NewsCallback returns a new Callback with the sender function defined.
 func NewCallback(pssSender pss.Sender) Callback {
 	privk := crypto.Secp256k1PrivateKeyFromBytes([]byte(TopicText))
 	recipient := privk.PublicKey
-	return func(chunkAddress swarm.Address, targets pss.Targets) {
+	return func(chunkAddress penguin.Address, targets pss.Targets) {
 		payload := chunkAddress
 		ctx := context.Background()
 		_ = pssSender.Send(ctx, Topic, payload.Bytes(), nil, &recipient, targets)
@@ -46,7 +46,7 @@ func NewRepairHandler(s storage.Storer, logger logging.Logger, pushSyncer pushsy
 
 		// check if the chunk exists in the local store and proceed.
 		// otherwise the Get will trigger a unnecessary network retrieve
-		exists, err := s.Has(ctx, swarm.NewAddress(chAddr))
+		exists, err := s.Has(ctx, penguin.NewAddress(chAddr))
 		if err != nil {
 			return
 		}
@@ -55,7 +55,7 @@ func NewRepairHandler(s storage.Storer, logger logging.Logger, pushSyncer pushsy
 		}
 
 		// retrieve the chunk from the local store
-		ch, err := s.Get(ctx, storage.ModeGetRequest, swarm.NewAddress(chAddr))
+		ch, err := s.Get(ctx, storage.ModeGetRequest, penguin.NewAddress(chAddr))
 		if err != nil {
 			logger.Tracef("chunk repair: error while getting chunk for repairing: %v", err)
 			return

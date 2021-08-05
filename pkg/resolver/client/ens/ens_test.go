@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -14,7 +14,7 @@ import (
 	goens "github.com/wealdtech/go-ens/v3"
 
 	"github.com/penguintop/penguin/pkg/resolver/client/ens"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestNewENSClient(t *testing.T) {
@@ -119,7 +119,7 @@ func TestClose(t *testing.T) {
 func TestResolve(t *testing.T) {
 	testContractAddrString := "00000000000C2E074eC69A0dFb2997BA6C702e1B"
 	testContractAddr := common.HexToAddress(testContractAddrString)
-	testSwarmAddr := swarm.MustParseHexAddress("aaabbbcc")
+	testPenguinAddr := penguin.MustParseHexAddress("aaabbbcc")
 
 	testCases := []struct {
 		desc         string
@@ -148,16 +148,16 @@ func TestResolve(t *testing.T) {
 			wantErr: ens.ErrInvalidContentHash,
 		},
 		{
-			desc: "resolve does not prefix address with /swarm",
+			desc: "resolve does not prefix address with /penguin",
 			resolveFn: func(*goens.Registry, common.Address, string) (string, error) {
-				return testSwarmAddr.String(), nil
+				return testPenguinAddr.String(), nil
 			},
 			wantErr: ens.ErrInvalidContentHash,
 		},
 		{
 			desc: "resolve returns prefixed address",
 			resolveFn: func(*goens.Registry, common.Address, string) (string, error) {
-				return ens.SwarmContentHashPrefix + testSwarmAddr.String(), nil
+				return ens.PenguinContentHashPrefix + testPenguinAddr.String(), nil
 			},
 			wantErr: ens.ErrInvalidContentHash,
 		},
@@ -167,7 +167,7 @@ func TestResolve(t *testing.T) {
 				if c != testContractAddr {
 					return "", errors.New("invalid contract address")
 				}
-				return ens.SwarmContentHashPrefix + testSwarmAddr.String(), nil
+				return ens.PenguinContentHashPrefix + testPenguinAddr.String(), nil
 			},
 		},
 	}

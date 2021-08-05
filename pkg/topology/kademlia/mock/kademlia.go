@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,13 +8,13 @@ import (
 	"context"
 	"sync"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
 type AddrTuple struct {
-	Addr swarm.Address // the peer address
-	PO   uint8         // the po
+	Addr penguin.Address // the peer address
+	PO   uint8           // the po
 }
 
 func WithEachPeerRevCalls(addrs ...AddrTuple) Option {
@@ -40,7 +40,7 @@ func WithDepthCalls(d ...uint8) Option {
 
 type Mock struct {
 	mtx          sync.Mutex
-	peers        []swarm.Address
+	peers        []penguin.Address
 	eachPeerRev  []AddrTuple
 	depth        uint8
 	depthReplies []uint8
@@ -60,15 +60,15 @@ func NewMockKademlia(o ...Option) *Mock {
 
 // AddPeers is called when a peers are added to the topology backlog
 // for further processing by connectivity strategy.
-func (m *Mock) AddPeers(addr ...swarm.Address) {
+func (m *Mock) AddPeers(addr ...penguin.Address) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (m *Mock) ClosestPeer(addr swarm.Address, _ bool, skipPeers ...swarm.Address) (peerAddr swarm.Address, err error) {
+func (m *Mock) ClosestPeer(addr penguin.Address, _ bool, skipPeers ...penguin.Address) (peerAddr penguin.Address, err error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (m *Mock) IsWithinDepth(adr swarm.Address) bool {
+func (m *Mock) IsWithinDepth(adr penguin.Address) bool {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -125,7 +125,7 @@ func (m *Mock) NeighborhoodDepth() uint8 {
 }
 
 // Connected is called when a peer dials in.
-func (m *Mock) Connected(_ context.Context, addr swarm.Address) error {
+func (m *Mock) Connected(_ context.Context, addr penguin.Address) error {
 	m.mtx.Lock()
 	m.peers = append(m.peers, addr)
 	m.mtx.Unlock()
@@ -134,7 +134,7 @@ func (m *Mock) Connected(_ context.Context, addr swarm.Address) error {
 }
 
 // Disconnected is called when a peer disconnects.
-func (m *Mock) Disconnected(_ swarm.Address) {
+func (m *Mock) Disconnected(_ penguin.Address) {
 	m.Trigger()
 }
 

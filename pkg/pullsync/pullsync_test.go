@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,15 +18,15 @@ import (
 	"github.com/penguintop/penguin/pkg/pullsync"
 	"github.com/penguintop/penguin/pkg/pullsync/pullstorage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
-	addrs  []swarm.Address
-	chunks []swarm.Chunk
+	addrs  []penguin.Address
+	chunks []penguin.Chunk
 )
 
-func someChunks(i ...int) (c []swarm.Chunk) {
+func someChunks(i ...int) (c []penguin.Chunk) {
 	for _, v := range i {
 		c = append(c, chunks[v])
 	}
@@ -35,8 +35,8 @@ func someChunks(i ...int) (c []swarm.Chunk) {
 
 func init() {
 	n := 5
-	chunks = make([]swarm.Chunk, n)
-	addrs = make([]swarm.Address, n)
+	chunks = make([]penguin.Chunk, n)
+	addrs = make([]penguin.Address, n)
 	for i := 0; i < n; i++ {
 		chunks[i] = testingc.GenerateTestRandomChunk()
 		addrs[i] = chunks[i].Address()
@@ -51,12 +51,12 @@ func init() {
 func TestIncoming_WantEmptyInterval(t *testing.T) {
 	var (
 		mockTopmost        = uint64(5)
-		ps, _              = newPullSync(nil, mock.WithIntervalsResp([]swarm.Address{}, mockTopmost, nil))
+		ps, _              = newPullSync(nil, mock.WithIntervalsResp([]penguin.Address{}, mockTopmost, nil))
 		recorder           = streamtest.New(streamtest.WithProtocols(ps.Protocol()))
 		psClient, clientDb = newPullSync(recorder)
 	)
 
-	topmost, _, err := psClient.SyncInterval(context.Background(), swarm.ZeroAddress, 1, 0, 5)
+	topmost, _, err := psClient.SyncInterval(context.Background(), penguin.ZeroAddress, 1, 0, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func TestIncoming_WantNone(t *testing.T) {
 		psClient, clientDb = newPullSync(recorder, mock.WithChunks(chunks...))
 	)
 
-	topmost, _, err := psClient.SyncInterval(context.Background(), swarm.ZeroAddress, 0, 0, 5)
+	topmost, _, err := psClient.SyncInterval(context.Background(), penguin.ZeroAddress, 0, 0, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +99,7 @@ func TestIncoming_WantOne(t *testing.T) {
 		psClient, clientDb = newPullSync(recorder, mock.WithChunks(someChunks(1, 2, 3, 4)...))
 	)
 
-	topmost, _, err := psClient.SyncInterval(context.Background(), swarm.ZeroAddress, 0, 0, 5)
+	topmost, _, err := psClient.SyncInterval(context.Background(), penguin.ZeroAddress, 0, 0, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func TestIncoming_WantAll(t *testing.T) {
 		psClient, clientDb = newPullSync(recorder)
 	)
 
-	topmost, _, err := psClient.SyncInterval(context.Background(), swarm.ZeroAddress, 0, 0, 5)
+	topmost, _, err := psClient.SyncInterval(context.Background(), penguin.ZeroAddress, 0, 0, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,10 +140,10 @@ func TestIncoming_WantAll(t *testing.T) {
 }
 
 func TestIncoming_UnsolicitedChunk(t *testing.T) {
-	evilAddr := swarm.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000666")
+	evilAddr := penguin.MustParseHexAddress("0000000000000000000000000000000000000000000000000000000000000666")
 	evilData := []byte{0x66, 0x66, 0x66}
 	stamp := postagetesting.MustNewStamp()
-	evil := swarm.NewChunk(evilAddr, evilData).WithStamp(stamp)
+	evil := penguin.NewChunk(evilAddr, evilData).WithStamp(stamp)
 
 	var (
 		mockTopmost = uint64(5)
@@ -152,7 +152,7 @@ func TestIncoming_UnsolicitedChunk(t *testing.T) {
 		psClient, _ = newPullSync(recorder)
 	)
 
-	_, _, err := psClient.SyncInterval(context.Background(), swarm.ZeroAddress, 0, 0, 5)
+	_, _, err := psClient.SyncInterval(context.Background(), penguin.ZeroAddress, 0, 0, 5)
 	if !errors.Is(err, pullsync.ErrUnsolicitedChunk) {
 		t.Fatalf("expected ErrUnsolicitedChunk but got %v", err)
 	}
@@ -166,7 +166,7 @@ func TestGetCursors(t *testing.T) {
 		psClient, _ = newPullSync(recorder)
 	)
 
-	curs, err := psClient.GetCursors(context.Background(), swarm.ZeroAddress)
+	curs, err := psClient.GetCursors(context.Background(), penguin.ZeroAddress)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -190,7 +190,7 @@ func TestGetCursorsError(t *testing.T) {
 		psClient, _ = newPullSync(recorder)
 	)
 
-	_, err := psClient.GetCursors(context.Background(), swarm.ZeroAddress)
+	_, err := psClient.GetCursors(context.Background(), penguin.ZeroAddress)
 	if err == nil {
 		t.Fatal("expected error but got none")
 	}
@@ -199,7 +199,7 @@ func TestGetCursorsError(t *testing.T) {
 	}
 }
 
-func haveChunks(t *testing.T, s *mock.PullStorage, addrs ...swarm.Address) {
+func haveChunks(t *testing.T, s *mock.PullStorage, addrs ...penguin.Address) {
 	t.Helper()
 	for _, a := range addrs {
 		have, err := s.Has(context.Background(), a)
@@ -215,7 +215,7 @@ func haveChunks(t *testing.T, s *mock.PullStorage, addrs ...swarm.Address) {
 func newPullSync(s p2p.Streamer, o ...mock.Option) (*pullsync.Syncer, *mock.PullStorage) {
 	storage := mock.NewPullStorage(o...)
 	logger := logging.New(ioutil.Discard, 0)
-	unwrap := func(swarm.Chunk) {}
-	validStamp := func(ch swarm.Chunk, _ []byte) (swarm.Chunk, error) { return ch, nil }
+	unwrap := func(penguin.Chunk) {}
+	validStamp := func(ch penguin.Chunk, _ []byte) (penguin.Chunk, error) { return ch, nil }
 	return pullsync.New(s, storage, unwrap, validStamp, logger), storage
 }

@@ -31,7 +31,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -102,7 +102,7 @@ func (ts *Tags) Get(uid uint32) (*Tag, error) {
 }
 
 // GetByAddress returns the latest underlying tag for the address or an error if not found
-func (ts *Tags) GetByAddress(address swarm.Address) (*Tag, error) {
+func (ts *Tags) GetByAddress(address penguin.Address) (*Tag, error) {
 	var t *Tag
 	var lastTime time.Time
 	ts.tags.Range(func(key interface{}, value interface{}) bool {

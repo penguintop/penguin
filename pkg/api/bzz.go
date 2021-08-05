@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -26,7 +26,7 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/ethersphere/langos"
@@ -44,7 +44,7 @@ func (s *server) penUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get Swarm-Postage-Batch-Id from http header
+	// get Penguin-Postage-Batch-Id from http header
 	batch, err := requestPostageBatchId(r)
 	if err != nil {
 		logger.Debugf("pen upload: postage batch id: %v", err)
@@ -61,7 +61,7 @@ func (s *server) penUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isDir := r.Header.Get(SwarmCollectionHeader)
+	isDir := r.Header.Get(PenguinCollectionHeader)
 	if strings.ToLower(isDir) == "true" || mediaType == multiPartFormData {
 		s.dirUploadHandler(w, r, putter)
 		return
@@ -71,7 +71,7 @@ func (s *server) penUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 // fileUploadResponse is returned when an HTTP request to upload a file is successful
 type penUploadResponse struct {
-	Reference swarm.Address `json:"reference"`
+	Reference penguin.Address `json:"reference"`
 }
 
 // fileUploadHandler uploads the file and its metadata supplied in the file body and
@@ -86,7 +86,7 @@ func (s *server) fileUploadHandler(w http.ResponseWriter, r *http.Request, store
 	// Content-Type has already been validated by this time
 	contentType := r.Header.Get(contentTypeHeader)
 
-	tag, created, err := s.getOrCreateTag(r.Header.Get(SwarmTagHeader))
+	tag, created, err := s.getOrCreateTag(r.Header.Get(PenguinTagHeader))
 	if err != nil {
 		logger.Debugf("pen upload file: get or create tag: %v", err)
 		logger.Error("pen upload file: get or create tag")
@@ -144,7 +144,7 @@ func (s *server) fileUploadHandler(w http.ResponseWriter, r *http.Request, store
 		manifest.WebsiteIndexDocumentSuffixKey: fileName,
 	}
 
-	err = m.Add(ctx, manifest.RootPath, manifest.NewEntry(swarm.ZeroAddress, rootMetadata))
+	err = m.Add(ctx, manifest.RootPath, manifest.NewEntry(penguin.ZeroAddress, rootMetadata))
 	if err != nil {
 		logger.Debugf("pen upload file: adding metadata to manifest, file %q: %v", fileName, err)
 		logger.Errorf("pen upload file: adding metadata to manifest, file %q", fileName)
@@ -202,7 +202,7 @@ func (s *server) fileUploadHandler(w http.ResponseWriter, r *http.Request, store
 		}
 	}
 
-	if strings.ToLower(r.Header.Get(SwarmPinHeader)) == "true" {
+	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, manifestReference, false); err != nil {
 			logger.Debugf("pen upload file: creation of pin for %q failed: %v", manifestReference, err)
 			logger.Error("pen upload file: creation of pin failed")
@@ -212,8 +212,8 @@ func (s *server) fileUploadHandler(w http.ResponseWriter, r *http.Request, store
 	}
 
 	w.Header().Set("ETag", fmt.Sprintf("%q", manifestReference.String()))
-	w.Header().Set(SwarmTagHeader, fmt.Sprint(tag.Uid))
-	w.Header().Set("Access-Control-Expose-Headers", SwarmTagHeader)
+	w.Header().Set(PenguinTagHeader, fmt.Sprint(tag.Uid))
+	w.Header().Set("Access-Control-Expose-Headers", PenguinTagHeader)
 	jsonhttp.Created(w, penUploadResponse{
 		Reference: manifestReference,
 	})
@@ -296,12 +296,12 @@ FETCH:
 				return
 			}
 
-			w.Header().Set(SwarmFeedIndexHeader, hex.EncodeToString(curBytes))
+			w.Header().Set(PenguinFeedIndexHeader, hex.EncodeToString(curBytes))
 			// this header might be overriding others. handle with care. in the future
 			// we should implement an append functionality for this specific header,
 			// since different parts of handlers might be overriding others' values
 			// resulting in inconsistent headers in the response.
-			w.Header().Set("Access-Control-Expose-Headers", SwarmFeedIndexHeader)
+			w.Header().Set("Access-Control-Expose-Headers", PenguinFeedIndexHeader)
 			goto FETCH
 		}
 	}
@@ -390,7 +390,7 @@ FETCH:
 func (s *server) serveManifestEntry(
 	w http.ResponseWriter,
 	r *http.Request,
-	address swarm.Address,
+	address penguin.Address,
 	manifestEntry manifest.Entry,
 	etag bool,
 ) {
@@ -408,8 +408,8 @@ func (s *server) serveManifestEntry(
 	s.downloadHandler(w, r, manifestEntry.Reference(), additionalHeaders, etag)
 }
 
-// downloadHandler contains common logic for dowloading Swarm file from API
-func (s *server) downloadHandler(w http.ResponseWriter, r *http.Request, reference swarm.Address, additionalHeaders http.Header, etag bool) {
+// downloadHandler contains common logic for dowloading Penguin file from API
+func (s *server) downloadHandler(w http.ResponseWriter, r *http.Request, reference penguin.Address, additionalHeaders http.Header, etag bool) {
 	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger)
 	targets := r.URL.Query().Get("targets")
 	if targets != "" {

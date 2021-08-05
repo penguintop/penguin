@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,12 +11,12 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/blocklist"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestExist(t *testing.T) {
-	addr1 := swarm.NewAddress([]byte{0, 1, 2, 3})
-	addr2 := swarm.NewAddress([]byte{4, 5, 6, 7})
+	addr1 := penguin.NewAddress([]byte{0, 1, 2, 3})
+	addr2 := penguin.NewAddress([]byte{4, 5, 6, 7})
 
 	bl := blocklist.NewBlocklist(mock.NewStateStore())
 
@@ -62,8 +62,8 @@ func TestExist(t *testing.T) {
 }
 
 func TestPeers(t *testing.T) {
-	addr1 := swarm.NewAddress([]byte{0, 1, 2, 3})
-	addr2 := swarm.NewAddress([]byte{4, 5, 6, 7})
+	addr1 := penguin.NewAddress([]byte{0, 1, 2, 3})
+	addr2 := penguin.NewAddress([]byte{4, 5, 6, 7})
 
 	bl := blocklist.NewBlocklist(mock.NewStateStore())
 
@@ -106,7 +106,7 @@ func TestPeers(t *testing.T) {
 	}
 }
 
-func isIn(p swarm.Address, peers []p2p.Peer) bool {
+func isIn(p penguin.Address, peers []p2p.Peer) bool {
 	for _, v := range peers {
 		if v.Address.Equal(p) {
 			return true

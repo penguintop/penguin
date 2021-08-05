@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -98,7 +98,7 @@ func TestSOC(t *testing.T) {
 		s := testingsoc.GenerateMockSOC(t, testData)
 
 		jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.SocPostResponse{
 				Reference: s.Address(),
@@ -122,14 +122,14 @@ func TestSOC(t *testing.T) {
 		s := testingsoc.GenerateMockSOC(t, testData)
 
 		jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.SocPostResponse{
 				Reference: s.Address(),
 			}),
 		)
 		jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusConflict,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(
 				jsonhttp.StatusResponse{
@@ -144,7 +144,7 @@ func TestSOC(t *testing.T) {
 		t.Run("err - bad batch", func(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchInvalid)
 			jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusBadRequest,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 				jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 					Message: "invalid postage batch id",
@@ -156,7 +156,7 @@ func TestSOC(t *testing.T) {
 			s := testingsoc.GenerateMockSOC(t, testData)
 			hexbatch := hex.EncodeToString(batchOk)
 			jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusCreated,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 			)
 		})
@@ -164,7 +164,7 @@ func TestSOC(t *testing.T) {
 			s := testingsoc.GenerateMockSOC(t, testData)
 			hexbatch := hex.EncodeToString(batchEmpty)
 			jsonhttptest.Request(t, client, http.MethodPost, socResource(hex.EncodeToString(s.Owner), hex.EncodeToString(s.ID), hex.EncodeToString(s.Signature)), http.StatusBadRequest,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithRequestBody(bytes.NewReader(s.WrappedChunk.Data())),
 			)
 		})

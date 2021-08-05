@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -70,7 +70,7 @@ func TestRequest_url(t *testing.T) {
 }
 
 func TestRequest_responseHeader(t *testing.T) {
-	headerName := "Swarm-Header"
+	headerName := "Penguin-Header"
 	headerValue := "somevalue"
 	var gotValue string
 
@@ -154,7 +154,7 @@ func TestWithJSONRequestBody(t *testing.T) {
 
 func TestWithMultipartRequest(t *testing.T) {
 	wantBody := []byte("somebody")
-	filename := "swarm.jpg"
+	filename := "penguin.jpg"
 	contentType := "image/jpeg"
 	var gotBody []byte
 	var gotContentDisposition, gotContentType string
@@ -202,7 +202,7 @@ func TestWithMultipartRequest(t *testing.T) {
 }
 
 func TestWithRequestHeader(t *testing.T) {
-	headerName := "Swarm-Header"
+	headerName := "Penguin-Header"
 	headerValue := "somevalue"
 	var gotValue string
 

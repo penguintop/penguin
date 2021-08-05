@@ -22,7 +22,7 @@ import (
 func (c *command) initDumpKeyCmd() (err error) {
 	cmd := &cobra.Command{
 		Use:   "dumpkey",
-		Short: "Dump Swarm Private Wif Key",
+		Short: "Dump Penguin Private Wif Key",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
@@ -53,7 +53,7 @@ func (c *command) initDumpKeyCmd() (err error) {
 				}
 				password = string(bytes.Trim(b, "\n"))
 			} else {
-				exists, err := keystore.Exists("swarm")
+				exists, err := keystore.Exists("penguin")
 				if err != nil {
 					return err
 				}
@@ -63,12 +63,12 @@ func (c *command) initDumpKeyCmd() (err error) {
 						return err
 					}
 
-					swarmPrivateKey, _, err := keystore.Key("swarm", password)
+					penguinPrivateKey, _, err := keystore.Key("penguin", password)
 					if err != nil {
-						return fmt.Errorf("swarm key: %w", err)
+						return fmt.Errorf("penguin key: %w", err)
 					}
 
-					tempBytes := swarmPrivateKey.D.Bytes()
+					tempBytes := penguinPrivateKey.D.Bytes()
 					var privKeyBytes [32]byte
 					copy(privKeyBytes[32-len(tempBytes):], tempBytes)
 					privKeyWif, err := xwcfmt.HexKeyToWifKey(hex.EncodeToString(privKeyBytes[:]))
@@ -78,8 +78,8 @@ func (c *command) initDumpKeyCmd() (err error) {
 
 					var key ecdsa.PrivateKey
 					key.D = big.NewInt(0).SetBytes(privKeyBytes[:])
-					signer := crypto.NewDefaultSigner(swarmPrivateKey)
-					publicKey := &swarmPrivateKey.PublicKey
+					signer := crypto.NewDefaultSigner(penguinPrivateKey)
+					publicKey := &penguinPrivateKey.PublicKey
 
 					nodeAddress, err := crypto.NewOverlayAddress(*publicKey, uint64(property.CHAIN_ID_NUM))
 					if err != nil {
@@ -95,12 +95,12 @@ func (c *command) initDumpKeyCmd() (err error) {
 					logger.Info("********************************************************************")
 					logger.Infof("!!! PrivateKey: %s !!!", privKeyWif)
 					logger.Infof("!!! Xwc Account Address: %s !!!", xwcAddr)
-					logger.Infof("!!! Swarm Node Address: %s !!!", nodeAddress)
+					logger.Infof("!!! Penguin Node Address: %s !!!", nodeAddress)
 					logger.Infof("!!! Please backup your PrivateKey, and Do not tell it to anyone else !!!")
 					logger.Info("********************************************************************")
 
 				} else {
-					return errors.New("swarm private key file not existed, maybe you do not set the option --data-dir")
+					return errors.New("penguin private key file not existed, maybe you do not set the option --data-dir")
 				}
 			}
 

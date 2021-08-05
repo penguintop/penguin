@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,21 +11,21 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/sctx"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/gorilla/mux"
 )
 
 type bytesPostResponse struct {
-	Reference swarm.Address `json:"reference"`
+	Reference penguin.Address `json:"reference"`
 }
 
 // bytesUploadHandler handles upload of raw binary data of arbitrary length.
 func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger)
 
-	tag, created, err := s.getOrCreateTag(r.Header.Get(SwarmTagHeader))
+	tag, created, err := s.getOrCreateTag(r.Header.Get(PenguinTagHeader))
 	if err != nil {
 		logger.Debugf("bytes upload: get or create tag: %v", err)
 		logger.Error("bytes upload: get or create tag")
@@ -84,7 +84,7 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if strings.ToLower(r.Header.Get(SwarmPinHeader)) == "true" {
+	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, address, false); err != nil {
 			logger.Debugf("bytes upload: creation of pin for %q failed: %v", address, err)
 			logger.Error("bytes upload: creation of pin failed")
@@ -93,8 +93,8 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set(SwarmTagHeader, fmt.Sprint(tag.Uid))
-	w.Header().Set("Access-Control-Expose-Headers", SwarmTagHeader)
+	w.Header().Set(PenguinTagHeader, fmt.Sprint(tag.Uid))
+	w.Header().Set("Access-Control-Expose-Headers", PenguinTagHeader)
 	jsonhttp.Created(w, bytesPostResponse{
 		Reference: address,
 	})

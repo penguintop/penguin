@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,17 +9,17 @@ import (
 	"sync"
 
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ storage.Storer = (*MockStorer)(nil)
 
 type MockStorer struct {
-	store           map[string]swarm.Chunk
+	store           map[string]penguin.Chunk
 	modePut         map[string]storage.ModePut
 	modeSet         map[string]storage.ModeSet
-	pinnedAddress   []swarm.Address // Stores the pinned address
-	pinnedCounter   []uint64        // and its respective counter. These are stored as slices to preserve the order.
+	pinnedAddress   []penguin.Address // Stores the pinned address
+	pinnedCounter   []uint64          // and its respective counter. These are stored as slices to preserve the order.
 	subpull         []storage.Descriptor
 	partialInterval bool
 	morePull        chan struct{}
@@ -39,7 +39,7 @@ func WithSubscribePullChunks(chs ...storage.Descriptor) Option {
 	})
 }
 
-func WithBaseAddress(a swarm.Address) Option {
+func WithBaseAddress(a penguin.Address) Option {
 	return optionFunc(func(m *MockStorer) {
 		m.baseAddress = a.Bytes()
 	})
@@ -53,12 +53,12 @@ func WithPartialInterval(v bool) Option {
 
 func NewStorer(opts ...Option) *MockStorer {
 	s := &MockStorer{
-		store:    make(map[string]swarm.Chunk),
+		store:    make(map[string]penguin.Chunk),
 		modePut:  make(map[string]storage.ModePut),
 		modeSet:  make(map[string]storage.ModeSet),
 		morePull: make(chan struct{}),
 		quit:     make(chan struct{}),
-		bins:     make([]uint64, swarm.MaxBins),
+		bins:     make([]uint64, penguin.MaxBins),
 	}
 
 	for _, v := range opts {
@@ -68,7 +68,7 @@ func NewStorer(opts ...Option) *MockStorer {
 	return s
 }
 
-func (m *MockStorer) Get(_ context.Context, _ storage.ModeGet, addr swarm.Address) (ch swarm.Chunk, err error) {
+func (m *MockStorer) Get(_ context.Context, _ storage.ModeGet, addr penguin.Address) (ch penguin.Chunk, err error) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -79,7 +79,7 @@ func (m *MockStorer) Get(_ context.Context, _ storage.ModeGet, addr swarm.Addres
 	return v, nil
 }
 
-func (m *MockStorer) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) (exist []bool, err error) {
+func (m *MockStorer) Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) (exist []bool, err error) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -90,7 +90,7 @@ func (m *MockStorer) Put(ctx context.Context, mode storage.ModePut, chs ...swarm
 			return exist, err
 		}
 		if !exist[i] {
-			po := swarm.Proximity(ch.Address().Bytes(), m.baseAddress)
+			po := penguin.Proximity(ch.Address().Bytes(), m.baseAddress)
 			m.bins[po]++
 		}
 		// this is needed since the chunk feeder shares memory across calls
@@ -99,9 +99,9 @@ func (m *MockStorer) Put(ctx context.Context, mode storage.ModePut, chs ...swarm
 		// and copies the data from the call into the in-memory store
 		b := make([]byte, len(ch.Data()))
 		copy(b, ch.Data())
-		addr := swarm.NewAddress(ch.Address().Bytes())
+		addr := penguin.NewAddress(ch.Address().Bytes())
 		stamp := ch.Stamp()
-		m.store[ch.Address().String()] = swarm.NewChunk(addr, b).WithStamp(stamp)
+		m.store[ch.Address().String()] = penguin.NewChunk(addr, b).WithStamp(stamp)
 		m.modePut[ch.Address().String()] = mode
 
 		// pin chunks if needed
@@ -126,26 +126,26 @@ func (m *MockStorer) Put(ctx context.Context, mode storage.ModePut, chs ...swarm
 	return exist, nil
 }
 
-func (m *MockStorer) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...swarm.Address) (ch []swarm.Chunk, err error) {
+func (m *MockStorer) GetMulti(ctx context.Context, mode storage.ModeGet, addrs ...penguin.Address) (ch []penguin.Chunk, err error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (m *MockStorer) has(ctx context.Context, addr swarm.Address) (yes bool, err error) {
+func (m *MockStorer) has(ctx context.Context, addr penguin.Address) (yes bool, err error) {
 	_, has := m.store[addr.String()]
 	return has, nil
 }
 
-func (m *MockStorer) Has(ctx context.Context, addr swarm.Address) (yes bool, err error) {
+func (m *MockStorer) Has(ctx context.Context, addr penguin.Address) (yes bool, err error) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	return m.has(ctx, addr)
 }
 
-func (m *MockStorer) HasMulti(ctx context.Context, addrs ...swarm.Address) (yes []bool, err error) {
+func (m *MockStorer) HasMulti(ctx context.Context, addrs ...penguin.Address) (yes []bool, err error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (m *MockStorer) Set(ctx context.Context, mode storage.ModeSet, addrs ...swarm.Address) (err error) {
+func (m *MockStorer) Set(ctx context.Context, mode storage.ModeSet, addrs ...penguin.Address) (err error) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	for _, addr := range addrs {
@@ -182,7 +182,7 @@ func (m *MockStorer) Set(ctx context.Context, mode storage.ModeSet, addrs ...swa
 					m.pinnedCounter[i] = m.pinnedCounter[i] - 1
 					if m.pinnedCounter[i] == 0 {
 						copy(m.pinnedAddress[i:], m.pinnedAddress[i+1:])
-						m.pinnedAddress[len(m.pinnedAddress)-1] = swarm.NewAddress([]byte{0})
+						m.pinnedAddress[len(m.pinnedAddress)-1] = penguin.NewAddress([]byte{0})
 						m.pinnedAddress = m.pinnedAddress[:len(m.pinnedAddress)-1]
 
 						copy(m.pinnedCounter[i:], m.pinnedCounter[i+1:])
@@ -198,7 +198,7 @@ func (m *MockStorer) Set(ctx context.Context, mode storage.ModeSet, addrs ...swa
 	}
 	return nil
 }
-func (m *MockStorer) GetModePut(addr swarm.Address) (mode storage.ModePut) {
+func (m *MockStorer) GetModePut(addr penguin.Address) (mode storage.ModePut) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	if mode, ok := m.modePut[addr.String()]; ok {
@@ -207,7 +207,7 @@ func (m *MockStorer) GetModePut(addr swarm.Address) (mode storage.ModePut) {
 	return mode
 }
 
-func (m *MockStorer) GetModeSet(addr swarm.Address) (mode storage.ModeSet) {
+func (m *MockStorer) GetModeSet(addr penguin.Address) (mode storage.ModeSet) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 	if mode, ok := m.modeSet[addr.String()]; ok {
@@ -298,7 +298,7 @@ func (m *MockStorer) SubscribePullCalls() int {
 	return m.subPullCalls
 }
 
-func (m *MockStorer) SubscribePush(ctx context.Context) (c <-chan swarm.Chunk, stop func()) {
+func (m *MockStorer) SubscribePush(ctx context.Context) (c <-chan penguin.Chunk, stop func()) {
 	panic("not implemented") // TODO: Implement
 }
 

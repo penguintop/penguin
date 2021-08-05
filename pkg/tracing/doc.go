@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ To use the tracing package a Tracer instance must be created:
 	tracer, tracerCloser, err := tracing.NewTracer(&tracing.Options{
 		Enabled:     true,
 		Endpoint:    "127.0.0.1:6831",
-		ServiceName: "bee",
+		ServiceName: "pen",
 	})
 	if err != nil {
 		// handle error

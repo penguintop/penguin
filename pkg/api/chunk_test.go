@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -24,7 +24,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestChunkUploadDownload uploads a chunk to an API that verifies the chunk according
@@ -34,8 +34,8 @@ func TestChunkUploadDownload(t *testing.T) {
 	var (
 		targets         = "0x222"
 		chunksEndpoint  = "/chunks"
-		chunksResource  = func(a swarm.Address) string { return "/chunks/" + a.String() }
-		resourceTargets = func(addr swarm.Address) string { return "/chunks/" + addr.String() + "?targets=" + targets }
+		chunksResource  = func(a penguin.Address) string { return "/chunks/" + a.String() }
+		resourceTargets = func(addr penguin.Address) string { return "/chunks/" + addr.String() + "?targets=" + targets }
 		chunk           = testingc.GenerateTestRandomChunk()
 		statestoreMock  = statestore.NewStateStore()
 		logger          = logging.New(ioutil.Discard, 0)
@@ -52,7 +52,7 @@ func TestChunkUploadDownload(t *testing.T) {
 
 	t.Run("empty chunk", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, chunksEndpoint, http.StatusBadRequest,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "data length",
 				Code:    http.StatusBadRequest,
@@ -62,7 +62,7 @@ func TestChunkUploadDownload(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, chunksEndpoint, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: chunk.Address()}),
 		)
@@ -81,10 +81,10 @@ func TestChunkUploadDownload(t *testing.T) {
 
 	t.Run("pin-invalid-value", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, chunksEndpoint, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: chunk.Address()}),
-			jsonhttptest.WithRequestHeader(api.SwarmPinHeader, "invalid-pin"),
+			jsonhttptest.WithRequestHeader(api.PenguinPinHeader, "invalid-pin"),
 		)
 
 		// Also check if the chunk is NOT pinned
@@ -94,7 +94,7 @@ func TestChunkUploadDownload(t *testing.T) {
 	})
 	t.Run("pin-header-missing", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, chunksEndpoint, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: chunk.Address()}),
 		)
@@ -107,10 +107,10 @@ func TestChunkUploadDownload(t *testing.T) {
 	t.Run("pin-ok", func(t *testing.T) {
 		reference := chunk.Address()
 		jsonhttptest.Request(t, client, http.MethodPost, chunksEndpoint, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: reference}),
-			jsonhttptest.WithRequestHeader(api.SwarmPinHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinPinHeader, "True"),
 		)
 
 		has, err := storerMock.Has(context.Background(), reference)

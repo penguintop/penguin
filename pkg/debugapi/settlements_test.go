@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/settlement"
 	"github.com/penguintop/penguin/pkg/settlement/swap/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestSettlements(t *testing.T) {
@@ -97,7 +97,7 @@ func TestSettlementsError(t *testing.T) {
 
 func TestSettlementsPeers(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	settlementSentFunc := func(swarm.Address) (*big.Int, error) {
+	settlementSentFunc := func(penguin.Address) (*big.Int, error) {
 		return big.NewInt(1000000000000000000), nil
 	}
 	testServer := newTestServer(t, testServerOptions{
@@ -115,10 +115,10 @@ func TestSettlementsPeers(t *testing.T) {
 
 func TestSettlementsPeersNoSettlements(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
-	noErrFunc := func(swarm.Address) (*big.Int, error) {
+	noErrFunc := func(penguin.Address) (*big.Int, error) {
 		return big.NewInt(1000000000000000000), nil
 	}
-	errFunc := func(swarm.Address) (*big.Int, error) {
+	errFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, settlement.ErrPeerNoSettlements
 	}
 
@@ -160,7 +160,7 @@ func TestSettlementsPeersNoSettlements(t *testing.T) {
 func TestSettlementsPeersError(t *testing.T) {
 	peer := "bff2c89e85e78c38bd89fca1acc996afb876c21bf5a8482ad798ce15f1c223fa"
 	wantErr := errors.New("Error")
-	settlementSentFunc := func(swarm.Address) (*big.Int, error) {
+	settlementSentFunc := func(penguin.Address) (*big.Int, error) {
 		return nil, wantErr
 	}
 	testServer := newTestServer(t, testServerOptions{

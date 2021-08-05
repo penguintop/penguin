@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/bmt"
 	"github.com/penguintop/penguin/pkg/bmt/reference"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -81,7 +81,7 @@ func benchmarkBMTBaseline(t *testing.B, n int) {
 func benchmarkBMT(t *testing.B, n int) {
 	testData := randomBytes(t, seed)
 
-	pool := bmt.NewPool(bmt.NewConf(swarm.NewHasher, testSegmentCount, testPoolSize))
+	pool := bmt.NewPool(bmt.NewConf(penguin.NewHasher, testSegmentCount, testPoolSize))
 	h := pool.Get()
 	defer pool.Put(h)
 
@@ -98,7 +98,7 @@ func benchmarkBMT(t *testing.B, n int) {
 func benchmarkPool(t *testing.B, poolsize int) {
 	testData := randomBytes(t, seed)
 
-	pool := bmt.NewPool(bmt.NewConf(swarm.NewHasher, testSegmentCount, poolsize))
+	pool := bmt.NewPool(bmt.NewConf(penguin.NewHasher, testSegmentCount, poolsize))
 	cycles := 100
 
 	t.ReportAllocs()
@@ -123,7 +123,7 @@ func benchmarkPool(t *testing.B, poolsize int) {
 func benchmarkRefHasher(t *testing.B, n int) {
 	testData := randomBytes(t, seed)
 
-	rbmt := reference.NewRefHasher(swarm.NewHasher(), 128)
+	rbmt := reference.NewRefHasher(penguin.NewHasher(), 128)
 
 	t.ReportAllocs()
 	t.ResetTimer()

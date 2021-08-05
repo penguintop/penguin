@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/pingpong/pb"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tracing"
 )
 
@@ -27,7 +27,7 @@ const (
 )
 
 type Interface interface {
-	Ping(ctx context.Context, address swarm.Address, msgs ...string) (rtt time.Duration, err error)
+	Ping(ctx context.Context, address penguin.Address, msgs ...string) (rtt time.Duration, err error)
 }
 
 type Service struct {
@@ -59,7 +59,7 @@ func (s *Service) Protocol() p2p.ProtocolSpec {
 	}
 }
 
-func (s *Service) Ping(ctx context.Context, address swarm.Address, msgs ...string) (rtt time.Duration, err error) {
+func (s *Service) Ping(ctx context.Context, address penguin.Address, msgs ...string) (rtt time.Duration, err error) {
 	span, logger, ctx := s.tracer.StartSpanFromContext(ctx, "pingpong-p2p-ping", s.logger)
 	defer span.Finish()
 

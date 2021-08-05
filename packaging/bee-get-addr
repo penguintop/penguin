@@ -7,13 +7,11 @@ This script requires root priviledges, use sudo.
     exit 1
 fi
 
-RESP=$(/usr/bin/bee init --config /etc/bee/bee.yaml 2>&1)
+RESP=$(/usr/bin/pen init --config /etc/pen/pen.yaml 2>&1)
 case "$RESP" in
     Error*|*'No such file'*)
         echo "
-The bee node has returned an error, probably because the bee-clef external signer is enabled, but the node couldn't connect to it.
-
-Check https://docs.ethswarm.org/ for more info.
+The pen node has returned an error, probably because the pen-clef external signer is enabled, but the node couldn't connect to it.
 
 Fix the configuration and try again.
 
@@ -26,11 +24,9 @@ The node's output was:
         echo "
 Please make sure there is sufficient XWC and PEN available on the node's XWC address: $ETH_ADDRESS.
 
-Learn how to fund your node by visiting our docs at at https://docs.ethswarm.org/docs/installation/fund-your-node
+Learn how to fund your node by visiting our docs at at
 
-Once the node's wallet has received the funds it will begin joining the Swarm network.
-
-See the docs for more at https://docs.ethswarm.org/docs/.
+Once the node's wallet has received the funds it will begin joining the Penguin network.
         "
         ;;
 esac

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/p2p"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -25,7 +25,7 @@ func (s *Service) pingpongHandler(w http.ResponseWriter, r *http.Request) {
 	span, logger, ctx := s.tracer.StartSpanFromContext(ctx, "pingpong-api", s.logger)
 	defer span.Finish()
 
-	address, err := swarm.ParseHexAddress(peerID)
+	address, err := penguin.ParseHexAddress(peerID)
 	if err != nil {
 		logger.Debugf("pingpong: parse peer address %s: %v", peerID, err)
 		jsonhttp.BadRequest(w, "invalid peer address")

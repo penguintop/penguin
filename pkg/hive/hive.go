@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -23,7 +23,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/pen"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 
 	"golang.org/x/time/rate"
 )
@@ -38,14 +38,14 @@ const (
 
 var (
 	ErrRateLimitExceeded = errors.New("rate limit exceeded")
-	limitBurst           = 4 * int(swarm.MaxBins)
+	limitBurst           = 4 * int(penguin.MaxBins)
 	limitRate            = rate.Every(time.Minute)
 )
 
 type Service struct {
 	streamer        p2p.Streamer
 	addressBook     addressbook.GetPutter
-	addPeersHandler func(...swarm.Address)
+	addPeersHandler func(...penguin.Address)
 	networkID       uint64
 	logger          logging.Logger
 	metrics         metrics
@@ -79,7 +79,7 @@ func (s *Service) Protocol() p2p.ProtocolSpec {
 	}
 }
 
-func (s *Service) BroadcastPeers(ctx context.Context, addressee swarm.Address, peers ...swarm.Address) error {
+func (s *Service) BroadcastPeers(ctx context.Context, addressee penguin.Address, peers ...penguin.Address) error {
 	max := maxBatchSize
 	s.metrics.BroadcastPeers.Inc()
 	s.metrics.BroadcastPeersPeers.Add(float64(len(peers)))
@@ -98,11 +98,11 @@ func (s *Service) BroadcastPeers(ctx context.Context, addressee swarm.Address, p
 	return nil
 }
 
-func (s *Service) SetAddPeersHandler(h func(addr ...swarm.Address)) {
+func (s *Service) SetAddPeersHandler(h func(addr ...penguin.Address)) {
 	s.addPeersHandler = h
 }
 
-func (s *Service) sendPeers(ctx context.Context, peer swarm.Address, peers []swarm.Address) (err error) {
+func (s *Service) sendPeers(ctx context.Context, peer penguin.Address, peers []penguin.Address) (err error) {
 	s.metrics.BroadcastPeersSends.Inc()
 	stream, err := s.streamer.NewStream(ctx, peer, nil, protocolName, protocolVersion, peersStreamName)
 	if err != nil {
@@ -164,7 +164,7 @@ func (s *Service) peersHandler(ctx context.Context, peer p2p.Peer, stream p2p.St
 	// but we still want to handle not closed stream from the other side to avoid zombie stream
 	go stream.FullClose()
 
-	var peers []swarm.Address
+	var peers []penguin.Address
 	for _, newPeer := range peersReq.Peers {
 		penAddress, err := pen.ParseAddress(newPeer.Underlay, newPeer.Overlay, newPeer.Signature, s.networkID)
 		if err != nil {
@@ -188,7 +188,7 @@ func (s *Service) peersHandler(ctx context.Context, peer p2p.Peer, stream p2p.St
 	return nil
 }
 
-func (s *Service) rateLimitPeer(peer swarm.Address, count int) error {
+func (s *Service) rateLimitPeer(peer penguin.Address, count int) error {
 
 	s.limiterLock.Lock()
 	defer s.limiterLock.Unlock()

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/encryption"
 	"github.com/penguintop/penguin/pkg/encryption/elgamal"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -56,7 +56,7 @@ type Targets []Target
 
 const (
 	// MaxPayloadSize is the maximum allowed payload size for the Message type, in bytes
-	MaxPayloadSize = swarm.ChunkSize - 3*swarm.HashSize
+	MaxPayloadSize = penguin.ChunkSize - 3*penguin.HashSize
 )
 
 // Wrap creates a new serialised message with the given topic, payload and recipient public key used
@@ -70,7 +70,7 @@ const (
 // - plaintext length encoding
 // - integrity protection
 // message:
-func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicKey, targets Targets) (swarm.Chunk, error) {
+func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicKey, targets Targets) (penguin.Chunk, error) {
 	if len(msg) > MaxPayloadSize {
 		return nil, ErrPayloadTooBig
 	}
@@ -85,7 +85,7 @@ func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicK
 	// integrity segment prepended to msg
 	plaintext := append(integrity, msg...)
 	// use el-Gamal with ECDH on an ephemeral key, recipient public key and topic as salt
-	enc, ephpub, err := elgamal.NewEncryptor(recipient, topic[:], 4032, swarm.NewHasher)
+	enc, ephpub, err := elgamal.NewEncryptor(recipient, topic[:], 4032, penguin.NewHasher)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicK
 	// f is evaluating the mined nonce
 	// it accepts the nonce if it has the parity required by the ephemeral public key  AND
 	// the chunk hashes to an address matching one of the targets
-	f := func(nonce []byte) (swarm.Chunk, error) {
+	f := func(nonce []byte) (penguin.Chunk, error) {
 		hash, err := h(nonce)
 		if err != nil {
 			return nil, err
@@ -126,7 +126,7 @@ func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicK
 		if !contains(targets, hash[:targetsLen]) {
 			return nil, nil
 		}
-		chunk := swarm.NewChunk(swarm.NewAddress(hash), append(hint, append(nonce, payload...)...))
+		chunk := penguin.NewChunk(penguin.NewAddress(hash), append(hint, append(nonce, payload...)...))
 		return chunk, nil
 	}
 	return mine(ctx, odd, f)
@@ -134,7 +134,7 @@ func Wrap(ctx context.Context, topic Topic, msg []byte, recipient *ecdsa.PublicK
 
 // Unwrap takes a chunk, a topic and a private key, and tries to decrypt the payload
 // using the private key, the prepended ephemeral public key for el-Gamal using the topic as salt
-func Unwrap(ctx context.Context, key *ecdsa.PrivateKey, chunk swarm.Chunk, topics []Topic) (topic Topic, msg []byte, err error) {
+func Unwrap(ctx context.Context, key *ecdsa.PrivateKey, chunk penguin.Chunk, topics []Topic) (topic Topic, msg []byte, err error) {
 	chunkData := chunk.Data()
 	pubkey, err := extractPublicKey(chunkData)
 	if err != nil {
@@ -203,7 +203,7 @@ func contains(col Targets, elem []byte) bool {
 }
 
 // mine iteratively enumerates different nonces until the address (BMT hash) of the chunkhas one of the targets as its prefix
-func mine(ctx context.Context, odd bool, f func(nonce []byte) (swarm.Chunk, error)) (swarm.Chunk, error) {
+func mine(ctx context.Context, odd bool, f func(nonce []byte) (penguin.Chunk, error)) (penguin.Chunk, error) {
 	seeds := make([]uint32, 8)
 	for i := range seeds {
 		b, err := random.Int(random.Reader, maxUint32)
@@ -225,7 +225,7 @@ func mine(ctx context.Context, odd bool, f func(nonce []byte) (swarm.Chunk, erro
 
 	quit := make(chan struct{})
 	// make both  errs  and result channels buffered so they never block
-	result := make(chan swarm.Chunk, 8)
+	result := make(chan penguin.Chunk, 8)
 	errs := make(chan error, 8)
 	for i := 0; i < 8; i++ {
 		go func(j int) {
@@ -278,7 +278,7 @@ func extractPublicKey(chunkData []byte) (*ecdsa.PublicKey, error) {
 // proper integrity check will disambiguate any potential collisions (false positives)
 // if the topic matches the hint, it returns the el-Gamal decryptor, otherwise an error
 func matchTopic(key *ecdsa.PrivateKey, pubkey *ecdsa.PublicKey, hint, topic []byte) (encryption.Decrypter, error) {
-	dec, err := elgamal.NewDecrypter(key, pubkey, topic, swarm.NewHasher)
+	dec, err := elgamal.NewDecrypter(key, pubkey, topic, penguin.NewHasher)
 	if err != nil {
 		return nil, err
 	}

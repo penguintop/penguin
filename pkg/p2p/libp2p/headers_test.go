@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestHeaders(t *testing.T) {
@@ -148,7 +148,7 @@ func TestHeadler(t *testing.T) {
 				Handler: func(_ context.Context, _ p2p.Peer, stream p2p.Stream) error {
 					return nil
 				},
-				Headler: func(headers p2p.Headers, address swarm.Address) p2p.Headers {
+				Headler: func(headers p2p.Headers, address penguin.Address) p2p.Headers {
 					defer close(handled)
 					gotReceivedHeaders = headers
 					return sentHeaders

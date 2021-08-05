@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -59,7 +59,7 @@ func TestGatewayMode(t *testing.T) {
 	})
 
 	t.Run("pinning", func(t *testing.T) {
-		headerOption := jsonhttptest.WithRequestHeader(api.SwarmPinHeader, "true")
+		headerOption := jsonhttptest.WithRequestHeader(api.PenguinPinHeader, "true")
 
 		forbiddenResponseOption := jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 			Message: "pinning is disabled",
@@ -68,14 +68,14 @@ func TestGatewayMode(t *testing.T) {
 
 		// should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/chunks", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 		)
 
 		jsonhttptest.Request(t, client, http.MethodPost, "/chunks/0773a91efd6547c754fc1d95fb1c62c7d1b47f959c2caa685dfec8736da95c1c", http.StatusForbidden, forbiddenResponseOption, headerOption)
 
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 		) // should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusForbidden, forbiddenResponseOption, headerOption)
@@ -84,7 +84,7 @@ func TestGatewayMode(t *testing.T) {
 	})
 
 	t.Run("encryption", func(t *testing.T) {
-		headerOption := jsonhttptest.WithRequestHeader(api.SwarmEncryptHeader, "true")
+		headerOption := jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "true")
 
 		forbiddenResponseOption := jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 			Message: "encryption is disabled",
@@ -92,7 +92,7 @@ func TestGatewayMode(t *testing.T) {
 		})
 
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 		) // should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusForbidden, forbiddenResponseOption, headerOption)

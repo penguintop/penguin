@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,11 +7,11 @@ package file
 import (
 	"io"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
-	maxBufferSize = swarm.ChunkSize * 2
+	maxBufferSize = penguin.ChunkSize * 2
 )
 
 // ChunkPipe ensures that only the last read is smaller than the chunk size,
@@ -51,20 +51,20 @@ func (c *ChunkPipe) Write(b []byte) (int, error) {
 		c.cursor += copied
 		nw += copied
 
-		if c.cursor >= swarm.ChunkSize {
+		if c.cursor >= penguin.ChunkSize {
 			// NOTE: the Write method contract requires all sent data to be
 			// written before returning (without error)
-			written, err := c.writer.Write(c.data[:swarm.ChunkSize])
+			written, err := c.writer.Write(c.data[:penguin.ChunkSize])
 			if err != nil {
 				return nw, err
 			}
-			if swarm.ChunkSize != written {
+			if penguin.ChunkSize != written {
 				return nw, io.ErrShortWrite
 			}
 
-			c.cursor -= swarm.ChunkSize
+			c.cursor -= penguin.ChunkSize
 
-			copy(c.data, c.data[swarm.ChunkSize:])
+			copy(c.data, c.data[penguin.ChunkSize:])
 		}
 	}
 

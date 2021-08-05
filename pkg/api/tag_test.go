@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -22,14 +22,14 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/tags"
 	"gitlab.com/nolash/go-mockbytes"
 )
 
 type fileUploadResponse struct {
-	Reference swarm.Address `json:"reference"`
+	Reference penguin.Address `json:"reference"`
 }
 
 func tagsWithIdResource(id uint32) string { return fmt.Sprintf("/tags/%d", id) }
@@ -76,7 +76,7 @@ func TestTags(t *testing.T) {
 				Message: "cannot get tag",
 				Code:    http.StatusBadRequest,
 			}),
-			jsonhttptest.WithRequestHeader(api.SwarmTagHeader, "invalid_id.jpg"), // the value should be uint32
+			jsonhttptest.WithRequestHeader(api.PenguinTagHeader, "invalid_id.jpg"), // the value should be uint32
 		)
 	})
 
@@ -107,20 +107,20 @@ func TestTags(t *testing.T) {
 		)
 
 		_ = jsonhttptest.Request(t, client, http.MethodPost, chunksResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: chunk.Address()}),
 		)
 
 		rcvdHeaders := jsonhttptest.Request(t, client, http.MethodPost, chunksResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{Reference: chunk.Address()}),
-			jsonhttptest.WithRequestHeader(api.SwarmTagHeader, strconv.FormatUint(uint64(tr.Uid), 10)),
+			jsonhttptest.WithRequestHeader(api.PenguinTagHeader, strconv.FormatUint(uint64(tr.Uid), 10)),
 		)
 
 		isTagFoundInResponse(t, rcvdHeaders, &tr)
-		tagValueTest(t, tr.Uid, 1, 1, 1, 0, 0, 0, swarm.ZeroAddress, client)
+		tagValueTest(t, tr.Uid, 1, 1, 1, 0, 0, 0, penguin.ZeroAddress, client)
 	})
 
 	t.Run("list tags", func(t *testing.T) {
@@ -233,9 +233,9 @@ func TestTags(t *testing.T) {
 
 		// upload content with tag
 		jsonhttptest.Request(t, client, http.MethodPost, chunksResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
-			jsonhttptest.WithRequestHeader(api.SwarmTagHeader, fmt.Sprint(tagId)),
+			jsonhttptest.WithRequestHeader(api.PenguinTagHeader, fmt.Sprint(tagId)),
 		)
 
 		// call done split
@@ -268,18 +268,18 @@ func TestTags(t *testing.T) {
 
 	t.Run("file tags", func(t *testing.T) {
 		// upload a file without supplying tag
-		expectedHash := swarm.MustParseHexAddress("40e739ebdfd18292925bba4138cd097db9aa18c1b57e74042f48469b48da33a8")
+		expectedHash := penguin.MustParseHexAddress("40e739ebdfd18292925bba4138cd097db9aa18c1b57e74042f48469b48da33a8")
 		expectedResponse := api.PenUploadResponse{Reference: expectedHash}
 
 		respHeaders := jsonhttptest.Request(t, client, http.MethodPost,
 			penResource+"?name=somefile", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader([]byte("some data"))),
 			jsonhttptest.WithExpectedJSONResponse(expectedResponse),
 			jsonhttptest.WithRequestHeader("Content-Type", "application/octet-stream"),
 		)
 
-		tagId, err := strconv.Atoi(respHeaders.Get(api.SwarmTagHeader))
+		tagId, err := strconv.Atoi(respHeaders.Get(api.PenguinTagHeader))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -292,18 +292,18 @@ func TestTags(t *testing.T) {
 			data: []byte("some dir data"),
 			name: "binary-file",
 		}})
-		expectedHash := swarm.MustParseHexAddress("42bc27c9137c93705ffbc2945fa1aab0e8e1826f1500b7f06f6e3f86f617213b")
+		expectedHash := penguin.MustParseHexAddress("42bc27c9137c93705ffbc2945fa1aab0e8e1826f1500b7f06f6e3f86f617213b")
 		expectedResponse := api.PenUploadResponse{Reference: expectedHash}
 
 		respHeaders := jsonhttptest.Request(t, client, http.MethodPost, penResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(tarReader),
-			jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 			jsonhttptest.WithExpectedJSONResponse(expectedResponse),
 			jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
 		)
 
-		tagId, err := strconv.Atoi(respHeaders.Get(api.SwarmTagHeader))
+		tagId, err := strconv.Atoi(respHeaders.Get(api.PenguinTagHeader))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -314,33 +314,33 @@ func TestTags(t *testing.T) {
 		// create a tag using the API
 		tr := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{}),
 			jsonhttptest.WithUnmarshalJSONResponse(&tr),
 		)
 
 		sentHeaders := make(http.Header)
-		sentHeaders.Set(api.SwarmTagHeader, strconv.FormatUint(uint64(tr.Uid), 10))
+		sentHeaders.Set(api.PenguinTagHeader, strconv.FormatUint(uint64(tr.Uid), 10))
 
 		g := mockbytes.New(0, mockbytes.MockTypeStandard).WithModulus(255)
-		dataChunk, err := g.SequentialBytes(swarm.ChunkSize)
+		dataChunk, err := g.SequentialBytes(penguin.ChunkSize)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		rootAddress := swarm.MustParseHexAddress("5e2a21902f51438be1adbd0e29e1bd34c53a21d3120aefa3c7275129f2f88de9")
+		rootAddress := penguin.MustParseHexAddress("5e2a21902f51438be1adbd0e29e1bd34c53a21d3120aefa3c7275129f2f88de9")
 
-		content := make([]byte, swarm.ChunkSize*2)
-		copy(content[swarm.ChunkSize:], dataChunk)
-		copy(content[:swarm.ChunkSize], dataChunk)
+		content := make([]byte, penguin.ChunkSize*2)
+		copy(content[penguin.ChunkSize:], dataChunk)
+		copy(content[:penguin.ChunkSize], dataChunk)
 
 		rcvdHeaders := jsonhttptest.Request(t, client, http.MethodPost, bytesResource, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(content)),
 			jsonhttptest.WithExpectedJSONResponse(fileUploadResponse{
 				Reference: rootAddress,
 			}),
-			jsonhttptest.WithRequestHeader(api.SwarmTagHeader, strconv.FormatUint(uint64(tr.Uid), 10)),
+			jsonhttptest.WithRequestHeader(api.PenguinTagHeader, strconv.FormatUint(uint64(tr.Uid), 10)),
 		)
 		id := isTagFoundInResponse(t, rcvdHeaders, nil)
 
@@ -352,7 +352,7 @@ func TestTags(t *testing.T) {
 		if tagToVerify.Uid != tr.Uid {
 			t.Fatalf("expected tag id to be %d but is %d", tagToVerify.Uid, tr.Uid)
 		}
-		tagValueTest(t, id, 3, 3, 1, 0, 0, 3, swarm.ZeroAddress, client)
+		tagValueTest(t, id, 3, 3, 1, 0, 0, 3, penguin.ZeroAddress, client)
 	})
 }
 
@@ -361,7 +361,7 @@ func TestTags(t *testing.T) {
 func isTagFoundInResponse(t *testing.T, headers http.Header, tr *api.TagResponse) uint32 {
 	t.Helper()
 
-	idStr := headers.Get(api.SwarmTagHeader)
+	idStr := headers.Get(api.PenguinTagHeader)
 	if idStr == "" {
 		t.Fatalf("could not find tag id header in chunk upload response")
 	}
@@ -378,7 +378,7 @@ func isTagFoundInResponse(t *testing.T, headers http.Header, tr *api.TagResponse
 	return id
 }
 
-func tagValueTest(t *testing.T, id uint32, split, stored, seen, sent, synced, total int64, address swarm.Address, client *http.Client) {
+func tagValueTest(t *testing.T, id uint32, split, stored, seen, sent, synced, total int64, address penguin.Address, client *http.Client) {
 	t.Helper()
 	tag := api.TagResponse{}
 	jsonhttptest.Request(t, client, http.MethodGet, tagsWithIdResource(id), http.StatusOK,

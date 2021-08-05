@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,9 +10,9 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 )
 
-func TestNewSwarmStreamName(t *testing.T) {
-	want := "/swarm/hive/1.2.0/peers"
-	got := p2p.NewSwarmStreamName("hive", "1.2.0", "peers")
+func TestNewPenguinStreamName(t *testing.T) {
+	want := "/penguin/hive/1.2.0/peers"
+	got := p2p.NewPenguinStreamName("hive", "1.2.0", "peers")
 
 	if got != want {
 		t.Errorf("got %s, want %s", got, want)

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -25,7 +25,7 @@ import (
 	pb "github.com/penguintop/penguin/pkg/retrieval/pb"
 	"github.com/penguintop/penguin/pkg/soc"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/opentracing/opentracing-go"
@@ -43,18 +43,18 @@ const (
 var _ Interface = (*Service)(nil)
 
 type Interface interface {
-	RetrieveChunk(ctx context.Context, addr swarm.Address) (chunk swarm.Chunk, err error)
+	RetrieveChunk(ctx context.Context, addr penguin.Address) (chunk penguin.Chunk, err error)
 }
 
 type retrievalResult struct {
-	chunk     swarm.Chunk
-	peer      swarm.Address
+	chunk     penguin.Chunk
+	peer      penguin.Address
 	err       error
 	retrieved bool
 }
 
 type Service struct {
-	addr          swarm.Address
+	addr          penguin.Address
 	streamer      p2p.Streamer
 	peerSuggester topology.EachPeerer
 	storer        storage.Storer
@@ -66,7 +66,7 @@ type Service struct {
 	tracer        *tracing.Tracer
 }
 
-func New(addr swarm.Address, storer storage.Storer, streamer p2p.Streamer, chunkPeerer topology.EachPeerer, logger logging.Logger, accounting accounting.Interface, pricer pricer.Interface, tracer *tracing.Tracer) *Service {
+func New(addr penguin.Address, storer storage.Storer, streamer p2p.Streamer, chunkPeerer topology.EachPeerer, logger logging.Logger, accounting accounting.Interface, pricer pricer.Interface, tracer *tracing.Tracer) *Service {
 	return &Service{
 		addr:          addr,
 		streamer:      streamer,
@@ -103,7 +103,7 @@ const (
 	originSuffix                  = "_origin"
 )
 
-func (s *Service) RetrieveChunk(ctx context.Context, addr swarm.Address) (swarm.Chunk, error) {
+func (s *Service) RetrieveChunk(ctx context.Context, addr penguin.Address) (penguin.Chunk, error) {
 	s.metrics.RequestCounter.Inc()
 
 	flightRoute := addr.String()
@@ -220,20 +220,20 @@ func (s *Service) RetrieveChunk(ctx context.Context, addr swarm.Address) (swarm.
 		return nil, err
 	}
 
-	return v.(swarm.Chunk), nil
+	return v.(penguin.Chunk), nil
 }
 
-func (s *Service) retrieveChunk(ctx context.Context, addr swarm.Address, sp *skipPeers) (chunk swarm.Chunk, peer swarm.Address, requested bool, err error) {
+func (s *Service) retrieveChunk(ctx context.Context, addr penguin.Address, sp *skipPeers) (chunk penguin.Chunk, peer penguin.Address, requested bool, err error) {
 	startTimer := time.Now()
 
 	v := ctx.Value(requestSourceContextKey{})
-	sourcePeerAddr := swarm.Address{}
+	sourcePeerAddr := penguin.Address{}
 	// allow upstream requests if this node is the source of the request
 	// i.e. the request was not forwarded, to improve retrieval
 	// if this node is the closest to he chunk but still does not contain it
 	allowUpstream := true
 	if src, ok := v.(string); ok {
-		sourcePeerAddr, err = swarm.ParseHexAddress(src)
+		sourcePeerAddr, err = penguin.ParseHexAddress(src)
 		if err == nil {
 			sp.Add(sourcePeerAddr)
 		}
@@ -249,12 +249,12 @@ func (s *Service) retrieveChunk(ctx context.Context, addr swarm.Address, sp *ski
 		return nil, peer, false, fmt.Errorf("get closest for address %s, allow upstream %v: %w", addr.String(), allowUpstream, err)
 	}
 
-	peerPO := swarm.Proximity(s.addr.Bytes(), peer.Bytes())
+	peerPO := penguin.Proximity(s.addr.Bytes(), peer.Bytes())
 
 	if !sourcePeerAddr.IsZero() {
 		// is forwarded request
-		sourceAddrPO := swarm.Proximity(sourcePeerAddr.Bytes(), addr.Bytes())
-		addrPO := swarm.Proximity(peer.Bytes(), addr.Bytes())
+		sourceAddrPO := penguin.Proximity(sourcePeerAddr.Bytes(), addr.Bytes())
+		addrPO := penguin.Proximity(peer.Bytes(), addr.Bytes())
 
 		poGain := int(addrPO) - int(sourceAddrPO)
 
@@ -315,12 +315,12 @@ func (s *Service) retrieveChunk(ctx context.Context, addr swarm.Address, sp *ski
 	if err != nil {
 		return nil, peer, true, fmt.Errorf("stamp unmarshal: %w", err)
 	}
-	chunk = swarm.NewChunk(addr, d.Data).WithStamp(stamp)
+	chunk = penguin.NewChunk(addr, d.Data).WithStamp(stamp)
 	if !cac.Valid(chunk) {
 		if !soc.Valid(chunk) {
 			s.metrics.InvalidChunkRetrieved.Inc()
 			s.metrics.TotalErrors.Inc()
-			return nil, peer, true, swarm.ErrInvalidChunk
+			return nil, peer, true, penguin.ErrInvalidChunk
 		}
 	}
 
@@ -338,9 +338,9 @@ func (s *Service) retrieveChunk(ctx context.Context, addr swarm.Address, sp *ski
 // provided in skipPeers and if allowUpstream is true, peers that are further of
 // the chunk than this node is, could also be returned, allowing the upstream
 // retrieve request.
-func (s *Service) closestPeer(addr swarm.Address, skipPeers []swarm.Address, allowUpstream bool) (swarm.Address, error) {
-	closest := swarm.Address{}
-	err := s.peerSuggester.EachPeerRev(func(peer swarm.Address, po uint8) (bool, bool, error) {
+func (s *Service) closestPeer(addr penguin.Address, skipPeers []penguin.Address, allowUpstream bool) (penguin.Address, error) {
+	closest := penguin.Address{}
+	err := s.peerSuggester.EachPeerRev(func(peer penguin.Address, po uint8) (bool, bool, error) {
 		for _, a := range skipPeers {
 			if a.Equal(peer) {
 				return false, false, nil
@@ -350,7 +350,7 @@ func (s *Service) closestPeer(addr swarm.Address, skipPeers []swarm.Address, all
 			closest = peer
 			return false, false, nil
 		}
-		dcmp, err := swarm.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
+		dcmp, err := penguin.DistanceCmp(addr.Bytes(), closest.Bytes(), peer.Bytes())
 		if err != nil {
 			return false, false, fmt.Errorf("distance compare error. addr %s closest %s peer %s: %w", addr.String(), closest.String(), peer.String(), err)
 		}
@@ -367,23 +367,23 @@ func (s *Service) closestPeer(addr swarm.Address, skipPeers []swarm.Address, all
 		return false, false, nil
 	})
 	if err != nil {
-		return swarm.Address{}, err
+		return penguin.Address{}, err
 	}
 
 	// check if found
 	if closest.IsZero() {
-		return swarm.Address{}, topology.ErrNotFound
+		return penguin.Address{}, topology.ErrNotFound
 	}
 	if allowUpstream {
 		return closest, nil
 	}
 
-	dcmp, err := swarm.DistanceCmp(addr.Bytes(), closest.Bytes(), s.addr.Bytes())
+	dcmp, err := penguin.DistanceCmp(addr.Bytes(), closest.Bytes(), s.addr.Bytes())
 	if err != nil {
-		return swarm.Address{}, fmt.Errorf("distance compare addr %s closest %s base address %s: %w", addr.String(), closest.String(), s.addr.String(), err)
+		return penguin.Address{}, fmt.Errorf("distance compare addr %s closest %s base address %s: %w", addr.String(), closest.String(), s.addr.String(), err)
 	}
 	if dcmp != 1 {
-		return swarm.Address{}, topology.ErrNotFound
+		return penguin.Address{}, topology.ErrNotFound
 	}
 
 	return closest, nil
@@ -403,11 +403,11 @@ func (s *Service) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) (e
 		return fmt.Errorf("read request: %w peer %s", err, p.Address.String())
 	}
 
-	span, _, ctx := s.tracer.StartSpanFromContext(ctx, "handle-retrieve-chunk", s.logger, opentracing.Tag{Key: "address", Value: swarm.NewAddress(req.Addr).String()})
+	span, _, ctx := s.tracer.StartSpanFromContext(ctx, "handle-retrieve-chunk", s.logger, opentracing.Tag{Key: "address", Value: penguin.NewAddress(req.Addr).String()})
 	defer span.Finish()
 
 	ctx = context.WithValue(ctx, requestSourceContextKey{}, p.Address.String())
-	addr := swarm.NewAddress(req.Addr)
+	addr := penguin.NewAddress(req.Addr)
 	chunk, err := s.storer.Get(ctx, storage.ModeGetRequest, addr)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {

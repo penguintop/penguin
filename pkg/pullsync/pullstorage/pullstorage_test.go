@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -23,22 +23,22 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	stesting "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
-	addrs = []swarm.Address{
-		swarm.MustParseHexAddress("0001"),
-		swarm.MustParseHexAddress("0002"),
-		swarm.MustParseHexAddress("0003"),
-		swarm.MustParseHexAddress("0004"),
-		swarm.MustParseHexAddress("0005"),
-		swarm.MustParseHexAddress("0006"),
+	addrs = []penguin.Address{
+        penguin.MustParseHexAddress("0001"),
+        penguin.MustParseHexAddress("0002"),
+        penguin.MustParseHexAddress("0003"),
+        penguin.MustParseHexAddress("0004"),
+        penguin.MustParseHexAddress("0005"),
+        penguin.MustParseHexAddress("0006"),
 	}
 	limit = 5
 )
 
-func someAddrs(i ...int) (r []swarm.Address) {
+func someAddrs(i ...int) (r []penguin.Address) {
 	for _, v := range i {
 		r = append(r, addrs[v])
 	}
@@ -257,11 +257,11 @@ func TestIntervalChunks_Localstore(t *testing.T) {
 			base, db := newTestDB(t, nil)
 			ps := pullstorage.New(db)
 
-			var chunks []swarm.Chunk
+			var chunks []penguin.Chunk
 
 			for i := 1; i <= tc.chunks; {
 				c := stesting.GenerateTestRandomChunk()
-				po := swarm.Proximity(c.Address().Bytes(), base)
+				po := penguin.Proximity(c.Address().Bytes(), base)
 				if po == 1 {
 					chunks = append(chunks, c)
 					i++
@@ -280,7 +280,7 @@ func TestIntervalChunks_Localstore(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			checkAddrs := make([]swarm.Address, len(tc.addrs))
+			checkAddrs := make([]penguin.Address, len(tc.addrs))
 			for i, v := range tc.addrs {
 				checkAddrs[i] = chunks[v-1].Address()
 			}
@@ -319,7 +319,7 @@ func TestIntervalChunks_IteratorShare(t *testing.T) {
 	}()
 
 	type result struct {
-		addrs []swarm.Address
+		addrs []penguin.Address
 		top   uint64
 	}
 	sched := make(chan struct{})
@@ -375,7 +375,7 @@ func TestIntervalChunks_IteratorShare(t *testing.T) {
 func TestIntervalChunks_IteratorShareContextCancellation(t *testing.T) {
 
 	type result struct {
-		addrs []swarm.Address
+		addrs []penguin.Address
 		top   uint64
 		err   error
 	}
@@ -415,7 +415,7 @@ func TestIntervalChunks_IteratorShareContextCancellation(t *testing.T) {
 		<-sched // wait for goroutine to get scheduled
 
 		// wait till all the routines are scheduled
-		waitStacks(t, "ethswarm.org/bee/pkg/pullsync/pullstorage/pullstorage.go:66", 3, 2*time.Second)
+		waitStacks(t, "github.com/penguintop/penguin/pkg/pullsync/pullstorage/pullstorage.go:66", 3, 2*time.Second)
 		// cancel the first caller
 		cancel()
 		i := 0
@@ -486,7 +486,7 @@ func TestIntervalChunks_IteratorShareContextCancellation(t *testing.T) {
 		<-sched // wait for goroutine to get scheduled
 
 		// wait till all the routines are scheduled
-		waitStacks(t, "ethswarm.org/bee/pkg/pullsync/pullstorage/pullstorage.go:66", 3, 2*time.Second)
+		waitStacks(t, "github.com/penguintop/penguin/pkg/pullsync/pullstorage/pullstorage.go:66", 3, 2*time.Second)
 		// cancel all callers
 		cancel()
 		i := 0
@@ -576,7 +576,7 @@ func newTestDB(t testing.TB, o *localstore.Options) (baseKey []byte, db *localst
 }
 
 // check that every a exists in b
-func checkAinB(t *testing.T, a, b []swarm.Address) {
+func checkAinB(t *testing.T, a, b []penguin.Address) {
 	t.Helper()
 	for _, v := range a {
 		if !isIn(v, b) {
@@ -585,7 +585,7 @@ func checkAinB(t *testing.T, a, b []swarm.Address) {
 	}
 }
 
-func isIn(a swarm.Address, b []swarm.Address) bool {
+func isIn(a penguin.Address, b []penguin.Address) bool {
 	for _, v := range b {
 		if a.Equal(v) {
 			return true

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 )
 
 func TestPinningService(t *testing.T) {
-	const content = "Hello, Bee!"
+	const content = "Hello, Pen!"
 
 	var (
 		ctx        = context.Background()

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,7 +28,7 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
@@ -52,9 +52,9 @@ func TestDirs(t *testing.T) {
 	t.Run("empty request body", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource,
 			http.StatusBadRequest,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(nil)),
-			jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: api.InvalidRequest.Error(),
 				Code:    http.StatusBadRequest,
@@ -68,9 +68,9 @@ func TestDirs(t *testing.T) {
 
 		jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource,
 			http.StatusInternalServerError,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(file),
-			jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: api.DirectoryStoreError.Error(),
 				Code:    http.StatusInternalServerError,
@@ -88,9 +88,9 @@ func TestDirs(t *testing.T) {
 		// submit valid tar, but with wrong content-type
 		jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource,
 			http.StatusBadRequest,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(tarReader),
-			jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: api.InvalidContentType.Error(),
 				Code:    http.StatusBadRequest,
@@ -102,7 +102,7 @@ func TestDirs(t *testing.T) {
 	// valid tars
 	for _, tc := range []struct {
 		name                string
-		expectedReference   swarm.Address
+		expectedReference   penguin.Address
 		encrypt             bool
 		wantIndexFilename   string
 		wantErrorFilename   string
@@ -113,7 +113,7 @@ func TestDirs(t *testing.T) {
 	}{
 		{
 			name:              "non-nested files without extension",
-			expectedReference: swarm.MustParseHexAddress("f3312af64715d26b5e1a3dc90f012d2c9cc74a167899dab1d07cdee8c107f939"),
+			expectedReference: penguin.MustParseHexAddress("f3312af64715d26b5e1a3dc90f012d2c9cc74a167899dab1d07cdee8c107f939"),
 			files: []f{
 				{
 					data: []byte("first file data"),
@@ -135,7 +135,7 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:              "nested files with extension",
-			expectedReference: swarm.MustParseHexAddress("4c9c76d63856102e54092c38a7cd227d769752d768b7adc8c3542e3dd9fcf295"),
+			expectedReference: penguin.MustParseHexAddress("4c9c76d63856102e54092c38a7cd227d769752d768b7adc8c3542e3dd9fcf295"),
 			files: []f{
 				{
 					data: []byte("robots text"),
@@ -165,11 +165,11 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:              "no index filename",
-			expectedReference: swarm.MustParseHexAddress("9e178dbd1ed4b748379e25144e28dfb29c07a4b5114896ef454480115a56b237"),
+			expectedReference: penguin.MustParseHexAddress("9e178dbd1ed4b748379e25144e28dfb29c07a4b5114896ef454480115a56b237"),
 			doMultipart:       true,
 			files: []f{
 				{
-					data: []byte("<h1>Swarm"),
+					data: []byte("<h1>Penguin"),
 					name: "index.html",
 					dir:  "",
 					header: http.Header{
@@ -180,13 +180,13 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:                "explicit index filename",
-			expectedReference:   swarm.MustParseHexAddress("a58484e3d77bbdb40323ddc9020c6e96e5eb5deb52015d3e0f63cce629ac1aa6"),
+			expectedReference:   penguin.MustParseHexAddress("a58484e3d77bbdb40323ddc9020c6e96e5eb5deb52015d3e0f63cce629ac1aa6"),
 			wantIndexFilename:   "index.html",
-			indexFilenameOption: jsonhttptest.WithRequestHeader(api.SwarmIndexDocumentHeader, "index.html"),
+			indexFilenameOption: jsonhttptest.WithRequestHeader(api.PenguinIndexDocumentHeader, "index.html"),
 			doMultipart:         true,
 			files: []f{
 				{
-					data: []byte("<h1>Swarm"),
+					data: []byte("<h1>Penguin"),
 					name: "index.html",
 					dir:  "",
 					header: http.Header{
@@ -197,12 +197,12 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:                "nested index filename",
-			expectedReference:   swarm.MustParseHexAddress("3e2f008a578c435efa7a1fce146e21c4ae8c20b80fbb4c4e0c1c87ca08fef414"),
+			expectedReference:   penguin.MustParseHexAddress("3e2f008a578c435efa7a1fce146e21c4ae8c20b80fbb4c4e0c1c87ca08fef414"),
 			wantIndexFilename:   "index.html",
-			indexFilenameOption: jsonhttptest.WithRequestHeader(api.SwarmIndexDocumentHeader, "index.html"),
+			indexFilenameOption: jsonhttptest.WithRequestHeader(api.PenguinIndexDocumentHeader, "index.html"),
 			files: []f{
 				{
-					data: []byte("<h1>Swarm"),
+					data: []byte("<h1>Penguin"),
 					name: "index.html",
 					dir:  "dir",
 					header: http.Header{
@@ -213,15 +213,15 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:                "explicit index and error filename",
-			expectedReference:   swarm.MustParseHexAddress("2cd9a6ac11eefbb71b372fb97c3ef64109c409955964a294fdc183c1014b3844"),
+			expectedReference:   penguin.MustParseHexAddress("2cd9a6ac11eefbb71b372fb97c3ef64109c409955964a294fdc183c1014b3844"),
 			wantIndexFilename:   "index.html",
 			wantErrorFilename:   "error.html",
-			indexFilenameOption: jsonhttptest.WithRequestHeader(api.SwarmIndexDocumentHeader, "index.html"),
-			errorFilenameOption: jsonhttptest.WithRequestHeader(api.SwarmErrorDocumentHeader, "error.html"),
+			indexFilenameOption: jsonhttptest.WithRequestHeader(api.PenguinIndexDocumentHeader, "index.html"),
+			errorFilenameOption: jsonhttptest.WithRequestHeader(api.PenguinErrorDocumentHeader, "error.html"),
 			doMultipart:         true,
 			files: []f{
 				{
-					data: []byte("<h1>Swarm"),
+					data: []byte("<h1>Penguin"),
 					name: "index.html",
 					dir:  "",
 					header: http.Header{
@@ -240,10 +240,10 @@ func TestDirs(t *testing.T) {
 		},
 		{
 			name:              "invalid archive paths",
-			expectedReference: swarm.MustParseHexAddress("133c92414c047708f3d6a8561571a0cc96512899ff0edbd9690c857f01ab6883"),
+			expectedReference: penguin.MustParseHexAddress("133c92414c047708f3d6a8561571a0cc96512899ff0edbd9690c857f01ab6883"),
 			files: []f{
 				{
-					data:     []byte("<h1>Swarm"),
+					data:     []byte("<h1>Penguin"),
 					name:     "index.html",
 					dir:      "",
 					filePath: "./index.html",
@@ -268,7 +268,7 @@ func TestDirs(t *testing.T) {
 			encrypt: true,
 			files: []f{
 				{
-					data:     []byte("<h1>Swarm"),
+					data:     []byte("<h1>Penguin"),
 					name:     "index.html",
 					dir:      "",
 					filePath: "./index.html",
@@ -387,9 +387,9 @@ func TestDirs(t *testing.T) {
 				var resp api.PenUploadResponse
 
 				options := []jsonhttptest.Option{
-					jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+					jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 					jsonhttptest.WithRequestBody(tarReader),
-					jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+					jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 					jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
 					jsonhttptest.WithUnmarshalJSONResponse(&resp),
 				}
@@ -400,7 +400,7 @@ func TestDirs(t *testing.T) {
 					options = append(options, tc.errorFilenameOption)
 				}
 				if tc.encrypt {
-					options = append(options, jsonhttptest.WithRequestHeader(api.SwarmEncryptHeader, "true"))
+					options = append(options, jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "true"))
 				}
 
 				// verify directory tar upload response
@@ -420,9 +420,9 @@ func TestDirs(t *testing.T) {
 					var resp api.PenUploadResponse
 
 					options := []jsonhttptest.Option{
-						jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+						jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 						jsonhttptest.WithRequestBody(mwReader),
-						jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+						jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 						jsonhttptest.WithRequestHeader("Content-Type", fmt.Sprintf("multipart/form-data; boundary=%q", mwBoundary)),
 						jsonhttptest.WithUnmarshalJSONResponse(&resp),
 					}
@@ -433,7 +433,7 @@ func TestDirs(t *testing.T) {
 						options = append(options, tc.errorFilenameOption)
 					}
 					if tc.encrypt {
-						options = append(options, jsonhttptest.WithRequestHeader(api.SwarmEncryptHeader, "true"))
+						options = append(options, jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "true"))
 					}
 
 					// verify directory tar upload response

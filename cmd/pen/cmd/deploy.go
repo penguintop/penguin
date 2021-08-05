@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -56,7 +56,7 @@ func (c *command) initDeployCmd() error {
 
 			ctx := cmd.Context()
 
-			swapBackend, overlayXwcAddress, swarmNodeAddress, chainID, transactionMonitor, transactionService, err := node.InitChain(
+			swapBackend, overlayXwcAddress, penguinNodeAddress, chainID, transactionMonitor, transactionService, err := node.InitChain(
 				ctx,
 				logger,
 				stateStore,
@@ -70,7 +70,7 @@ func (c *command) initDeployCmd() error {
 			defer swapBackend.Close()
 			defer transactionMonitor.Close()
 
-			_ = swarmNodeAddress
+			_ = penguinNodeAddress
 
 			chequebookFactory, err := node.InitChequebookFactory(
 				logger,

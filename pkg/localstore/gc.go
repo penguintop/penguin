@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -152,7 +152,7 @@ func (db *DB) collectGarbage() (collectedCount uint64, done bool, err error) {
 
 	// get rid of dirty entries
 	for _, item := range candidates {
-		if swarm.NewAddress(item.Address).MemberOf(db.dirtyAddresses) {
+		if penguin.NewAddress(item.Address).MemberOf(db.dirtyAddresses) {
 			collectedCount--
 			continue
 		}

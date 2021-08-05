@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,13 +15,13 @@ import (
 	"github.com/penguintop/penguin/pkg/resolver"
 	"github.com/penguintop/penguin/pkg/resolver/mock"
 	"github.com/penguintop/penguin/pkg/resolver/multiresolver"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
-type Address = swarm.Address
+type Address = penguin.Address
 
 func newAddr(s string) Address {
-	return swarm.NewAddress([]byte(s))
+	return penguin.NewAddress([]byte(s))
 }
 
 func TestMultiresolverOpts(t *testing.T) {
@@ -121,14 +121,14 @@ func TestResolve(t *testing.T) {
 	newErrResolver := func() resolver.Interface {
 		return mock.NewResolver(
 			mock.WithResolveFunc(func(name string) (Address, error) {
-				return swarm.ZeroAddress, errResolutionFailed
+				return penguin.ZeroAddress, errResolutionFailed
 			}),
 		)
 	}
 	newUnregisteredNameResolver := func() resolver.Interface {
 		return mock.NewResolver(
 			mock.WithResolveFunc(func(name string) (Address, error) {
-				return swarm.ZeroAddress, errUnregisteredName
+				return penguin.ZeroAddress, errUnregisteredName
 			}),
 		)
 	}
@@ -217,7 +217,7 @@ func TestResolve(t *testing.T) {
 		},
 		{
 			name:    "iam.unregistered",
-			wantAdr: swarm.ZeroAddress,
+			wantAdr: penguin.ZeroAddress,
 			wantErr: errUnregisteredName,
 		},
 	}

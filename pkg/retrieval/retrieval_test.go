@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -27,7 +27,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	storemock "github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
@@ -44,8 +44,8 @@ func TestDelivery(t *testing.T) {
 		mockStorer           = storemock.NewStorer()
 		clientMockAccounting = accountingmock.NewAccounting()
 		serverMockAccounting = accountingmock.NewAccounting()
-		clientAddr           = swarm.MustParseHexAddress("9ee7add8")
-		serverAddr           = swarm.MustParseHexAddress("9ee7add7")
+		clientAddr           = penguin.MustParseHexAddress("9ee7add8")
+		serverAddr           = penguin.MustParseHexAddress("9ee7add7")
 
 		pricerMock = pricermock.NewMockService(defaultPrice, defaultPrice)
 	)
@@ -61,7 +61,7 @@ func TestDelivery(t *testing.T) {
 	}
 
 	// create the server that will handle the request and will serve the response
-	server := retrieval.New(swarm.MustParseHexAddress("0034"), mockStorer, nil, nil, logger, serverMockAccounting, pricerMock, nil)
+	server := retrieval.New(penguin.MustParseHexAddress("0034"), mockStorer, nil, nil, logger, serverMockAccounting, pricerMock, nil)
 	recorder := streamtest.New(
 		streamtest.WithProtocols(server.Protocol()),
 		streamtest.WithBaseAddr(clientAddr),
@@ -157,8 +157,8 @@ func TestRetrieveChunk(t *testing.T) {
 
 	// requesting a chunk from downstream peer is expected
 	t.Run("downstream", func(t *testing.T) {
-		serverAddress := swarm.MustParseHexAddress("03")
-		clientAddress := swarm.MustParseHexAddress("01")
+		serverAddress := penguin.MustParseHexAddress("03")
+		clientAddress := penguin.MustParseHexAddress("01")
 		chunk := testingc.FixtureChunk("02c2")
 
 		serverStorer := storemock.NewStorer()
@@ -188,9 +188,9 @@ func TestRetrieveChunk(t *testing.T) {
 	t.Run("forward", func(t *testing.T) {
 		chunk := testingc.FixtureChunk("0025")
 
-		serverAddress := swarm.MustParseHexAddress("0100000000000000000000000000000000000000000000000000000000000000")
-		forwarderAddress := swarm.MustParseHexAddress("0200000000000000000000000000000000000000000000000000000000000000")
-		clientAddress := swarm.MustParseHexAddress("030000000000000000000000000000000000000000000000000000000000000000")
+		serverAddress := penguin.MustParseHexAddress("0100000000000000000000000000000000000000000000000000000000000000")
+		forwarderAddress := penguin.MustParseHexAddress("0200000000000000000000000000000000000000000000000000000000000000")
+		clientAddress := penguin.MustParseHexAddress("030000000000000000000000000000000000000000000000000000000000000000")
 
 		serverStorer := storemock.NewStorer()
 		_, err := serverStorer.Put(context.Background(), storage.ModePutUpload, chunk)
@@ -255,11 +255,11 @@ func TestRetrievePreemptiveRetry(t *testing.T) {
 
 	pricerMock := pricermock.NewMockService(defaultPrice, defaultPrice)
 
-	clientAddress := swarm.MustParseHexAddress("1010")
+	clientAddress := penguin.MustParseHexAddress("1010")
 
-	serverAddress1 := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
-	serverAddress2 := swarm.MustParseHexAddress("0200000000000000000000000000000000000000000000000000000000000000")
-	peers := []swarm.Address{
+	serverAddress1 := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	serverAddress2 := penguin.MustParseHexAddress("0200000000000000000000000000000000000000000000000000000000000000")
+	peers := []penguin.Address{
 		serverAddress1,
 		serverAddress2,
 	}
@@ -279,11 +279,11 @@ func TestRetrievePreemptiveRetry(t *testing.T) {
 	}
 
 	noPeerSuggester := mockPeerSuggester{eachPeerRevFunc: func(f topology.EachPeerFunc) error {
-		_, _, _ = f(swarm.ZeroAddress, 0)
+		_, _, _ = f(penguin.ZeroAddress, 0)
 		return nil
 	}}
 
-	peerSuggesterFn := func(peers ...swarm.Address) topology.EachPeerer {
+	peerSuggesterFn := func(peers ...penguin.Address) topology.EachPeerer {
 		if len(peers) == 0 {
 			return noPeerSuggester
 		}

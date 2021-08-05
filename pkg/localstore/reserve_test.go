@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -36,10 +36,10 @@ func TestDB_ReserveGC_AllOutOfRadius(t *testing.T) {
 	})
 	closed = db.close
 
-	addrs := make([]swarm.Address, 0)
+	addrs := make([]penguin.Address, 0)
 
 	for i := 0; i < chunkCount; i++ {
-		ch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(3, 3)
+		ch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(3, 3)
 		err := db.UnreserveBatch(ch.Stamp().BatchID(), 4)
 		if err != nil {
 			t.Fatal(err)
@@ -130,10 +130,10 @@ func TestDB_ReserveGC_AllWithinRadius(t *testing.T) {
 	})
 	closed = db.close
 
-	addrs := make([]swarm.Address, 0)
+	addrs := make([]penguin.Address, 0)
 
 	for i := 0; i < chunkCount; i++ {
-		ch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(2, 3)
+		ch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(2, 3)
 		err := db.UnreserveBatch(ch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -199,7 +199,7 @@ func TestDB_ReserveGC_Unreserve(t *testing.T) {
 
 	// put the first chunkCount chunks within radius
 	for i := 0; i < chunkCount; i++ {
-		ch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(2, 3)
+		ch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(2, 3)
 		err := db.UnreserveBatch(ch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -214,9 +214,9 @@ func TestDB_ReserveGC_Unreserve(t *testing.T) {
 		}
 	}
 
-	var po4Chs []swarm.Chunk
+	var po4Chs []penguin.Chunk
 	for i := 0; i < chunkCount; i++ {
-		ch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 4).WithBatch(2, 3)
+		ch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 4).WithBatch(2, 3)
 		err := db.UnreserveBatch(ch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -232,9 +232,9 @@ func TestDB_ReserveGC_Unreserve(t *testing.T) {
 		po4Chs = append(po4Chs, ch)
 	}
 
-	var gcChs []swarm.Chunk
+	var gcChs []penguin.Chunk
 	for i := 0; i < 100; i++ {
-		gcch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(2, 3)
+		gcch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(2, 3)
 		err := db.UnreserveBatch(gcch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -316,7 +316,7 @@ func TestDB_ReserveGC_Unreserve(t *testing.T) {
 }
 
 // TestDB_ReserveGC_EvictMaxPO tests that when unreserving a batch at
-// swarm.MaxPO+1 results in the correct behaviour.
+// penguin.MaxPO+1 results in the correct behaviour.
 func TestDB_ReserveGC_EvictMaxPO(t *testing.T) {
 	chunkCount := 150
 
@@ -336,7 +336,7 @@ func TestDB_ReserveGC_EvictMaxPO(t *testing.T) {
 
 	// put the first chunkCount chunks within radius
 	for i := 0; i < chunkCount; i++ {
-		ch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(2, 3)
+		ch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(2, 3)
 		err := db.UnreserveBatch(ch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -351,9 +351,9 @@ func TestDB_ReserveGC_EvictMaxPO(t *testing.T) {
 		}
 	}
 
-	var gcChs []swarm.Chunk
+	var gcChs []penguin.Chunk
 	for i := 0; i < 100; i++ {
-		gcch := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2).WithBatch(2, 3)
+		gcch := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2).WithBatch(2, 3)
 		err := db.UnreserveBatch(gcch.Stamp().BatchID(), 2)
 		if err != nil {
 			t.Fatal(err)
@@ -370,7 +370,7 @@ func TestDB_ReserveGC_EvictMaxPO(t *testing.T) {
 	}
 
 	for _, ch := range gcChs {
-		err := db.UnreserveBatch(ch.Stamp().BatchID(), swarm.MaxPO+1)
+		err := db.UnreserveBatch(ch.Stamp().BatchID(), penguin.MaxPO+1)
 		if err != nil {
 			t.Fatal(err)
 		}

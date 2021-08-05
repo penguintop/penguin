@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,11 +16,11 @@ import (
 	"github.com/penguintop/penguin/pkg/file/pipeline/store"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
-	addr swarm.Address
+	addr penguin.Address
 	span []byte
 	ctx  = context.Background()
 	mode = storage.ModePutUpload
@@ -29,7 +29,7 @@ var (
 func init() {
 	b := make([]byte, 32)
 	b[31] = 0x01
-	addr = swarm.NewAddress(b)
+	addr = penguin.NewAddress(b)
 
 	span = make([]byte, 8)
 	binary.LittleEndian.PutUint64(span, 1)
@@ -110,13 +110,13 @@ func TestLevels(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			rootch, err := s.Get(ctx, storage.ModeGetRequest, swarm.NewAddress(ref))
+			rootch, err := s.Get(ctx, storage.ModeGetRequest, penguin.NewAddress(ref))
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			//check the span. since write spans are 1 value 1, then expected span == tc.writes
-			sp := binary.LittleEndian.Uint64(rootch.Data()[:swarm.SpanSize])
+			sp := binary.LittleEndian.Uint64(rootch.Data()[:penguin.SpanSize])
 			if sp != uint64(tc.writes) {
 				t.Fatalf("want span %d got %d", tc.writes, sp)
 			}
@@ -194,12 +194,12 @@ func TestRegression(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rootch, err := s.Get(ctx, storage.ModeGetRequest, swarm.NewAddress(ref))
+	rootch, err := s.Get(ctx, storage.ModeGetRequest, penguin.NewAddress(ref))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	sp := binary.LittleEndian.Uint64(rootch.Data()[:swarm.SpanSize])
+	sp := binary.LittleEndian.Uint64(rootch.Data()[:penguin.SpanSize])
 	if sp != uint64(writes*4096) {
 		t.Fatalf("want span %d got %d", writes*4096, sp)
 	}

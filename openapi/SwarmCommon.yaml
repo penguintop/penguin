@@ -6,8 +6,8 @@ info:
     \*****pen*****
 
 externalDocs:
-  description: Browse the documentation @ the Swarm Docs
-  url: "https://docs.swarm.eth"
+  description: Browse the documentation @ the Penguin Docs
+  url: "https://docs.penguin.eth"
 
 paths: {}
 components:
@@ -16,13 +16,13 @@ components:
       type: object
       properties:
         address:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
 
     Addresses:
       type: object
       properties:
         overlay:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         underlay:
           type: array
           items:
@@ -60,7 +60,7 @@ components:
       type: object
       properties:
         peer:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         balance:
           type: integer
 
@@ -76,7 +76,7 @@ components:
       type: object
       properties:
         baseAddr:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         population:
           type: integer
         connected:
@@ -124,7 +124,7 @@ components:
       type: object
       properties:
         peer:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         lastreceived:
           $ref: "#/components/schemas/Cheque"
         lastsent:
@@ -175,7 +175,7 @@ components:
       type: object
       properties:
         hash:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
 
     HexString:
       type: string
@@ -189,7 +189,7 @@ components:
       type: object
       properties:
         address:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
 
     NewTagResponse:
       type: object
@@ -223,7 +223,7 @@ components:
         uid:
           $ref: "#/components/schemas/Uid"
         address:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         startedAt:
           $ref: "#/components/schemas/DateTime"
 
@@ -265,7 +265,7 @@ components:
       type: object
       properties:
         reference:
-          $ref: "#/components/schemas/SwarmReference"
+          $ref: "#/components/schemas/PenguinReference"
 
     PostageBatchesResponse:
       type: object
@@ -314,7 +314,7 @@ components:
       type: object
       properties:
         peer:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         received:
           type: integer
         sent:
@@ -333,7 +333,7 @@ components:
           items:
             $ref: "#/components/schemas/Settlement"
 
-    SwarmAddress:
+    PenguinAddress:
       type: string
       pattern: "^[A-Fa-f0-9]{64}$"
       example: "36b7efd913ca4cf880b8eeac5093fa27b0825906c600685b6abdd6566e6cfe8f"
@@ -343,7 +343,7 @@ components:
       pattern: "^[A-Fa-f0-9]{66}$"
       example: "02ab7473879005929d10ce7d4f626412dad9fe56b0a6622038931d26bd79abf0a4"
 
-    SwarmEncryptedReference:
+    PenguinEncryptedReference:
       type: string
       pattern: "^[A-Fa-f0-9]{128}$"
       example: "36b7efd913ca4cf880b8eeac5093fa27b0825906c600685b6abdd6566e6cfe8f2d2810619d29b5dbefd5d74abce25d58b81b251baddb9c3871cf0d6967deaae2"
@@ -351,30 +351,30 @@ components:
     DomainName:
       type: string
       pattern: '^[A-Za-z0-9]+\.[A-Za-z0-9]+$'
-      example: "swarm.eth"
+      example: "penguin.eth"
 
     BatchID:
       pattern: "^[A-Fa-f0-9]{64}$"
       example: "36b7efd913ca4cf880b8eeac5093fa27b0825906c600685b6abdd6566e6cfe8f"
 
-    SwarmOnlyReference:
+    PenguinOnlyReference:
       oneOf:
-        - $ref: "#/components/schemas/SwarmAddress"
-        - $ref: "#/components/schemas/SwarmEncryptedReference"
+        - $ref: "#/components/schemas/PenguinAddress"
+        - $ref: "#/components/schemas/PenguinEncryptedReference"
 
-    SwarmOnlyReferencesList:
+    PenguinOnlyReferencesList:
       type: object
       properties:
         addresses:
           type: array
           nullable: true
           items:
-            $ref: "#/components/schemas/SwarmOnlyReference"
+            $ref: "#/components/schemas/PenguinOnlyReference"
 
-    SwarmReference:
+    PenguinReference:
       oneOf:
-        - $ref: "#/components/schemas/SwarmAddress"
-        - $ref: "#/components/schemas/SwarmEncryptedReference"
+        - $ref: "#/components/schemas/PenguinAddress"
+        - $ref: "#/components/schemas/PenguinEncryptedReference"
         - $ref: "#/components/schemas/DomainName"
 
     SwapCashoutResult:
@@ -391,7 +391,7 @@ components:
       type: object
       properties:
         peer:
-          $ref: "#/components/schemas/SwarmAddress"
+          $ref: "#/components/schemas/PenguinAddress"
         lastCashedCheque:
           $ref: "#/components/schemas/Cheque"
         transactionHash:
@@ -429,22 +429,22 @@ components:
       pattern: "^(sequence|epoch)$"
 
   headers:
-    SwarmTag:
+    PenguinTag:
       description: "Tag UID"
       schema:
-        $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+        $ref: "PenguinCommon.yaml#/components/schemas/Uid"
 
-    SwarmFeedIndex:
+    PenguinFeedIndex:
       description: "The index of the found update"
       schema:
         $ref: "#/components/schemas/HexString"
 
-    SwarmFeedIndexNext:
+    PenguinFeedIndexNext:
       description: "The index of the next possible update"
       schema:
         $ref: "#/components/schemas/HexString"
 
-    SwarmRecoveryTargets:
+    PenguinRecoveryTargets:
       description: "The targets provided for recovery"
       schema:
         type: string
@@ -465,7 +465,7 @@ components:
       in: header
       name: gas-price
       schema:
-        $ref: "SwarmCommon.yaml#/components/schemas/GasPrice"
+        $ref: "PenguinCommon.yaml#/components/schemas/GasPrice"
       required: false
       description: "Gas price for transaction"
 
@@ -473,11 +473,11 @@ components:
       in: header
       name: gas-limit
       schema:
-        $ref: "SwarmCommon.yaml#/components/schemas/GasLimit"
+        $ref: "PenguinCommon.yaml#/components/schemas/GasLimit"
       required: false
       description: "Gas limit for transaction"
 
-    SwarmRecoveryTargetsParameter:
+    PenguinRecoveryTargetsParameter:
       in: query
       name: targets
       schema:
@@ -485,25 +485,25 @@ components:
       required: false
       description: Global pinning targets prefix
 
-    SwarmTagParameter:
+    PenguinTagParameter:
       in: header
-      name: swarm-tag
+      name: penguin-tag
       schema:
-        $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+        $ref: "PenguinCommon.yaml#/components/schemas/Uid"
       required: false
       description: Associate upload with an existing Tag UID
 
-    SwarmPinParameter:
+    PenguinPinParameter:
       in: header
-      name: swarm-pin
+      name: penguin-pin
       schema:
         type: boolean
       required: false
       description: Represents the pinning state of the chunk
 
-    SwarmEncryptParameter:
+    PenguinEncryptParameter:
       in: header
-      name: swarm-encrypt
+      name: penguin-encrypt
       schema:
         type: boolean
       required: false
@@ -516,39 +516,39 @@ components:
         type: string
       description: The specified content-type is preserved for download of the asset
 
-    SwarmIndexDocumentParameter:
+    PenguinIndexDocumentParameter:
       in: header
-      name: swarm-index-document
+      name: penguin-index-document
       schema:
         type: string
         example: index.html
       required: false
       description: Default file to be referenced on path, if exists under that path
 
-    SwarmErrorDocumentParameter:
+    PenguinErrorDocumentParameter:
       in: header
-      name: swarm-error-document
+      name: penguin-error-document
       schema:
         type: string
         example: error.html
       required: false
       description: Configure custom error document to be returned when a specified path can not be found in collection
 
-    SwarmCollection:
+    PenguinCollection:
       in: header
-      name: swarm-collection
+      name: penguin-collection
       schema:
         type: boolean
       required: false
       description: Upload file/files as a collection
 
-    SwarmPostageBatchId:
+    PenguinPostageBatchId:
       in: header
-      name: swarm-postage-batch-id
+      name: penguin-postage-batch-id
       description: "ID of Postage Batch that is used to upload data with"
       required: true
       schema:
-        $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+        $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
 
   responses:
     "204":

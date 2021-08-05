@@ -25,7 +25,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestDB_SubscribePull_first is a regression test for the first=false (from-1) bug
@@ -36,7 +36,7 @@ import (
 func TestDB_SubscribePull_first(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -83,7 +83,7 @@ func TestDB_SubscribePull_first(t *testing.T) {
 func TestDB_SubscribePull(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -99,7 +99,7 @@ func TestDB_SubscribePull(t *testing.T) {
 	// to validate the number of addresses received by the subscription
 	errChan := make(chan error)
 
-	for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+	for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 		ch, _, stop := db.SubscribePull(ctx, bin, 0, 0)
 		defer stop()
 
@@ -127,7 +127,7 @@ func TestDB_SubscribePull(t *testing.T) {
 func TestDB_SubscribePull_multiple(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -148,7 +148,7 @@ func TestDB_SubscribePull_multiple(t *testing.T) {
 	// start a number of subscriptions
 	// that all of them will write every address error to errChan
 	for j := 0; j < subsCount; j++ {
-		for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+		for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 			ch, _, stop := db.SubscribePull(ctx, bin, 0, 0)
 			defer stop()
 
@@ -177,7 +177,7 @@ func TestDB_SubscribePull_multiple(t *testing.T) {
 func TestDB_SubscribePull_since(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -205,7 +205,7 @@ func TestDB_SubscribePull_since(t *testing.T) {
 
 			if wanted {
 				if _, ok := addrs[bin]; !ok {
-					addrs[bin] = make([]swarm.Address, 0)
+					addrs[bin] = make([]penguin.Address, 0)
 				}
 				addrs[bin] = append(addrs[bin], ch.Address())
 				wantedChunksCount++
@@ -232,7 +232,7 @@ func TestDB_SubscribePull_since(t *testing.T) {
 	// to validate the number of addresses received by the subscription
 	errChan := make(chan error)
 
-	for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+	for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 		since, ok := first[bin]
 		if !ok {
 			continue
@@ -255,7 +255,7 @@ func TestDB_SubscribePull_since(t *testing.T) {
 func TestDB_SubscribePull_until(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -278,7 +278,7 @@ func TestDB_SubscribePull_until(t *testing.T) {
 			bin := db.po(ch.Address())
 
 			if _, ok := addrs[bin]; !ok {
-				addrs[bin] = make([]swarm.Address, 0)
+				addrs[bin] = make([]penguin.Address, 0)
 			}
 			if wanted {
 				addrs[bin] = append(addrs[bin], ch.Address())
@@ -308,7 +308,7 @@ func TestDB_SubscribePull_until(t *testing.T) {
 	// to validate the number of addresses received by the subscription
 	errChan := make(chan error)
 
-	for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+	for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 		until, ok := last[bin]
 		if !ok {
 			continue
@@ -333,7 +333,7 @@ func TestDB_SubscribePull_until(t *testing.T) {
 func TestDB_SubscribePull_sinceAndUntil(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 	var addrsMu sync.Mutex
 	var wantedChunksCount int
 
@@ -356,7 +356,7 @@ func TestDB_SubscribePull_sinceAndUntil(t *testing.T) {
 			bin := db.po(ch.Address())
 
 			if _, ok := addrs[bin]; !ok {
-				addrs[bin] = make([]swarm.Address, 0)
+				addrs[bin] = make([]penguin.Address, 0)
 			}
 			if wanted {
 				addrs[bin] = append(addrs[bin], ch.Address())
@@ -392,7 +392,7 @@ func TestDB_SubscribePull_sinceAndUntil(t *testing.T) {
 	// to validate the number of addresses received by the subscription
 	errChan := make(chan error)
 
-	for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+	for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 		since, ok := upload1[bin]
 		if ok {
 			// start from the next uploaded chunk
@@ -477,7 +477,7 @@ func TestDB_SubscribePull_rangeOnRemovedChunks(t *testing.T) {
 	// signals that there were valid bins for this check to ensure test validity
 	var checkedBins int
 	// subscribe to every bin and validate returned values
-	for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+	for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 		// do not subscribe to bins that do not have chunks
 		if len(chunks[bin]) == 0 {
 			continue
@@ -520,7 +520,7 @@ func TestDB_SubscribePull_rangeOnRemovedChunks(t *testing.T) {
 
 // uploadRandomChunksBin uploads random chunks to database and adds them to
 // the map of addresses ber bin.
-func uploadRandomChunksBin(t *testing.T, db *DB, addrs map[uint8][]swarm.Address, addrsMu *sync.Mutex, wantedChunksCount *int, count int) {
+func uploadRandomChunksBin(t *testing.T, db *DB, addrs map[uint8][]penguin.Address, addrsMu *sync.Mutex, wantedChunksCount *int, count int) {
 	addrsMu.Lock()
 	defer addrsMu.Unlock()
 
@@ -534,7 +534,7 @@ func uploadRandomChunksBin(t *testing.T, db *DB, addrs map[uint8][]swarm.Address
 
 		bin := db.po(ch.Address())
 		if _, ok := addrs[bin]; !ok {
-			addrs[bin] = make([]swarm.Address, 0)
+			addrs[bin] = make([]penguin.Address, 0)
 		}
 		addrs[bin] = append(addrs[bin], ch.Address())
 
@@ -545,7 +545,7 @@ func uploadRandomChunksBin(t *testing.T, db *DB, addrs map[uint8][]swarm.Address
 // readPullSubscriptionBin is a helper function that reads all storage.Descriptors from a channel and
 // sends error to errChan, even if it is nil, to count the number of storage.Descriptors
 // returned by the channel.
-func readPullSubscriptionBin(ctx context.Context, db *DB, bin uint8, ch <-chan storage.Descriptor, addrs map[uint8][]swarm.Address, addrsMu *sync.Mutex, errChan chan error) {
+func readPullSubscriptionBin(ctx context.Context, db *DB, bin uint8, ch <-chan storage.Descriptor, addrs map[uint8][]penguin.Address, addrsMu *sync.Mutex, errChan chan error) {
 	var i int // address index
 	for {
 		select {
@@ -610,7 +610,7 @@ func checkErrChan(ctx context.Context, t *testing.T, errChan chan error, wantedC
 func TestDB_LastPullSubscriptionBinID(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make(map[uint8][]swarm.Address)
+	addrs := make(map[uint8][]penguin.Address)
 
 	binIDCounter := make(map[uint8]uint64)
 	var binIDCounterMu sync.RWMutex
@@ -633,7 +633,7 @@ func TestDB_LastPullSubscriptionBinID(t *testing.T) {
 			bin := db.po(ch.Address())
 
 			if _, ok := addrs[bin]; !ok {
-				addrs[bin] = make([]swarm.Address, 0)
+				addrs[bin] = make([]penguin.Address, 0)
 			}
 			addrs[bin] = append(addrs[bin], ch.Address())
 
@@ -645,7 +645,7 @@ func TestDB_LastPullSubscriptionBinID(t *testing.T) {
 		}
 
 		// check
-		for bin := uint8(0); bin <= swarm.MaxPO; bin++ {
+		for bin := uint8(0); bin <= penguin.MaxPO; bin++ {
 			want, ok := last[bin]
 			got, err := db.LastPullSubscriptionBinID(bin)
 			if ok {
@@ -665,7 +665,7 @@ func TestDB_LastPullSubscriptionBinID(t *testing.T) {
 func TestAddressInBin(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	for po := uint8(0); po < swarm.MaxPO; po++ {
+	for po := uint8(0); po < penguin.MaxPO; po++ {
 		addr := db.addressInBin(po)
 
 		got := db.po(addr)

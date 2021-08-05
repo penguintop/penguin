@@ -28,13 +28,13 @@ import (
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
 	// filename in tar archive that holds the information
 	// about exported data format version
-	exportVersionFilename = ".swarm-export-version"
+	exportVersionFilename = ".penguin-export-version"
 	// current export format version
 	currentExportVersion = "2"
 )
@@ -155,12 +155,12 @@ func (db *DB) Import(ctx context.Context, r io.Reader) (count int64, err error) 
 				}
 			}
 			data := rawdata[postage.StampSize:]
-			key := swarm.NewAddress(keybytes)
+			key := penguin.NewAddress(keybytes)
 
-			var ch swarm.Chunk
+			var ch penguin.Chunk
 			switch version {
 			case currentExportVersion:
-				ch = swarm.NewChunk(key, data).WithStamp(stamp)
+				ch = penguin.NewChunk(key, data).WithStamp(stamp)
 			default:
 				select {
 				case errC <- fmt.Errorf("unsupported export data version %q", version):

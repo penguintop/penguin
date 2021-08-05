@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -22,7 +22,7 @@ import (
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var chunkData = []byte("mockdata")
@@ -32,7 +32,7 @@ var chunkStamp = postagetesting.MustNewStamp()
 // it is not found locally
 func TestNetstoreRetrieval(t *testing.T) {
 	retrieve, store, nstore := newRetrievingNetstore(nil, noopValidStamp)
-	addr := swarm.MustParseHexAddress("000001")
+	addr := penguin.MustParseHexAddress("000001")
 	_, err := nstore.Get(context.Background(), storage.ModeGetRequest, addr)
 	if err != nil {
 		t.Fatal(err)
@@ -76,10 +76,10 @@ func TestNetstoreRetrieval(t *testing.T) {
 // whenever it is found locally.
 func TestNetstoreNoRetrieval(t *testing.T) {
 	retrieve, store, nstore := newRetrievingNetstore(nil, noopValidStamp)
-	addr := swarm.MustParseHexAddress("000001")
+	addr := penguin.MustParseHexAddress("000001")
 
 	// store should have the chunk in advance
-	_, err := store.Put(context.Background(), storage.ModePutUpload, swarm.NewChunk(addr, chunkData))
+	_, err := store.Put(context.Background(), storage.ModePutUpload, penguin.NewChunk(addr, chunkData))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,7 +106,7 @@ func TestRecovery(t *testing.T) {
 	}
 
 	retrieve, _, nstore := newRetrievingNetstore(rec.recovery, noopValidStamp)
-	addr := swarm.MustParseHexAddress("deadbeef")
+	addr := penguin.MustParseHexAddress("deadbeef")
 	retrieve.failure = true
 	ctx := context.Background()
 	ctx = sctx.SetTargets(ctx, "be, cd")
@@ -126,7 +126,7 @@ func TestRecovery(t *testing.T) {
 
 func TestInvalidRecoveryFunction(t *testing.T) {
 	retrieve, _, nstore := newRetrievingNetstore(nil, noopValidStamp)
-	addr := swarm.MustParseHexAddress("deadbeef")
+	addr := penguin.MustParseHexAddress("deadbeef")
 	retrieve.failure = true
 	ctx := context.Background()
 	ctx = sctx.SetTargets(ctx, "be, cd")
@@ -138,11 +138,11 @@ func TestInvalidRecoveryFunction(t *testing.T) {
 }
 
 func TestInvalidPostageStamp(t *testing.T) {
-	f := func(c swarm.Chunk, _ []byte) (swarm.Chunk, error) {
+	f := func(c penguin.Chunk, _ []byte) (penguin.Chunk, error) {
 		return nil, errors.New("invalid postage stamp")
 	}
 	retrieve, store, nstore := newRetrievingNetstore(nil, f)
-	addr := swarm.MustParseHexAddress("000001")
+	addr := penguin.MustParseHexAddress("000001")
 	_, err := nstore.Get(context.Background(), storage.ModeGetRequest, addr)
 	if err != nil {
 		t.Fatal(err)
@@ -186,7 +186,7 @@ func TestInvalidPostageStamp(t *testing.T) {
 }
 
 // returns a mock retrieval protocol, a mock local storage and a netstore
-func newRetrievingNetstore(rec recovery.Callback, validStamp func(swarm.Chunk, []byte) (swarm.Chunk, error)) (ret *retrievalMock, mockStore *mock.MockStorer, ns storage.Storer) {
+func newRetrievingNetstore(rec recovery.Callback, validStamp func(penguin.Chunk, []byte) (penguin.Chunk, error)) (ret *retrievalMock, mockStore *mock.MockStorer, ns storage.Storer) {
 	retrieve := &retrievalMock{}
 	store := mock.NewStorer()
 	logger := logging.New(ioutil.Discard, 0)
@@ -197,17 +197,17 @@ type retrievalMock struct {
 	called    bool
 	callCount int32
 	failure   bool
-	addr      swarm.Address
+	addr      penguin.Address
 }
 
-func (r *retrievalMock) RetrieveChunk(ctx context.Context, addr swarm.Address) (chunk swarm.Chunk, err error) {
+func (r *retrievalMock) RetrieveChunk(ctx context.Context, addr penguin.Address) (chunk penguin.Chunk, err error) {
 	if r.failure {
 		return nil, fmt.Errorf("chunk not found")
 	}
 	r.called = true
 	atomic.AddInt32(&r.callCount, 1)
 	r.addr = addr
-	return swarm.NewChunk(addr, chunkData).WithStamp(chunkStamp), nil
+	return penguin.NewChunk(addr, chunkData).WithStamp(chunkStamp), nil
 }
 
 type mockRecovery struct {
@@ -215,14 +215,14 @@ type mockRecovery struct {
 }
 
 // Send mocks the pss Send function
-func (mr *mockRecovery) recovery(chunkAddress swarm.Address, targets pss.Targets) {
+func (mr *mockRecovery) recovery(chunkAddress penguin.Address, targets pss.Targets) {
 	mr.callbackC <- true
 }
 
-func (r *mockRecovery) RetrieveChunk(ctx context.Context, addr swarm.Address) (chunk swarm.Chunk, err error) {
+func (r *mockRecovery) RetrieveChunk(ctx context.Context, addr penguin.Address) (chunk penguin.Chunk, err error) {
 	return nil, fmt.Errorf("chunk not found")
 }
 
-var noopValidStamp = func(c swarm.Chunk, _ []byte) (swarm.Chunk, error) {
+var noopValidStamp = func(c penguin.Chunk, _ []byte) (penguin.Chunk, error) {
 	return c, nil
 }

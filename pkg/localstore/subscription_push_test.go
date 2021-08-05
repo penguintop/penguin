@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestDB_SubscribePush uploads some chunks before and after
@@ -35,7 +35,7 @@ import (
 func TestDB_SubscribePush(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	chunks := make([]swarm.Chunk, 0)
+	chunks := make([]penguin.Chunk, 0)
 	var chunksMu sync.Mutex
 
 	chunkProcessedTimes := make([]int, 0)
@@ -147,7 +147,7 @@ func TestDB_SubscribePush(t *testing.T) {
 func TestDB_SubscribePush_multiple(t *testing.T) {
 	db := newTestDB(t, nil)
 
-	addrs := make([]swarm.Address, 0)
+	addrs := make([]penguin.Address, 0)
 	var addrsMu sync.Mutex
 
 	uploadRandomChunks := func(count int) {

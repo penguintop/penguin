@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,7 +16,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/logging/httpaccess"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func (s *server) setupRouting() {
@@ -36,7 +36,7 @@ func (s *server) setupRouting() {
 	router.NotFoundHandler = http.HandlerFunc(jsonhttp.NotFoundHandler)
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "XWC Swarm Bee")
+		fmt.Fprintln(w, "XWC Penguin Pen")
 	})
 
 	router.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func (s *server) setupRouting() {
 
 	handle("/chunks", jsonhttp.MethodHandler{
 		"POST": web.ChainHandlers(
-			jsonhttp.NewMaxBodyBytesHandler(swarm.ChunkWithSpanSize),
+			jsonhttp.NewMaxBodyBytesHandler(penguin.ChunkWithSpanSize),
 			web.FinalHandlerFunc(s.chunkUploadHandler),
 		),
 	})
@@ -69,7 +69,7 @@ func (s *server) setupRouting() {
 
 	handle("/soc/{owner}/{id}", jsonhttp.MethodHandler{
 		"POST": web.ChainHandlers(
-			jsonhttp.NewMaxBodyBytesHandler(swarm.ChunkWithSpanSize),
+			jsonhttp.NewMaxBodyBytesHandler(penguin.ChunkWithSpanSize),
 			web.FinalHandlerFunc(s.socUploadHandler),
 		),
 	})
@@ -77,7 +77,7 @@ func (s *server) setupRouting() {
 	handle("/feeds/{owner}/{topic}", jsonhttp.MethodHandler{
 		"GET": http.HandlerFunc(s.feedGetHandler),
 		"POST": web.ChainHandlers(
-			jsonhttp.NewMaxBodyBytesHandler(swarm.ChunkWithSpanSize),
+			jsonhttp.NewMaxBodyBytesHandler(penguin.ChunkWithSpanSize),
 			web.FinalHandlerFunc(s.feedPostHandler),
 		),
 	})
@@ -108,7 +108,7 @@ func (s *server) setupRouting() {
 		s.gatewayModeForbidEndpointHandler,
 		web.FinalHandler(jsonhttp.MethodHandler{
 			"POST": web.ChainHandlers(
-				jsonhttp.NewMaxBodyBytesHandler(swarm.ChunkSize),
+				jsonhttp.NewMaxBodyBytesHandler(penguin.ChunkSize),
 				web.FinalHandlerFunc(s.pssPostHandler),
 			),
 		})),
@@ -188,7 +188,7 @@ func (s *server) setupRouting() {
 				if o := r.Header.Get("Origin"); o != "" && s.checkOrigin(r) {
 					w.Header().Set("Access-Control-Allow-Credentials", "true")
 					w.Header().Set("Access-Control-Allow-Origin", o)
-					w.Header().Set("Access-Control-Allow-Headers", "Origin, Accept, Authorization, Content-Type, X-Requested-With, Access-Control-Request-Headers, Access-Control-Request-Method, Swarm-Tag, Swarm-Pin, Swarm-Encrypt, Swarm-Index-Document, Swarm-Error-Document, Swarm-Collection, Swarm-Postage-Batch-Id, Gas-Price")
+					w.Header().Set("Access-Control-Allow-Headers", "Origin, Accept, Authorization, Content-Type, X-Requested-With, Access-Control-Request-Headers, Access-Control-Request-Method, Penguin-Tag, Penguin-Pin, Penguin-Encrypt, Penguin-Index-Document, Penguin-Error-Document, Penguin-Collection, Penguin-Postage-Batch-Id, Gas-Price")
 					w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST, PUT, DELETE")
 					w.Header().Set("Access-Control-Max-Age", "3600")
 				}
@@ -214,12 +214,12 @@ func (s *server) gatewayModeForbidEndpointHandler(h http.Handler) http.Handler {
 func (s *server) gatewayModeForbidHeadersHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if s.GatewayMode {
-			if strings.ToLower(r.Header.Get(SwarmPinHeader)) == "true" {
+			if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 				s.logger.Tracef("gateway mode: forbidden pinning %s", r.URL.String())
 				jsonhttp.Forbidden(w, "pinning is disabled")
 				return
 			}
-			if strings.ToLower(r.Header.Get(SwarmEncryptHeader)) == "true" {
+			if strings.ToLower(r.Header.Get(PenguinEncryptHeader)) == "true" {
 				s.logger.Tracef("gateway mode: forbidden encryption %s", r.URL.String())
 				jsonhttp.Forbidden(w, "encryption is disabled")
 				return

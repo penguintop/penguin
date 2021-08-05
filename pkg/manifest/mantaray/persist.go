@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -32,7 +32,7 @@ type Saver interface {
 }
 
 // LoadSaver is a composite interface of Loader and Saver
-// it is meant to be implemented as thin wrappers around persistent storage like Swarm
+// it is meant to be implemented as thin wrappers around persistent storage like Penguin
 type LoadSaver interface {
 	Loader
 	Saver

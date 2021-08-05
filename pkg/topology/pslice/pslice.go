@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,7 +7,7 @@ package pslice
 import (
 	"sync"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/topology"
 )
 
@@ -16,16 +16,16 @@ import (
 // in order to reduce duplicate PO calculation which is normally known and already needed in the
 // calling context.
 type PSlice struct {
-	peers     []swarm.Address // the slice of peers
-	bins      []uint          // the indexes of every proximity order in the peers slice, index is po, value is index of peers slice
+	peers     []penguin.Address // the slice of peers
+	bins      []uint            // the indexes of every proximity order in the peers slice, index is po, value is index of peers slice
 	baseBytes []byte
 	sync.RWMutex
 }
 
 // New creates a new PSlice.
-func New(maxBins int, base swarm.Address) *PSlice {
+func New(maxBins int, base penguin.Address) *PSlice {
 	return &PSlice{
-		peers:     make([]swarm.Address, 0),
+		peers:     make([]penguin.Address, 0),
 		bins:      make([]uint, maxBins),
 		baseBytes: base.Bytes(),
 	}
@@ -96,7 +96,7 @@ func (s *PSlice) EachBinRev(pf topology.EachPeerFunc) error {
 	return nil
 }
 
-func (s *PSlice) BinPeers(bin uint8) []swarm.Address {
+func (s *PSlice) BinPeers(bin uint8) []penguin.Address {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -112,7 +112,7 @@ func (s *PSlice) BinPeers(bin uint8) []swarm.Address {
 		bEnd = int(s.bins[b+1])
 	}
 
-	ret := make([]swarm.Address, bEnd-int(s.bins[b]))
+	ret := make([]penguin.Address, bEnd-int(s.bins[b]))
 	copy(ret, s.peers[s.bins[b]:bEnd])
 
 	return ret
@@ -144,7 +144,7 @@ func (s *PSlice) ShallowestEmpty() (bin uint8, none bool) {
 }
 
 // Exists checks if a peer exists.
-func (s *PSlice) Exists(addr swarm.Address) bool {
+func (s *PSlice) Exists(addr penguin.Address) bool {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -153,7 +153,7 @@ func (s *PSlice) Exists(addr swarm.Address) bool {
 }
 
 // checks if a peer exists. must be called under lock.
-func (s *PSlice) exists(addr swarm.Address) (bool, int) {
+func (s *PSlice) exists(addr penguin.Address) (bool, int) {
 	if len(s.peers) == 0 {
 		return false, 0
 	}
@@ -166,7 +166,7 @@ func (s *PSlice) exists(addr swarm.Address) (bool, int) {
 }
 
 // Add a peer at a certain PO.
-func (s *PSlice) Add(addrs ...swarm.Address) {
+func (s *PSlice) Add(addrs ...penguin.Address) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -189,7 +189,7 @@ func (s *PSlice) Add(addrs ...swarm.Address) {
 }
 
 // Remove a peer at a certain PO.
-func (s *PSlice) Remove(addr swarm.Address) {
+func (s *PSlice) Remove(addr penguin.Address) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -209,7 +209,7 @@ func (s *PSlice) Remove(addr swarm.Address) {
 
 func (s *PSlice) po(peer []byte) uint8 {
 
-	po := swarm.Proximity(s.baseBytes, peer)
+	po := penguin.Proximity(s.baseBytes, peer)
 	if int(po) >= len(s.bins) {
 		return uint8(len(s.bins)) - 1
 	}
@@ -247,8 +247,8 @@ func decDeeper(bins []uint, po uint8) {
 // copy makes copies of peers and bins with a possibility of adding peers
 // additional capacity if it is know that a number of new addresses will be
 // inserted.
-func (s *PSlice) copy(peersExtraCap int) (peers []swarm.Address, bins []uint) {
-	peers = make([]swarm.Address, len(s.peers), len(s.peers)+peersExtraCap)
+func (s *PSlice) copy(peersExtraCap int) (peers []penguin.Address, bins []uint) {
+	peers = make([]penguin.Address, len(s.peers), len(s.peers)+peersExtraCap)
 	copy(peers, s.peers)
 	bins = make([]uint, len(s.bins))
 	copy(bins, s.bins)
@@ -257,14 +257,14 @@ func (s *PSlice) copy(peersExtraCap int) (peers []swarm.Address, bins []uint) {
 
 // insertAddresses is based on the optimized implementation from
 // https://github.com/golang/go/wiki/SliceTricks#insertvector
-func insertAddresses(s []swarm.Address, pos int, vs ...swarm.Address) []swarm.Address {
+func insertAddresses(s []penguin.Address, pos int, vs ...penguin.Address) []penguin.Address {
 	if n := len(s) + len(vs); n <= cap(s) {
 		s2 := s[:n]
 		copy(s2[pos+len(vs):], s[pos:])
 		copy(s2[pos:], vs)
 		return s2
 	}
-	s2 := make([]swarm.Address, len(s)+len(vs))
+	s2 := make([]penguin.Address, len(s)+len(vs))
 	copy(s2, s[:pos])
 	copy(s2[pos:], vs)
 	copy(s2[pos+len(vs):], s[pos:])

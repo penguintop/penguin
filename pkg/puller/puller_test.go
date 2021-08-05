@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,8 +17,8 @@ import (
 	mockps "github.com/penguintop/penguin/pkg/pullsync/mock"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+    "github.com/penguintop/penguin/pkg/penguin"
+    "github.com/penguintop/penguin/pkg/penguin/test"
 	mockk "github.com/penguintop/penguin/pkg/topology/kademlia/mock"
 )
 
@@ -412,7 +412,7 @@ func TestDepthChange(t *testing.T) {
 	}
 }
 
-func checkIntervals(t *testing.T, s storage.StateStorer, addr swarm.Address, expInterval string, bin uint8) {
+func checkIntervals(t *testing.T, s storage.StateStorer, addr penguin.Address, expInterval string, bin uint8) {
 	t.Helper()
 	key := puller.PeerIntervalKey(addr, bin)
 	i := &intervalstore.Intervals{}
@@ -425,7 +425,7 @@ func checkIntervals(t *testing.T, s storage.StateStorer, addr swarm.Address, exp
 	}
 }
 
-func checkNotFound(t *testing.T, s storage.StateStorer, addr swarm.Address, bin uint8) {
+func checkNotFound(t *testing.T, s storage.StateStorer, addr penguin.Address, bin uint8) {
 	t.Helper()
 	key := puller.PeerIntervalKey(addr, bin)
 	i := &intervalstore.Intervals{}
@@ -442,7 +442,7 @@ func checkNotFound(t *testing.T, s storage.StateStorer, addr swarm.Address, bin 
 	t.Fatalf("wanted error but got none. bin %d", bin)
 }
 
-func waitCheckCalls(t *testing.T, expCalls []c, callsFn func(swarm.Address) []mockps.SyncCall, addr swarm.Address) {
+func waitCheckCalls(t *testing.T, expCalls []c, callsFn func(penguin.Address) []mockps.SyncCall, addr penguin.Address) {
 	t.Helper()
 	for i := 0; i < 10; i++ {
 		time.Sleep(50 * time.Millisecond)
@@ -495,7 +495,7 @@ func checkCallsUnordered(t *testing.T, expCalls []c, calls []mockps.SyncCall) {
 }
 
 // waitCursorsCalled waits until GetCursors are called on the given address.
-func waitCursorsCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, invert bool) {
+func waitCursorsCalled(t *testing.T, ps *mockps.PullSyncMock, addr penguin.Address, invert bool) {
 	t.Helper()
 	for i := 0; i < 20; i++ {
 		if v := ps.CursorsCalls(addr); v {
@@ -515,7 +515,7 @@ func waitCursorsCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address
 }
 
 // waitLiveSyncCalled waits until SyncInterval is called on the address given.
-func waitLiveSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, invert bool) {
+func waitLiveSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr penguin.Address, invert bool) {
 	t.Helper()
 	for i := 0; i < 15; i++ {
 		v := ps.LiveSyncCalls(addr)
@@ -536,7 +536,7 @@ func waitLiveSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Addres
 }
 
 // waitSyncCalled waits until SyncInterval is called on the address given.
-func waitSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, invert bool) {
+func waitSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr penguin.Address, invert bool) {
 	t.Helper()
 	for i := 0; i < 15; i++ {
 		v := ps.SyncCalls(addr)
@@ -556,7 +556,7 @@ func waitSyncCalled(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, i
 	t.Fatal("timed out waiting for sync")
 }
 
-func waitSyncCalledTimes(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, times int) {
+func waitSyncCalledTimes(t *testing.T, ps *mockps.PullSyncMock, addr penguin.Address, times int) {
 	t.Helper()
 	for i := 0; i < 15; i++ {
 		v := ps.SyncCalls(addr)
@@ -569,7 +569,7 @@ func waitSyncCalledTimes(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Addre
 	t.Fatal("timed out waiting for sync")
 }
 
-func waitLiveSyncCalledTimes(t *testing.T, ps *mockps.PullSyncMock, addr swarm.Address, times int) {
+func waitLiveSyncCalledTimes(t *testing.T, ps *mockps.PullSyncMock, addr penguin.Address, times int) {
 	t.Helper()
 	for i := 0; i < 15; i++ {
 		v := ps.LiveSyncCalls(addr)

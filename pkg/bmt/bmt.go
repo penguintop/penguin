@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"hash"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ Hash = (*Hasher)(nil)
@@ -265,7 +265,7 @@ func (h *Hasher) writeFinalNode(level int, n *node, isLeft bool, s []byte) {
 
 // calculates the Keccak256 SHA3 hash of the data
 func sha3hash(data ...[]byte) ([]byte, error) {
-	return doHash(swarm.NewHasher(), data...)
+	return doHash(penguin.NewHasher(), data...)
 }
 
 // calculates Hash of the data

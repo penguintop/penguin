@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/handshake/pb"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/pen"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 
 	"github.com/libp2p/go-libp2p-core/network"
 	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
@@ -63,7 +63,7 @@ type AdvertisableAddressResolver interface {
 }
 
 type SenderMatcher interface {
-	Matches(ctx context.Context, tx []byte, networkID uint64, senderOverlay swarm.Address) (bool, error)
+	Matches(ctx context.Context, tx []byte, networkID uint64, senderOverlay penguin.Address) (bool, error)
 }
 
 // Service can perform initiate or handle a handshake between peers.
@@ -71,7 +71,7 @@ type Service struct {
 	signer                crypto.Signer
 	advertisableAddresser AdvertisableAddressResolver
 	senderMatcher         SenderMatcher
-	overlay               swarm.Address
+	overlay               penguin.Address
 	fullNode              bool
 	transaction           []byte
 	networkID             uint64
@@ -98,7 +98,7 @@ func (i *Info) LightString() string {
 }
 
 // New creates a new handshake Service.
-func New(signer crypto.Signer, advertisableAddresser AdvertisableAddressResolver, isSender SenderMatcher, overlay swarm.Address, networkID uint64, fullNode bool, transaction []byte, welcomeMessage string, logger logging.Logger) (*Service, error) {
+func New(signer crypto.Signer, advertisableAddresser AdvertisableAddressResolver, isSender SenderMatcher, overlay penguin.Address, networkID uint64, fullNode bool, transaction []byte, welcomeMessage string, logger logging.Logger) (*Service, error) {
 	if len(welcomeMessage) > MaxWelcomeMessageLength {
 		return nil, ErrWelcomeMessageLength
 	}

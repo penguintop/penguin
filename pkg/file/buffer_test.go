@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -16,20 +16,20 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/file"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
 	dataWrites = [][]int{
-		{swarm.ChunkSize - 2},                         // short
-		{swarm.ChunkSize - 2, 4},                      // short, over
-		{swarm.ChunkSize - 2, 4, swarm.ChunkSize - 6}, // short, over, short
-		{swarm.ChunkSize - 2, 4, swarm.ChunkSize - 4}, // short, over, onononon
-		{swarm.ChunkSize, 2, swarm.ChunkSize - 4},     // on, short, short
-		{swarm.ChunkSize, 2, swarm.ChunkSize - 2},     // on, short, on
-		{swarm.ChunkSize, 2, swarm.ChunkSize},         // on, short, over
-		{swarm.ChunkSize, 2, swarm.ChunkSize - 2, 4},  // on, short, on, short
-		{swarm.ChunkSize, swarm.ChunkSize},            // on, on
+		{penguin.ChunkSize - 2},                           // short
+		{penguin.ChunkSize - 2, 4},                        // short, over
+		{penguin.ChunkSize - 2, 4, penguin.ChunkSize - 6}, // short, over, short
+		{penguin.ChunkSize - 2, 4, penguin.ChunkSize - 4}, // short, over, onononon
+		{penguin.ChunkSize, 2, penguin.ChunkSize - 4},     // on, short, short
+		{penguin.ChunkSize, 2, penguin.ChunkSize - 2},     // on, short, on
+		{penguin.ChunkSize, 2, penguin.ChunkSize},         // on, short, over
+		{penguin.ChunkSize, 2, penguin.ChunkSize - 2, 4},  // on, short, on, short
+		{penguin.ChunkSize, penguin.ChunkSize},            // on, on
 	}
 )
 
@@ -52,7 +52,7 @@ func testChunkPipe(t *testing.T) {
 	sizeC := make(chan int, 255)
 	errC := make(chan error, 1)
 	go func() {
-		data := make([]byte, swarm.ChunkSize)
+		data := make([]byte, penguin.ChunkSize)
 		for {
 			// get buffered chunkpipe read
 			c, err := buf.Read(data)
@@ -64,7 +64,7 @@ func testChunkPipe(t *testing.T) {
 			}
 
 			// only the last read should be smaller than chunk size
-			if c < swarm.ChunkSize {
+			if c < penguin.ChunkSize {
 				close(sizeC)
 				errC <- nil
 				return
@@ -121,21 +121,21 @@ func TestCopyBuffer(t *testing.T) {
 	readBufferSizes := []int{
 		64,
 		1024,
-		swarm.ChunkSize,
+        penguin.ChunkSize,
 	}
 	dataSizes := []int{
 		1,
 		64,
 		1024,
-		swarm.ChunkSize - 1,
-		swarm.ChunkSize,
-		swarm.ChunkSize + 1,
-		swarm.ChunkSize * 2,
-		swarm.ChunkSize*2 + 3,
-		swarm.ChunkSize * 5,
-		swarm.ChunkSize*5 + 3,
-		swarm.ChunkSize * 17,
-		swarm.ChunkSize*17 + 3,
+        penguin.ChunkSize - 1,
+        penguin.ChunkSize,
+        penguin.ChunkSize + 1,
+        penguin.ChunkSize * 2,
+        penguin.ChunkSize*2 + 3,
+        penguin.ChunkSize * 5,
+        penguin.ChunkSize*5 + 3,
+        penguin.ChunkSize * 17,
+        penguin.ChunkSize*17 + 3,
 	}
 
 	testCases := []struct {
@@ -174,7 +174,7 @@ func TestCopyBuffer(t *testing.T) {
 			go func() {
 				src := bytes.NewReader(srcBytes)
 
-				buf := make([]byte, swarm.ChunkSize)
+				buf := make([]byte, penguin.ChunkSize)
 				c, err := io.CopyBuffer(chunkPipe, src, buf)
 				if err != nil {
 					errC <- err

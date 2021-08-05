@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,8 +9,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/penguintop/penguin/pkg/swarm"
-	"github.com/penguintop/penguin/pkg/swarm/test"
+	"github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/topology/pslice"
 )
 
@@ -19,7 +19,7 @@ func TestShallowestEmpty(t *testing.T) {
 	var (
 		base  = test.RandomAddress()
 		ps    = pslice.New(16, base)
-		peers = make([][]swarm.Address, 16)
+		peers = make([][]penguin.Address, 16)
 	)
 
 	for i := 0; i < 16; i++ {
@@ -93,7 +93,7 @@ func TestAddRemove(t *testing.T) {
 	var (
 		base  = test.RandomAddress()
 		ps    = pslice.New(4, base)
-		peers = make([]swarm.Address, 8)
+		peers = make([]penguin.Address, 8)
 	)
 
 	// 2 peers per bin
@@ -144,26 +144,26 @@ func TestAddRemove(t *testing.T) {
 	chkLen(t, ps, 3)
 	chkBins(t, ps, []uint{0, 1, 3, 3})
 	chkExists(t, ps, peers[0], peers[2], peers[3])
-	chkNotExists(t, ps, append([]swarm.Address{peers[1]}, peers[4:]...)...)
+	chkNotExists(t, ps, append([]penguin.Address{peers[1]}, peers[4:]...)...)
 
 	// this should not move the last cursor
 	ps.Add(peers[7])
 	chkLen(t, ps, 4)
 	chkBins(t, ps, []uint{0, 1, 3, 3})
 	chkExists(t, ps, peers[0], peers[2], peers[3], peers[7])
-	chkNotExists(t, ps, append([]swarm.Address{peers[1]}, peers[4:7]...)...)
+	chkNotExists(t, ps, append([]penguin.Address{peers[1]}, peers[4:7]...)...)
 
 	ps.Add(peers[5])
 	chkLen(t, ps, 5)
 	chkBins(t, ps, []uint{0, 1, 3, 4})
 	chkExists(t, ps, peers[0], peers[2], peers[3], peers[5], peers[7])
-	chkNotExists(t, ps, []swarm.Address{peers[1], peers[4], peers[6]}...)
+	chkNotExists(t, ps, []penguin.Address{peers[1], peers[4], peers[6]}...)
 
 	ps.Remove(peers[2])
 	chkLen(t, ps, 4)
 	chkBins(t, ps, []uint{0, 1, 2, 3})
 	chkExists(t, ps, peers[0], peers[3], peers[5], peers[7])
-	chkNotExists(t, ps, []swarm.Address{peers[1], peers[2], peers[4], peers[6]}...)
+	chkNotExists(t, ps, []penguin.Address{peers[1], peers[2], peers[4], peers[6]}...)
 
 	p := uint8(0)
 	for i := 0; i < 8; i += 2 {
@@ -189,7 +189,7 @@ func TestIteratorError(t *testing.T) {
 
 	ps.Add(a)
 
-	f := func(p swarm.Address, _ uint8) (stop, jumpToNext bool, err error) {
+	f := func(p penguin.Address, _ uint8) (stop, jumpToNext bool, err error) {
 		return false, false, e
 	}
 
@@ -206,37 +206,37 @@ func TestIterators(t *testing.T) {
 
 	ps := pslice.New(4, base)
 
-	peers := make([]swarm.Address, 4)
+	peers := make([]penguin.Address, 4)
 	for i := 0; i < 4; i++ {
 		a := test.RandomAddressAt(base, i)
 		peers[i] = a
 	}
 
-	testIterator(t, ps, false, false, 0, []swarm.Address{})
-	testIteratorRev(t, ps, false, false, 0, []swarm.Address{})
+	testIterator(t, ps, false, false, 0, []penguin.Address{})
+	testIteratorRev(t, ps, false, false, 0, []penguin.Address{})
 
 	for _, v := range peers {
 		ps.Add(v)
 	}
 
-	testIterator(t, ps, false, false, 4, []swarm.Address{peers[3], peers[2], peers[1], peers[0]})
+	testIterator(t, ps, false, false, 4, []penguin.Address{peers[3], peers[2], peers[1], peers[0]})
 	testIteratorRev(t, ps, false, false, 4, peers)
 
 	ps.Remove(peers[2])
-	testIterator(t, ps, false, false, 3, []swarm.Address{peers[3], peers[1], peers[0]})
-	testIteratorRev(t, ps, false, false, 3, []swarm.Address{peers[0], peers[1], peers[3]})
+	testIterator(t, ps, false, false, 3, []penguin.Address{peers[3], peers[1], peers[0]})
+	testIteratorRev(t, ps, false, false, 3, []penguin.Address{peers[0], peers[1], peers[3]})
 
 	ps.Remove(peers[0])
-	testIterator(t, ps, false, false, 2, []swarm.Address{peers[3], peers[1]})
-	testIteratorRev(t, ps, false, false, 2, []swarm.Address{peers[1], peers[3]})
+	testIterator(t, ps, false, false, 2, []penguin.Address{peers[3], peers[1]})
+	testIteratorRev(t, ps, false, false, 2, []penguin.Address{peers[1], peers[3]})
 
 	ps.Remove(peers[3])
-	testIterator(t, ps, false, false, 1, []swarm.Address{peers[1]})
-	testIteratorRev(t, ps, false, false, 1, []swarm.Address{peers[1]})
+	testIterator(t, ps, false, false, 1, []penguin.Address{peers[1]})
+	testIteratorRev(t, ps, false, false, 1, []penguin.Address{peers[1]})
 
 	ps.Remove(peers[1])
-	testIterator(t, ps, false, false, 0, []swarm.Address{})
-	testIteratorRev(t, ps, false, false, 0, []swarm.Address{})
+	testIterator(t, ps, false, false, 0, []penguin.Address{})
+	testIteratorRev(t, ps, false, false, 0, []penguin.Address{})
 }
 
 func TestBinPeers(t *testing.T) {
@@ -267,7 +267,7 @@ func TestBinPeers(t *testing.T) {
 
 			base := test.RandomAddress()
 
-			binPeers := make([][]swarm.Address, len(tc.peersCount))
+			binPeers := make([][]penguin.Address, len(tc.peersCount))
 
 			// prepare slice
 			ps := pslice.New(len(tc.peersCount), base)
@@ -295,7 +295,7 @@ func TestBinPeers(t *testing.T) {
 	}
 }
 
-func isEqual(a, b []swarm.Address) bool {
+func isEqual(a, b []penguin.Address) bool {
 
 	if len(a) != len(b) {
 		return false
@@ -323,7 +323,7 @@ func TestIteratorsJumpStop(t *testing.T) {
 	base := test.RandomAddress()
 	ps := pslice.New(4, base)
 
-	peers := make([]swarm.Address, 12)
+	peers := make([]penguin.Address, 12)
 	j := 0
 	for i := 0; i < 4; i++ {
 		for ii := 0; ii < 3; ii++ {
@@ -335,19 +335,19 @@ func TestIteratorsJumpStop(t *testing.T) {
 	}
 
 	// check that jump to next bin works as expected
-	testIterator(t, ps, true, false, 4, []swarm.Address{peers[11], peers[8], peers[5], peers[2]})
-	testIteratorRev(t, ps, true, false, 4, []swarm.Address{peers[2], peers[5], peers[8], peers[11]})
+	testIterator(t, ps, true, false, 4, []penguin.Address{peers[11], peers[8], peers[5], peers[2]})
+	testIteratorRev(t, ps, true, false, 4, []penguin.Address{peers[2], peers[5], peers[8], peers[11]})
 
 	// check that the stop functionality works correctly
-	testIterator(t, ps, true, true, 1, []swarm.Address{peers[11]})
-	testIteratorRev(t, ps, true, true, 1, []swarm.Address{peers[2]})
+	testIterator(t, ps, true, true, 1, []penguin.Address{peers[11]})
+	testIteratorRev(t, ps, true, true, 1, []penguin.Address{peers[2]})
 
 }
 
-func testIteratorRev(t *testing.T, ps *pslice.PSlice, skipNext, stop bool, iterations int, peerseq []swarm.Address) {
+func testIteratorRev(t *testing.T, ps *pslice.PSlice, skipNext, stop bool, iterations int, peerseq []penguin.Address) {
 	t.Helper()
 	i := 0
-	f := func(p swarm.Address, po uint8) (bool, bool, error) {
+	f := func(p penguin.Address, po uint8) (bool, bool, error) {
 		if i == iterations {
 			t.Fatal("too many iterations!")
 		}
@@ -364,10 +364,10 @@ func testIteratorRev(t *testing.T, ps *pslice.PSlice, skipNext, stop bool, itera
 	}
 }
 
-func testIterator(t *testing.T, ps *pslice.PSlice, skipNext, stop bool, iterations int, peerseq []swarm.Address) {
+func testIterator(t *testing.T, ps *pslice.PSlice, skipNext, stop bool, iterations int, peerseq []penguin.Address) {
 	t.Helper()
 	i := 0
-	f := func(p swarm.Address, po uint8) (bool, bool, error) {
+	f := func(p penguin.Address, po uint8) (bool, bool, error) {
 		if i == iterations {
 			t.Fatal("too many iterations!")
 		}
@@ -401,7 +401,7 @@ func chkBins(t *testing.T, ps *pslice.PSlice, seq []uint) {
 	}
 }
 
-func chkExists(t *testing.T, ps *pslice.PSlice, addrs ...swarm.Address) {
+func chkExists(t *testing.T, ps *pslice.PSlice, addrs ...penguin.Address) {
 	t.Helper()
 	for _, a := range addrs {
 		if !ps.Exists(a) {
@@ -410,7 +410,7 @@ func chkExists(t *testing.T, ps *pslice.PSlice, addrs ...swarm.Address) {
 	}
 }
 
-func chkNotExists(t *testing.T, ps *pslice.PSlice, addrs ...swarm.Address) {
+func chkNotExists(t *testing.T, ps *pslice.PSlice, addrs ...penguin.Address) {
 	t.Helper()
 	for _, a := range addrs {
 		if ps.Exists(a) {

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -28,13 +28,13 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
 const ownerString = "8d3766440f0d7b949a5e32995d09619a7f86e632"
 
-var expReference = swarm.MustParseHexAddress("891a1d1c8436c792d02fc2e8883fef7ab387eaeaacd25aa9f518be7be7856d54")
+var expReference = penguin.MustParseHexAddress("891a1d1c8436c792d02fc2e8883fef7ab387eaeaacd25aa9f518be7be7856d54")
 
 func TestFeed_Get(t *testing.T) {
 	var (
@@ -99,9 +99,9 @@ func TestFeed_Get(t *testing.T) {
 			jsonhttptest.WithExpectedJSONResponse(api.FeedReferenceResponse{Reference: expReference}),
 		)
 
-		h := respHeaders[api.SwarmFeedIndexHeader]
+		h := respHeaders[api.PenguinFeedIndexHeader]
 		if len(h) == 0 {
-			t.Fatal("expected swarm feed index header to be set")
+			t.Fatal("expected penguin feed index header to be set")
 		}
 		b, err := hex.DecodeString(h[0])
 		if err != nil {
@@ -131,7 +131,7 @@ func TestFeed_Get(t *testing.T) {
 			jsonhttptest.WithExpectedJSONResponse(api.FeedReferenceResponse{Reference: expReference}),
 		)
 
-		if h := respHeaders[api.SwarmFeedIndexHeader]; len(h) > 0 {
+		if h := respHeaders[api.PenguinFeedIndexHeader]; len(h) > 0 {
 			b, err := hex.DecodeString(h[0])
 			if err != nil {
 				t.Fatal(err)
@@ -140,7 +140,7 @@ func TestFeed_Get(t *testing.T) {
 				t.Fatalf("feed index header mismatch. got %v want %v", b, idBytes)
 			}
 		} else {
-			t.Fatal("expected swarm feed index header to be set")
+			t.Fatal("expected penguin feed index header to be set")
 		}
 	})
 }
@@ -167,7 +167,7 @@ func TestFeed_Post(t *testing.T) {
 
 	t.Run("ok", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, url, http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithExpectedJSONResponse(api.FeedReferenceResponse{
 				Reference: expReference,
 			}),
@@ -198,7 +198,7 @@ func TestFeed_Post(t *testing.T) {
 		t.Run("err - bad batch", func(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchInvalid)
 			jsonhttptest.Request(t, client, http.MethodPost, url, http.StatusBadRequest,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 				jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 					Message: "invalid postage batch id",
 					Code:    http.StatusBadRequest,
@@ -208,13 +208,13 @@ func TestFeed_Post(t *testing.T) {
 		t.Run("ok - batch zeros", func(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchOk)
 			jsonhttptest.Request(t, client, http.MethodPost, url, http.StatusCreated,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 			)
 		})
 		t.Run("bad request - batch empty", func(t *testing.T) {
 			hexbatch := hex.EncodeToString(batchEmpty)
 			jsonhttptest.Request(t, client, http.MethodPost, url, http.StatusBadRequest,
-				jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, hexbatch),
+				jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, hexbatch),
 			)
 		})
 	})
@@ -245,16 +245,16 @@ func (f *factoryMock) NewLookup(t feeds.Type, feed *feeds.Feed) (feeds.Lookup, e
 
 type mockLookup struct {
 	at, after int64
-	chunk     swarm.Chunk
+	chunk     penguin.Chunk
 	err       error
 	cur, next feeds.Index
 }
 
-func newMockLookup(at, after int64, ch swarm.Chunk, err error, cur, next feeds.Index) *mockLookup {
+func newMockLookup(at, after int64, ch penguin.Chunk, err error, cur, next feeds.Index) *mockLookup {
 	return &mockLookup{at: at, after: after, chunk: ch, err: err, cur: cur, next: next}
 }
 
-func (l *mockLookup) At(_ context.Context, at, after int64) (swarm.Chunk, feeds.Index, feeds.Index, error) {
+func (l *mockLookup) At(_ context.Context, at, after int64) (penguin.Chunk, feeds.Index, feeds.Index, error) {
 	if l.at == -1 {
 		// shortcut to ignore the value in the call since time.Now() is a moving target
 		return l.chunk, l.cur, l.next, nil
@@ -265,7 +265,7 @@ func (l *mockLookup) At(_ context.Context, at, after int64) (swarm.Chunk, feeds.
 	return nil, nil, nil, errors.New("no feed update found")
 }
 
-func toChunk(t *testing.T, at uint64, payload []byte) swarm.Chunk {
+func toChunk(t *testing.T, at uint64, payload []byte) penguin.Chunk {
 	ts := make([]byte, 8)
 	binary.BigEndian.PutUint64(ts, at)
 	content := append(ts, payload...)

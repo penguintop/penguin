@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,13 +10,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/penguintop/penguin/cmd/bee/cmd"
+	"github.com/penguintop/penguin/cmd/pen/cmd"
 )
 
 var homeDir string
 
 func TestMain(m *testing.M) {
-	dir, err := ioutil.TempDir("", "bee-cmd-")
+	dir, err := ioutil.TempDir("", "pen-cmd-")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

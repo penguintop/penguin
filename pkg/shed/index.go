@@ -25,10 +25,10 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/iterator"
 )
 
-// Item holds fields relevant to Swarm Chunk data and metadata.
-// All information required for swarm storage and operations
+// Item holds fields relevant to Penguin Chunk data and metadata.
+// All information required for penguin storage and operations
 // on that storage must be defined here.
-// This structure is logically connected to swarm storage,
+// This structure is logically connected to penguin storage,
 // the only part of this package that is not generalized,
 // mostly for performance reasons.
 //

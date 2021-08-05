@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 )
 
 // protocolSemverMatcher returns a matcher function for a given base protocol.
-// Protocol ID must be constructed according to the Swarm protocol ID
+// Protocol ID must be constructed according to the Penguin protocol ID
 // specification, where the second to last part is the version is semver format.
 // The matcher function will return a boolean indicating whether a protocol ID
 // matches the base protocol. A given protocol ID matches the base protocol if

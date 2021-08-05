@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement/pseudosettle"
 	"github.com/penguintop/penguin/pkg/settlement/pseudosettle/pb"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type testObserver struct {
@@ -31,12 +31,12 @@ type testObserver struct {
 }
 
 type notifyPaymentReceivedCall struct {
-	peer   swarm.Address
+	peer   penguin.Address
 	amount *big.Int
 }
 
 type notifyPaymentSentCall struct {
-	peer   swarm.Address
+	peer   penguin.Address
 	amount *big.Int
 	err    error
 }
@@ -49,11 +49,11 @@ func newTestObserver(debtAmounts map[string]*big.Int, shadowBalanceAmounts map[s
 	}
 }
 
-func (t *testObserver) setPeerDebt(peer swarm.Address, debt *big.Int) {
+func (t *testObserver) setPeerDebt(peer penguin.Address, debt *big.Int) {
 	t.peerDebts[peer.String()] = debt
 }
 
-func (t *testObserver) PeerDebt(peer swarm.Address) (*big.Int, error) {
+func (t *testObserver) PeerDebt(peer penguin.Address) (*big.Int, error) {
 	if debt, ok := t.peerDebts[peer.String()]; ok {
 		return debt, nil
 	}
@@ -61,7 +61,7 @@ func (t *testObserver) PeerDebt(peer swarm.Address) (*big.Int, error) {
 	return nil, errors.New("Peer not listed")
 }
 
-func (t *testObserver) NotifyRefreshmentReceived(peer swarm.Address, amount *big.Int) error {
+func (t *testObserver) NotifyRefreshmentReceived(peer penguin.Address, amount *big.Int) error {
 	t.receivedCalled <- notifyPaymentReceivedCall{
 		peer:   peer,
 		amount: amount,
@@ -69,11 +69,11 @@ func (t *testObserver) NotifyRefreshmentReceived(peer swarm.Address, amount *big
 	return nil
 }
 
-func (t *testObserver) NotifyPaymentReceived(peer swarm.Address, amount *big.Int) error {
+func (t *testObserver) NotifyPaymentReceived(peer penguin.Address, amount *big.Int) error {
 	return nil
 }
 
-func (t *testObserver) NotifyPaymentSent(peer swarm.Address, amount *big.Int, err error) {
+func (t *testObserver) NotifyPaymentSent(peer penguin.Address, amount *big.Int, err error) {
 	t.sentCalled <- notifyPaymentSentCall{
 		peer:   peer,
 		amount: amount,
@@ -81,11 +81,11 @@ func (t *testObserver) NotifyPaymentSent(peer swarm.Address, amount *big.Int, er
 	}
 }
 
-func (t *testObserver) Reserve(ctx context.Context, peer swarm.Address, amount uint64) error {
+func (t *testObserver) Reserve(ctx context.Context, peer penguin.Address, amount uint64) error {
 	return nil
 }
 
-func (t *testObserver) Release(peer swarm.Address, amount uint64) {
+func (t *testObserver) Release(peer penguin.Address, amount uint64) {
 }
 
 var testRefreshRate = int64(10000)
@@ -96,7 +96,7 @@ func TestPayment(t *testing.T) {
 	storeRecipient := mock.NewStateStore()
 	defer storeRecipient.Close()
 
-	peerID := swarm.MustParseHexAddress("9ee7add7")
+	peerID := penguin.MustParseHexAddress("9ee7add7")
 	peer := p2p.Peer{Address: peerID}
 
 	debt := int64(10000)
@@ -216,7 +216,7 @@ func TestTimeLimitedPayment(t *testing.T) {
 	storeRecipient := mock.NewStateStore()
 	defer storeRecipient.Close()
 
-	peerID := swarm.MustParseHexAddress("9ee7add7")
+	peerID := penguin.MustParseHexAddress("9ee7add7")
 	peer := p2p.Peer{Address: peerID}
 
 	debt := testRefreshRate

@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/traversal"
 )
 
@@ -30,7 +30,7 @@ func TestSteward(t *testing.T) {
 		traverser      = traversal.New(store)
 		traversedAddrs = make(map[string]struct{})
 		mu             sync.Mutex
-		fn             = func(_ context.Context, ch swarm.Chunk) (*pushsync.Receipt, error) {
+		fn             = func(_ context.Context, ch penguin.Chunk) (*pushsync.Receipt, error) {
 			mu.Lock()
 			traversedAddrs[ch.Address().String()] = struct{}{}
 			mu.Unlock()
@@ -71,10 +71,10 @@ func TestSteward(t *testing.T) {
 
 type loggingStore struct {
 	storage.Storer
-	addrs []swarm.Address
+	addrs []penguin.Address
 }
 
-func (l *loggingStore) Put(ctx context.Context, mode storage.ModePut, chs ...swarm.Chunk) (exist []bool, err error) {
+func (l *loggingStore) Put(ctx context.Context, mode storage.ModePut, chs ...penguin.Chunk) (exist []bool, err error) {
 	for _, c := range chs {
 		l.addrs = append(l.addrs, c.Address())
 	}

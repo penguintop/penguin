@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/p2p/libp2p/internal/headers/pb"
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var sendHeadersTimeout = 10 * time.Second
@@ -37,7 +37,7 @@ func sendHeaders(ctx context.Context, headers p2p.Headers, stream *stream) error
 	return nil
 }
 
-func handleHeaders(headler p2p.HeadlerFunc, stream *stream, peerAddress swarm.Address) error {
+func handleHeaders(headler p2p.HeadlerFunc, stream *stream, peerAddress penguin.Address) error {
 	w, r := protobuf.NewWriterAndReader(stream)
 
 	ctx, cancel := context.WithTimeout(context.Background(), sendHeadersTimeout)

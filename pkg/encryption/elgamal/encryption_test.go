@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/encryption/elgamal"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestElgamalCorrect(t *testing.T) {
@@ -27,7 +27,7 @@ func TestElgamalCorrect(t *testing.T) {
 		t.Fatal(err)
 	}
 	padding := 4032
-	enc, ephpub, err := elgamal.NewEncryptor(pub, salt, padding, swarm.NewHasher)
+	enc, ephpub, err := elgamal.NewEncryptor(pub, salt, padding, penguin.NewHasher)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func TestElgamalCorrect(t *testing.T) {
 		t.Fatalf("ciphertext has incorrect length: expected %v,  got %v", padding, len(ciphertext))
 	}
 
-	dec, err := elgamal.NewDecrypter(key, ephpub, salt, swarm.NewHasher)
+	dec, err := elgamal.NewDecrypter(key, ephpub, salt, penguin.NewHasher)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // RandomAddressAt generates a random address
 // at proximity order prox relative to address.
-func RandomAddressAt(self swarm.Address, prox int) swarm.Address {
+func RandomAddressAt(self penguin.Address, prox int) penguin.Address {
 	addr := make([]byte, len(self.Bytes()))
 	copy(addr, self.Bytes())
 	pos := -1
@@ -34,7 +34,7 @@ func RandomAddressAt(self swarm.Address, prox int) swarm.Address {
 		addr[i] = byte(rand.Intn(255)) // skipcq: GSC-G404
 	}
 
-	a := swarm.NewAddress(addr)
+	a := penguin.NewAddress(addr)
 	if a.Equal(self) {
 		panic(fmt.Sprint(a.String(), self.String()))
 	}
@@ -42,7 +42,7 @@ func RandomAddressAt(self swarm.Address, prox int) swarm.Address {
 }
 
 // RandomAddress generates a random address.
-func RandomAddress() swarm.Address {
+func RandomAddress() penguin.Address {
 	b := make([]byte, 32)
-	return RandomAddressAt(swarm.NewAddress(b), -1)
+	return RandomAddressAt(penguin.NewAddress(b), -1)
 }

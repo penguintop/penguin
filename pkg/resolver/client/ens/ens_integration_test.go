@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,20 +11,20 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/resolver/client/ens"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestENSntegration(t *testing.T) {
 	// TODO: consider using a stable gateway instead of INFURA.
 	defaultEndpoint := "https://goerli.infura.io/v3/59d83a5a4be74f86b9851190c802297b"
-	defaultAddr := swarm.MustParseHexAddress("00cb23598c2e520b6a6aae3ddc94fed4435a2909690bdd709bf9d9e7c2aadfad")
+	defaultAddr := penguin.MustParseHexAddress("00cb23598c2e520b6a6aae3ddc94fed4435a2909690bdd709bf9d9e7c2aadfad")
 
 	testCases := []struct {
 		desc            string
 		endpoint        string
 		contractAddress string
 		name            string
-		wantAdr         swarm.Address
+		wantAdr         penguin.Address
 		wantErr         error
 	}{
 		// TODO: add a test targeting a resolver with an invalid contenthash
@@ -46,23 +46,23 @@ func TestENSntegration(t *testing.T) {
 		},
 		{
 			desc:    "not registered",
-			name:    "unused.test.swarm.eth",
+			name:    "unused.test.penguin.eth",
 			wantErr: ens.ErrResolveFailed,
 		},
 		{
 			desc:    "no content hash",
-			name:    "nocontent.resolver.test.swarm.eth",
+			name:    "nocontent.resolver.test.penguin.eth",
 			wantErr: ens.ErrResolveFailed,
 		},
 		{
 			desc:            "invalid contract address",
 			contractAddress: "0xFFFFFFFF",
-			name:            "example.resolver.test.swarm.eth",
+			name:            "example.resolver.test.penguin.eth",
 			wantErr:         ens.ErrFailedToConnect,
 		},
 		{
 			desc:    "ok",
-			name:    "example.resolver.test.swarm.eth",
+			name:    "example.resolver.test.penguin.eth",
 			wantAdr: defaultAddr,
 		},
 	}

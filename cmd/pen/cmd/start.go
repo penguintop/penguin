@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	pen "github.com/penguintop/penguin"
 	"github.com/penguintop/penguin/pkg/property"
 	"github.com/penguintop/penguin/pkg/xwcfmt"
 	"io/ioutil"
@@ -24,7 +25,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/external"
-	"github.com/ethersphere/bee"
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/keystore"
 	filekeystore "github.com/penguintop/penguin/pkg/keystore/file"
@@ -32,20 +32,20 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/node"
 	"github.com/penguintop/penguin/pkg/resolver/multiresolver"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/kardianos/service"
 	"github.com/spf13/cobra"
 )
 
 const (
-	serviceName = "SwarmBeeSvc"
+	serviceName = "PenguinPenSvc"
 )
 
 func (c *command) initStartCmd() (err error) {
 
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Start a Swarm node",
+		Short: "Start a Penguin node",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()
@@ -81,7 +81,7 @@ func (c *command) initStartCmd() (err error) {
 				}
 			}
 
-			beeASCII := `
+			penASCII := `
 Welcome to the Penguin....
 
        /~~~~~~\
@@ -105,8 +105,8 @@ Welcome to the Penguin....
 HHHHHHHHHHHHHHHHHHHHH
 
 		   `
-			fmt.Println(beeASCII)
-			logger.Infof("version: %v", bee.Version)
+			fmt.Println(penASCII)
+			logger.Infof("version: %v", pen.Version)
 
 			debugAPIAddr := c.config.GetString(optionNameDebugAPIAddr)
 			if !c.config.GetBool(optionNameDebugAPIEnable) {
@@ -126,7 +126,7 @@ HHHHHHHHHHHHHHHHHHHHH
 				return errors.New("boot node must be started as a full node")
 			}
 
-			b, err := node.NewBee(c.config.GetString(optionNameP2PAddr), signerConfig.address, *signerConfig.publicKey, signerConfig.signer, uint64(property.CHAIN_ID_NUM), logger, signerConfig.libp2pPrivateKey, signerConfig.pssPrivateKey, node.Options{
+			b, err := node.NewPen(c.config.GetString(optionNameP2PAddr), signerConfig.address, *signerConfig.publicKey, signerConfig.signer, uint64(property.CHAIN_ID_NUM), logger, signerConfig.libp2pPrivateKey, signerConfig.pssPrivateKey, node.Options{
 				DataDir:                  c.config.GetString(optionNameDataDir),
 				CacheCapacity:            c.config.GetUint64(optionNameCacheCapacity),
 				DBOpenFilesLimit:         c.config.GetUint64(optionNameDBOpenFilesLimit),
@@ -214,8 +214,8 @@ HHHHHHHHHHHHHHHHHHHHH
 			if isWindowsService {
 				s, err := service.New(p, &service.Config{
 					Name:        serviceName,
-					DisplayName: "Bee",
-					Description: "Bee, Swarm client.",
+					DisplayName: "Pen",
+					Description: "Pen, Penguin client.",
 				})
 				if err != nil {
 					return err
@@ -260,7 +260,7 @@ func (p *program) Stop(s service.Service) error {
 
 type signerConfig struct {
 	signer           crypto.Signer
-	address          swarm.Address
+	address          penguin.Address
 	publicKey        *ecdsa.PublicKey
 	libp2pPrivateKey *ecdsa.PrivateKey
 	pssPrivateKey    *ecdsa.PrivateKey
@@ -292,7 +292,7 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 	}
 
 	var signer crypto.Signer
-	var address swarm.Address
+	var address penguin.Address
 	var password string
 	var publicKey *ecdsa.PublicKey
 	if p := c.config.GetString(optionNamePassword); p != "" {
@@ -366,18 +366,18 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		//	return nil, err
 		//}
 		//
-		//logger.Infof("using swarm network address through clef: %s", address)
+		//logger.Infof("using penguin network address through clef: %s", address)
 
 		// TODO
 		return nil, fmt.Errorf("clef signer not support now")
 	} else {
 		logger.Warning("clef is not enabled; portability and security of your keys is sub optimal")
-		swarmPrivateKey, created, err := keystore.Key("swarm", password)
+		penguinPrivateKey, created, err := keystore.Key("penguin", password)
 		if err != nil {
-			return nil, fmt.Errorf("swarm key: %w", err)
+			return nil, fmt.Errorf("penguin key: %w", err)
 		}
-		signer = crypto.NewDefaultSigner(swarmPrivateKey)
-		publicKey = &swarmPrivateKey.PublicKey
+		signer = crypto.NewDefaultSigner(penguinPrivateKey)
+		publicKey = &penguinPrivateKey.PublicKey
 
 		address, err = crypto.NewOverlayAddress(*publicKey, uint64(property.CHAIN_ID_NUM))
 		if err != nil {
@@ -385,9 +385,9 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		}
 
 		if created {
-			logger.Infof("new swarm network address created: %s", address)
+			logger.Infof("new penguin network address created: %s", address)
 
-			tempBytes := swarmPrivateKey.D.Bytes()
+			tempBytes := penguinPrivateKey.D.Bytes()
 			var privKeyBytes [32]byte
 			copy(privKeyBytes[32-len(tempBytes):], tempBytes)
 			privKeyWif, err := xwcfmt.HexKeyToWifKey(hex.EncodeToString(privKeyBytes[:]))
@@ -403,11 +403,11 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 			_, _ = reader.ReadByte()
 
 		} else {
-			logger.Infof("using existing swarm network address: %s", address)
+			logger.Infof("using existing penguin network address: %s", address)
 		}
 	}
 
-	logger.Infof("swarm public key %x", crypto.EncodeSecp256k1PublicKey(publicKey))
+	logger.Infof("penguin public key %x", crypto.EncodeSecp256k1PublicKey(publicKey))
 
 	libp2pPrivateKey, created, err := keystore.Key("libp2p", password)
 	if err != nil {

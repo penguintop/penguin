@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/p2p"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -30,13 +30,13 @@ var (
 )
 
 type Recorder struct {
-	base               swarm.Address
+	base               penguin.Address
 	fullNode           bool
 	records            map[string][]*Record
 	recordsMu          sync.Mutex
 	protocols          []p2p.ProtocolSpec
 	middlewares        []p2p.HandlerMiddleware
-	streamErr          func(swarm.Address, string, string, string) error
+	streamErr          func(penguin.Address, string, string, string) error
 	protocolsWithPeers map[string]p2p.ProtocolSpec
 }
 
@@ -58,7 +58,7 @@ func WithMiddlewares(middlewares ...p2p.HandlerMiddleware) Option {
 	})
 }
 
-func WithBaseAddr(a swarm.Address) Option {
+func WithBaseAddr(a penguin.Address) Option {
 	return optionFunc(func(r *Recorder) {
 		r.base = a
 	})
@@ -70,7 +70,7 @@ func WithLightNode() Option {
 	})
 }
 
-func WithStreamError(streamErr func(swarm.Address, string, string, string) error) Option {
+func WithStreamError(streamErr func(penguin.Address, string, string, string) error) Option {
 	return optionFunc(func(r *Recorder) {
 		r.streamErr = streamErr
 	})
@@ -94,7 +94,7 @@ func (r *Recorder) SetProtocols(protocols ...p2p.ProtocolSpec) {
 	r.protocols = append(r.protocols, protocols...)
 }
 
-func (r *Recorder) NewStream(ctx context.Context, addr swarm.Address, h p2p.Headers, protocolName, protocolVersion, streamName string) (p2p.Stream, error) {
+func (r *Recorder) NewStream(ctx context.Context, addr penguin.Address, h p2p.Headers, protocolName, protocolVersion, streamName string) (p2p.Stream, error) {
 	if r.streamErr != nil {
 		err := r.streamErr(addr, protocolName, protocolVersion, streamName)
 		if err != nil {
@@ -143,7 +143,7 @@ func (r *Recorder) NewStream(ctx context.Context, addr swarm.Address, h p2p.Head
 		}
 	}()
 
-	id := addr.String() + p2p.NewSwarmStreamName(protocolName, protocolVersion, streamName)
+	id := addr.String() + p2p.NewPenguinStreamName(protocolName, protocolVersion, streamName)
 
 	r.recordsMu.Lock()
 	defer r.recordsMu.Unlock()
@@ -152,8 +152,8 @@ func (r *Recorder) NewStream(ctx context.Context, addr swarm.Address, h p2p.Head
 	return streamOut, nil
 }
 
-func (r *Recorder) Records(addr swarm.Address, protocolName, protocolVersio, streamName string) ([]*Record, error) {
-	id := addr.String() + p2p.NewSwarmStreamName(protocolName, protocolVersio, streamName)
+func (r *Recorder) Records(addr penguin.Address, protocolName, protocolVersio, streamName string) ([]*Record, error) {
+	id := addr.String() + p2p.NewPenguinStreamName(protocolName, protocolVersio, streamName)
 
 	r.recordsMu.Lock()
 	defer r.recordsMu.Unlock()
@@ -171,7 +171,7 @@ func (r *Recorder) Records(addr swarm.Address, protocolName, protocolVersio, str
 
 // WaitRecords waits for some time for records to come into the recorder. If msgs is 0, the timeoutSec period is waited to verify
 // that _no_ messages arrive during this time period.
-func (r *Recorder) WaitRecords(t *testing.T, addr swarm.Address, proto, version, stream string, msgs, timeoutSec int) []*Record {
+func (r *Recorder) WaitRecords(t *testing.T, addr penguin.Address, proto, version, stream string, msgs, timeoutSec int) []*Record {
 	t.Helper()
 	wait := 10 * time.Millisecond
 	iters := int((time.Duration(timeoutSec) * time.Second) / wait)
@@ -383,7 +383,7 @@ func NewRecorderDisconnecter(r *Recorder) *RecorderDisconnecter {
 	}
 }
 
-func (r *RecorderDisconnecter) Disconnect(overlay swarm.Address) error {
+func (r *RecorderDisconnecter) Disconnect(overlay penguin.Address) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -391,7 +391,7 @@ func (r *RecorderDisconnecter) Disconnect(overlay swarm.Address) error {
 	return nil
 }
 
-func (r *RecorderDisconnecter) Blocklist(overlay swarm.Address, d time.Duration) error {
+func (r *RecorderDisconnecter) Blocklist(overlay penguin.Address, d time.Duration) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -399,7 +399,7 @@ func (r *RecorderDisconnecter) Blocklist(overlay swarm.Address, d time.Duration)
 	return nil
 }
 
-func (r *RecorderDisconnecter) IsDisconnected(overlay swarm.Address) bool {
+func (r *RecorderDisconnecter) IsDisconnected(overlay penguin.Address) bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -407,7 +407,7 @@ func (r *RecorderDisconnecter) IsDisconnected(overlay swarm.Address) bool {
 	return yes
 }
 
-func (r *RecorderDisconnecter) IsBlocklisted(overlay swarm.Address) (bool, time.Duration) {
+func (r *RecorderDisconnecter) IsBlocklisted(overlay penguin.Address) (bool, time.Duration) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

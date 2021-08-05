@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -22,7 +22,7 @@ import (
 	pushsyncmock "github.com/penguintop/penguin/pkg/pushsync/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology/mock"
 )
@@ -43,7 +43,7 @@ type Store struct {
 }
 
 // Override the Set function to capture the ModeSetSync
-func (s *Store) Set(ctx context.Context, mode storage.ModeSet, addrs ...swarm.Address) error {
+func (s *Store) Set(ctx context.Context, mode storage.ModeSet, addrs ...penguin.Address) error {
 	s.modeSetMu.Lock()
 	defer s.modeSetMu.Unlock()
 
@@ -72,16 +72,16 @@ func (s *Store) Close() error {
 // as ModeSetSync status.
 func TestSendChunkToSyncWithTag(t *testing.T) {
 	// create a trigger  and a closestpeer
-	triggerPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
 
 	key, _ := crypto.GenerateSecp256k1Key()
 	signer := crypto.NewDefaultSigner(key)
 
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		signature, _ := signer.Sign(chunk.Address().Bytes())
 		receipt := &pushsync.Receipt{
-			Address:   swarm.NewAddress(chunk.Address().Bytes()),
+			Address:   penguin.NewAddress(chunk.Address().Bytes()),
 			Signature: signature,
 		}
 		return receipt, nil
@@ -128,16 +128,16 @@ func TestSendChunkToPushSyncWithoutTag(t *testing.T) {
 	chunk := testingc.GenerateTestRandomChunk()
 
 	// create a trigger  and a closestpeer
-	triggerPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
 
 	key, _ := crypto.GenerateSecp256k1Key()
 	signer := crypto.NewDefaultSigner(key)
 
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		signature, _ := signer.Sign(chunk.Address().Bytes())
 		receipt := &pushsync.Receipt{
-			Address:   swarm.NewAddress(chunk.Address().Bytes()),
+			Address:   penguin.NewAddress(chunk.Address().Bytes()),
 			Signature: signature,
 		}
 		return receipt, nil
@@ -174,10 +174,10 @@ func TestSendChunkAndReceiveInvalidReceipt(t *testing.T) {
 	chunk := testingc.GenerateTestRandomChunk()
 
 	// create a trigger  and a closestpeer
-	triggerPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
 
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		return nil, errors.New("invalid receipt")
 	})
 
@@ -212,17 +212,17 @@ func TestSendChunkAndTimeoutinReceivingReceipt(t *testing.T) {
 	chunk := testingc.GenerateTestRandomChunk()
 
 	// create a trigger  and a closestpeer
-	triggerPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
 
 	key, _ := crypto.GenerateSecp256k1Key()
 	signer := crypto.NewDefaultSigner(key)
 
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		time.Sleep(1 * time.Second)
 		signature, _ := signer.Sign(chunk.Address().Bytes())
 		receipt := &pushsync.Receipt{
-			Address:   swarm.NewAddress(chunk.Address().Bytes()),
+			Address:   penguin.NewAddress(chunk.Address().Bytes()),
 			Signature: signature,
 		}
 		return receipt, nil
@@ -254,8 +254,8 @@ func TestSendChunkAndTimeoutinReceivingReceipt(t *testing.T) {
 
 func TestPusherClose(t *testing.T) {
 	// create a trigger  and a closestpeer
-	triggerPeer := swarm.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
-	closestPeer := swarm.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
+	triggerPeer := penguin.MustParseHexAddress("6000000000000000000000000000000000000000000000000000000000000000")
+	closestPeer := penguin.MustParseHexAddress("f000000000000000000000000000000000000000000000000000000000000000")
 
 	var (
 		goFuncStartedC    = make(chan struct{})
@@ -272,12 +272,12 @@ func TestPusherClose(t *testing.T) {
 	key, _ := crypto.GenerateSecp256k1Key()
 	signer := crypto.NewDefaultSigner(key)
 
-	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
+	pushSyncService := pushsyncmock.New(func(ctx context.Context, chunk penguin.Chunk) (*pushsync.Receipt, error) {
 		goFuncStartedC <- struct{}{}
 		<-goFuncAfterCloseC
 		signature, _ := signer.Sign(chunk.Address().Bytes())
 		receipt := &pushsync.Receipt{
-			Address:   swarm.NewAddress(chunk.Address().Bytes()),
+			Address:   penguin.NewAddress(chunk.Address().Bytes()),
 			Signature: signature,
 		}
 		return receipt, nil
@@ -361,7 +361,7 @@ func TestPusherClose(t *testing.T) {
 	}
 }
 
-func createPusher(t *testing.T, addr swarm.Address, pushSyncService pushsync.PushSyncer, mockOpts ...mock.Option) (*tags.Tags, *pusher.Service, *Store) {
+func createPusher(t *testing.T, addr penguin.Address, pushSyncService pushsync.PushSyncer, mockOpts ...mock.Option) (*tags.Tags, *pusher.Service, *Store) {
 	t.Helper()
 	logger := logging.New(ioutil.Discard, 0)
 	storer, err := localstore.New("", addr.Bytes(), nil, logger)
@@ -383,7 +383,7 @@ func createPusher(t *testing.T, addr swarm.Address, pushSyncService pushsync.Pus
 	return mtags, pusherService, pusherStorer
 }
 
-func checkIfModeSet(addr swarm.Address, mode storage.ModeSet, storer *Store) error {
+func checkIfModeSet(addr penguin.Address, mode storage.ModeSet, storer *Store) error {
 	var found bool
 	storer.modeSetMu.Lock()
 	defer storer.modeSetMu.Unlock()

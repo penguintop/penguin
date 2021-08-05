@@ -1,8 +1,8 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package bee
+package pen
 
 var (
 	version = "0.0.1" // manually set semantic version number

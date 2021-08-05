@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,7 +13,7 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestHasChunkHandler(t *testing.T) {
@@ -22,10 +22,10 @@ func TestHasChunkHandler(t *testing.T) {
 		Storer: mockStorer,
 	})
 
-	key := swarm.MustParseHexAddress("aabbcc")
+	key := penguin.MustParseHexAddress("aabbcc")
 	value := []byte("data data data")
 
-	_, err := mockStorer.Put(context.Background(), storage.ModePutUpload, swarm.NewChunk(key, value))
+	_, err := mockStorer.Put(context.Background(), storage.ModePutUpload, penguin.NewChunk(key, value))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func TestHasChunkHandler(t *testing.T) {
 				Code:    http.StatusOK,
 			}),
 		)
-		yes, err := mockStorer.Has(context.Background(), swarm.NewAddress([]byte(notPresentChunkAddress)))
+		yes, err := mockStorer.Has(context.Background(), penguin.NewAddress([]byte(notPresentChunkAddress)))
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -18,9 +18,9 @@ var (
 // Interface is the interface used by Accounting to trigger settlement
 type Interface interface {
 	// TotalSent returns the total amount sent to a peer
-	TotalSent(peer swarm.Address) (totalSent *big.Int, err error)
+	TotalSent(peer penguin.Address) (totalSent *big.Int, err error)
 	// TotalReceived returns the total amount received from a peer
-	TotalReceived(peer swarm.Address) (totalSent *big.Int, err error)
+	TotalReceived(peer penguin.Address) (totalSent *big.Int, err error)
 	// SettlementsSent returns sent settlements for each individual known peer
 	SettlementsSent() (map[string]*big.Int, error)
 	// SettlementsReceived returns received settlements for each individual known peer
@@ -28,8 +28,8 @@ type Interface interface {
 }
 
 type Accounting interface {
-	PeerDebt(peer swarm.Address) (*big.Int, error)
-	NotifyPaymentReceived(peer swarm.Address, amount *big.Int) error
-	NotifyPaymentSent(peer swarm.Address, amount *big.Int, receivedError error)
-	NotifyRefreshmentReceived(peer swarm.Address, amount *big.Int) error
+	PeerDebt(peer penguin.Address) (*big.Int, error)
+	NotifyPaymentReceived(peer penguin.Address, amount *big.Int) error
+	NotifyPaymentSent(peer penguin.Address, amount *big.Int, receivedError error)
+	NotifyRefreshmentReceived(peer penguin.Address, amount *big.Int) error
 }

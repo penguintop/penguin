@@ -1,9 +1,9 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 // Package p2p provides the peer-to-peer abstractions used
-// across different protocols in Bee.
+// across different protocols in Pen.
 package p2p
 
 import (
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/pen"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	ma "github.com/multiformats/go-multiaddr"
 )
 
@@ -30,10 +30,10 @@ type Service interface {
 }
 
 type Disconnecter interface {
-	Disconnect(overlay swarm.Address) error
+	Disconnect(overlay penguin.Address) error
 	// Blocklist will disconnect a peer and put it on a blocklist (blocking in & out connections) for provided duration
 	// duration 0 is treated as an infinite duration
-	Blocklist(overlay swarm.Address, duration time.Duration) error
+	Blocklist(overlay penguin.Address, duration time.Duration) error
 }
 
 type Halter interface {
@@ -50,7 +50,7 @@ type PickyNotifier interface {
 type Notifier interface {
 	Connected(context.Context, Peer) error
 	Disconnected(Peer)
-	Announce(context.Context, swarm.Address, bool) error
+	Announce(context.Context, penguin.Address, bool) error
 }
 
 // DebugService extends the Service with method used for debugging.
@@ -62,7 +62,7 @@ type DebugService interface {
 
 // Streamer is able to create a new Stream.
 type Streamer interface {
-	NewStream(ctx context.Context, address swarm.Address, h Headers, protocol, version, stream string) (Stream, error)
+	NewStream(ctx context.Context, address penguin.Address, h Headers, protocol, version, stream string) (Stream, error)
 }
 
 type StreamerDisconnecter interface {
@@ -100,8 +100,8 @@ type StreamSpec struct {
 
 // Peer holds information about a Peer.
 type Peer struct {
-	Address  swarm.Address `json:"address"`
-	FullNode bool          `json:"fullNode"`
+	Address  penguin.Address `json:"address"`
+	FullNode bool            `json:"fullNode"`
 }
 
 // HandlerFunc handles a received Stream from a Peer.
@@ -112,7 +112,7 @@ type HandlerMiddleware func(HandlerFunc) HandlerFunc
 
 // HeadlerFunc is returning response headers based on the received request
 // headers.
-type HeadlerFunc func(Headers, swarm.Address) Headers
+type HeadlerFunc func(Headers, penguin.Address) Headers
 
 // Headers represents a collection of p2p header key value pairs.
 type Headers map[string][]byte
@@ -122,8 +122,8 @@ const (
 	HeaderNameTracingSpanContext = "tracing-span-context"
 )
 
-// NewSwarmStreamName constructs a libp2p compatible stream name out of
+// NewPenguinStreamName constructs a libp2p compatible stream name out of
 // protocol name and version and stream name.
-func NewSwarmStreamName(protocol, version, stream string) string {
-	return "/swarm/" + protocol + "/" + version + "/" + stream
+func NewPenguinStreamName(protocol, version, stream string) string {
+	return "/penguin/" + protocol + "/" + version + "/" + stream
 }

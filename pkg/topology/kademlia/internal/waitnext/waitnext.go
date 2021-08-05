@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type next struct {
@@ -29,7 +29,7 @@ func New() *WaitNext {
 	}
 }
 
-func (r *WaitNext) Set(addr swarm.Address, tryAfter time.Time, attempts int) {
+func (r *WaitNext) Set(addr penguin.Address, tryAfter time.Time, attempts int) {
 
 	r.Lock()
 	defer r.Unlock()
@@ -37,7 +37,7 @@ func (r *WaitNext) Set(addr swarm.Address, tryAfter time.Time, attempts int) {
 	r.next[addr.ByteString()] = &next{tryAfter: tryAfter, failedAttempts: attempts}
 }
 
-func (r *WaitNext) SetTryAfter(addr swarm.Address, tryAfter time.Time) {
+func (r *WaitNext) SetTryAfter(addr penguin.Address, tryAfter time.Time) {
 
 	r.Lock()
 	defer r.Unlock()
@@ -49,7 +49,7 @@ func (r *WaitNext) SetTryAfter(addr swarm.Address, tryAfter time.Time) {
 	}
 }
 
-func (r *WaitNext) Waiting(addr swarm.Address) bool {
+func (r *WaitNext) Waiting(addr penguin.Address) bool {
 
 	r.Lock()
 	defer r.Unlock()
@@ -58,7 +58,7 @@ func (r *WaitNext) Waiting(addr swarm.Address) bool {
 	return ok && time.Now().Before(info.tryAfter)
 }
 
-func (r *WaitNext) Attempts(addr swarm.Address) int {
+func (r *WaitNext) Attempts(addr penguin.Address) int {
 
 	r.Lock()
 	defer r.Unlock()
@@ -70,7 +70,7 @@ func (r *WaitNext) Attempts(addr swarm.Address) int {
 	return 0
 }
 
-func (r *WaitNext) Remove(addr swarm.Address) {
+func (r *WaitNext) Remove(addr penguin.Address) {
 
 	r.Lock()
 	defer r.Unlock()

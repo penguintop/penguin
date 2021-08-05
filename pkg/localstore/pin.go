@@ -5,13 +5,13 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-// pinCounter returns the pin counter for a given swarm address, provided that the
+// pinCounter returns the pin counter for a given penguin address, provided that the
 // address has been pinned.
-func (db *DB) pinCounter(address swarm.Address) (uint64, error) {
+func (db *DB) pinCounter(address penguin.Address) (uint64, error) {
 	out, err := db.pinIndex.Get(shed.Item{
 		Address: address.Bytes(),
 	})

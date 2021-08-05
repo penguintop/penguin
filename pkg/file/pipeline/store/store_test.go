@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,7 +15,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/pipeline/store"
 	"github.com/penguintop/penguin/pkg/storage"
 	storer "github.com/penguintop/penguin/pkg/storage/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestStoreWriter tests that store writer stores the provided data and calls the next chain writer.
@@ -52,7 +52,7 @@ func TestStoreWriter(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		d, err := mockStore.Get(ctx, storage.ModeGetRequest, swarm.NewAddress(tc.ref))
+		d, err := mockStore.Get(ctx, storage.ModeGetRequest, penguin.NewAddress(tc.ref))
 		if err != nil {
 			t.Fatal(err)
 		}

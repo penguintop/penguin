@@ -1,8 +1,8 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package node defines the concept of a Bee node
+// Package node defines the concept of a Pen node
 // by bootstrapping and injecting all necessary
 // dependencies.
 package node
@@ -68,7 +68,7 @@ import (
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/kademlia"
@@ -82,7 +82,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type Bee struct {
+type Pen struct {
 	p2pService               io.Closer
 	p2pHalter                p2p.Halter
 	p2pCancel                context.CancelFunc
@@ -158,7 +158,7 @@ const (
 	basePrice   = 10
 )
 
-func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, signer crypto.Signer, networkID uint64, logger logging.Logger, libp2pPrivateKey, pssPrivateKey *ecdsa.PrivateKey, o Options) (b *Bee, err error) {
+func NewPen(addr string, penguinAddress penguin.Address, publicKey ecdsa.PublicKey, signer crypto.Signer, networkID uint64, logger logging.Logger, libp2pPrivateKey, pssPrivateKey *ecdsa.PrivateKey, o Options) (b *Pen, err error) {
 	tracer, tracerCloser, err := tracing.NewTracer(&tracing.Options{
 		Enabled:     o.TracingEnabled,
 		Endpoint:    o.TracingEndpoint,
@@ -178,7 +178,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		}
 	}()
 
-	b = &Bee{
+	b = &Pen{
 		p2pCancel:      p2pCancel,
 		errorLogWriter: logger.WriterLevel(logrus.ErrorLevel),
 		tracerCloser:   tracerCloser,
@@ -191,7 +191,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 			return nil, fmt.Errorf("xwc address: %w", err)
 		}
 		// set up basic debug api endpoints for debugging and /health endpoint
-		debugAPIService = debugapi.New(swarmAddress, publicKey, pssPrivateKey.PublicKey, overlayXwcAddress, logger, tracer, o.CORSAllowedOrigins)
+		debugAPIService = debugapi.New(penguinAddress, publicKey, pssPrivateKey.PublicKey, overlayXwcAddress, logger, tracer, o.CORSAllowedOrigins)
 
 		debugAPIListener, err := net.Listen("tcp", o.DebugAPIAddr)
 		if err != nil {
@@ -223,7 +223,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 	}
 	b.stateStoreCloser = stateStore
 
-	err = CheckOverlayWithStore(swarmAddress, stateStore)
+	err = CheckOverlayWithStore(penguinAddress, stateStore)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 	var (
 		swapBackend        *xwcclient.Client
 		overlayXwcAddress  common.Address
-		swarmNodeAddress   swarm.Address
+		penguinNodeAddress   penguin.Address
 		chainID            int64
 		transactionService transaction.Service
 		transactionMonitor transaction.Monitor
@@ -243,7 +243,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		cashoutService     chequebook.CashoutService
 	)
 	if !o.Standalone {
-		swapBackend, overlayXwcAddress, swarmNodeAddress, chainID, transactionMonitor, transactionService, err = InitChain(
+		swapBackend, overlayXwcAddress, penguinNodeAddress, chainID, transactionMonitor, transactionService, err = InitChain(
 			p2pCtx,
 			logger,
 			stateStore,
@@ -302,7 +302,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		)
 	}
 
-	lightNodes := lightnode.NewContainer(swarmAddress)
+	lightNodes := lightnode.NewContainer(penguinAddress)
 
 	txHash, err := getTxHash(stateStore, logger, o)
 	if err != nil {
@@ -311,7 +311,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 
 	senderMatcher := transaction.NewMatcher(swapBackend, types.NewEIP155Signer(big.NewInt(chainID)))
 
-	p2ps, err := libp2p.New(p2pCtx, signer, networkID, swarmAddress, addr, addressbook, stateStore, lightNodes, senderMatcher, logger, tracer, libp2p.Options{
+	p2ps, err := libp2p.New(p2pCtx, signer, networkID, penguinAddress, addr, addressbook, stateStore, lightNodes, senderMatcher, logger, tracer, libp2p.Options{
 		PrivateKey:     libp2pPrivateKey,
 		NATAddr:        o.NATAddr,
 		EnableWS:       o.EnableWS,
@@ -342,7 +342,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		DisableSeeksCompaction: o.DBDisableSeeksCompaction,
 	}
 
-	storer, err := localstore.New(path, swarmAddress.Bytes(), lo, logger)
+	storer, err := localstore.New(path, penguinAddress.Bytes(), lo, logger)
 	if err != nil {
 		return nil, fmt.Errorf("localstore: %w", err)
 	}
@@ -462,7 +462,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 
 		stakingContractService = staking.New(
 			overlayXwcAddress,
-			swarmNodeAddress,
+			penguinNodeAddress,
 			stakingContractAddress,
 			erc20Address,
 			transactionService,
@@ -521,7 +521,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		return nil, fmt.Errorf("unable to create metrics storage for kademlia: %w", err)
 	}
 
-	kad := kademlia.New(swarmAddress, addressbook, hive, p2ps, metricsDB, logger, kademlia.Options{Bootnodes: bootnodes, StandaloneMode: o.Standalone, BootnodeMode: o.BootnodeMode})
+	kad := kademlia.New(penguinAddress, addressbook, hive, p2ps, metricsDB, logger, kademlia.Options{Bootnodes: bootnodes, StandaloneMode: o.Standalone, BootnodeMode: o.BootnodeMode})
 	b.topologyCloser = kad
 	b.topologyHalter = kad
 	hive.SetAddPeersHandler(kad.AddPeers)
@@ -548,7 +548,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 		return nil, fmt.Errorf("invalid payment threshold: %s", paymentThreshold)
 	}
 
-	pricer := pricer.NewFixedPricer(swarmAddress, basePrice)
+	pricer := pricer.NewFixedPricer(penguinAddress, basePrice)
 
 	minThreshold := pricer.MostExpensive()
 
@@ -616,7 +616,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 
 	pricing.SetPaymentThresholdObserver(acc)
 
-	retrieve := retrieval.New(swarmAddress, storer, p2ps, kad, logger, acc, pricer, tracer)
+	retrieve := retrieval.New(penguinAddress, storer, p2ps, kad, logger, acc, pricer, tracer)
 	tagService := tags.NewTags(stateStore, logger)
 	b.tagsCloser = tagService
 
@@ -636,7 +636,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 
 	pinningService := pinning.NewService(storer, stateStore, traversalService)
 
-	pushSyncProtocol := pushsync.New(swarmAddress, p2ps, storer, kad, tagService, o.FullNodeMode, pssService.TryUnwrap, validStamp, logger, acc, pricer, signer, tracer)
+	pushSyncProtocol := pushsync.New(penguinAddress, p2ps, storer, kad, tagService, o.FullNodeMode, pssService.TryUnwrap, validStamp, logger, acc, pricer, signer, tracer)
 
 	// set the pushSyncer in the PSS
 	pssService.SetPushSyncer(pushSyncProtocol)
@@ -781,7 +781,7 @@ func NewBee(addr string, swarmAddress swarm.Address, publicKey ecdsa.PublicKey, 
 	return b, nil
 }
 
-func (b *Bee) Shutdown(ctx context.Context) error {
+func (b *Pen) Shutdown(ctx context.Context) error {
 	var mErr error
 
 	// halt kademlia while shutting down other
@@ -906,13 +906,13 @@ func getTxHash(stateStore storage.StateStorer, logger logging.Logger, o Options)
 
 // pidKiller is used to issue a forced shut down of the node from sub modules. The issue with using the
 // node's Shutdown method is that it only shuts down the node and does not exit the start process
-// which is waiting on the os.Signals. This is not desirable, but currently bee node cannot handle
+// which is waiting on the os.Signals. This is not desirable, but currently pen node cannot handle
 // rate-limiting blockchain API calls properly. We will shut down the node in this case to allow the
 // user to rectify the API issues (by adjusting limits or using a different one). There is no platform
 // agnostic way to trigger os.Signals in go unfortunately. Which is why we will use the process.Kill
 // approach which works on windows as well.
 type pidKiller struct {
-	node *Bee
+	node *Pen
 }
 
 func (p *pidKiller) Shutdown(ctx context.Context) error {

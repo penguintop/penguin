@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,13 +11,13 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/pinning"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
 // pinRootHash pins root hash of given reference. This method is idempotent.
 func (s *server) pinRootHash(w http.ResponseWriter, r *http.Request) {
-	ref, err := swarm.ParseHexAddress(mux.Vars(r)["reference"])
+	ref, err := penguin.ParseHexAddress(mux.Vars(r)["reference"])
 	if err != nil {
 		s.logger.Debugf("pin root hash: unable to parse reference %q: %v", ref, err)
 		s.logger.Error("pin root hash: unable to parse reference")
@@ -53,7 +53,7 @@ func (s *server) pinRootHash(w http.ResponseWriter, r *http.Request) {
 
 // unpinRootHash unpin's an already pinned root hash. This method is idempotent.
 func (s *server) unpinRootHash(w http.ResponseWriter, r *http.Request) {
-	ref, err := swarm.ParseHexAddress(mux.Vars(r)["reference"])
+	ref, err := penguin.ParseHexAddress(mux.Vars(r)["reference"])
 	if err != nil {
 		s.logger.Debugf("unpin root hash: unable to parse reference: %v", err)
 		s.logger.Error("unpin root hash: unable to parse reference")
@@ -90,7 +90,7 @@ func (s *server) unpinRootHash(w http.ResponseWriter, r *http.Request) {
 
 // getPinnedRootHash returns back the given reference if its root hash is pinned.
 func (s *server) getPinnedRootHash(w http.ResponseWriter, r *http.Request) {
-	ref, err := swarm.ParseHexAddress(mux.Vars(r)["reference"])
+	ref, err := penguin.ParseHexAddress(mux.Vars(r)["reference"])
 	if err != nil {
 		s.logger.Debugf("pinned root hash: unable to parse reference %q: %v", ref, err)
 		s.logger.Error("pinned root hash: unable to parse reference")
@@ -112,7 +112,7 @@ func (s *server) getPinnedRootHash(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonhttp.OK(w, struct {
-		Reference swarm.Address `json:"reference"`
+		Reference penguin.Address `json:"reference"`
 	}{
 		Reference: ref,
 	})
@@ -129,7 +129,7 @@ func (s *server) listPinnedRootHashes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonhttp.OK(w, struct {
-		References []swarm.Address `json:"references"`
+		References []penguin.Address `json:"references"`
 	}{
 		References: pinned,
 	})

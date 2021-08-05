@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/traversal"
 	"github.com/hashicorp/go-multierror"
 )
@@ -25,20 +25,20 @@ type Interface interface {
 	// The boolean arguments specifies whether all nodes
 	// in the tree should also be traversed and pinned.
 	// Repeating calls of this method are idempotent.
-	CreatePin(context.Context, swarm.Address, bool) error
+	CreatePin(context.Context, penguin.Address, bool) error
 	// DeletePin deletes given reference. All the existing
 	// nodes in the tree will also be traversed and un-pinned.
 	// Repeating calls of this method are idempotent.
-	DeletePin(context.Context, swarm.Address) error
+	DeletePin(context.Context, penguin.Address) error
 	// HasPin returns true if the given reference has root pin.
-	HasPin(swarm.Address) (bool, error)
+	HasPin(penguin.Address) (bool, error)
 	// Pins return all pinned references.
-	Pins() ([]swarm.Address, error)
+	Pins() ([]penguin.Address, error)
 }
 
 const storePrefix = "root-pin"
 
-func rootPinKey(ref swarm.Address) string {
+func rootPinKey(ref penguin.Address) string {
 	return fmt.Sprintf("%s-%s", storePrefix, ref)
 }
 
@@ -63,9 +63,9 @@ type Service struct {
 }
 
 // CreatePin implements Interface.CreatePin method.
-func (s *Service) CreatePin(ctx context.Context, ref swarm.Address, traverse bool) error {
+func (s *Service) CreatePin(ctx context.Context, ref penguin.Address, traverse bool) error {
 	// iterFn is a pinning iterator function over the leaves of the root.
-	iterFn := func(leaf swarm.Address) error {
+	iterFn := func(leaf penguin.Address) error {
 		switch err := s.pinStorage.Set(ctx, storage.ModeSetPin, leaf); {
 		case errors.Is(err, storage.ErrNotFound):
 			ch, err := s.pinStorage.Get(ctx, storage.ModeGetRequestPin, leaf)
@@ -89,7 +89,7 @@ func (s *Service) CreatePin(ctx context.Context, ref swarm.Address, traverse boo
 	}
 
 	key := rootPinKey(ref)
-	switch err := s.rhStorage.Get(key, new(swarm.Address)); {
+	switch err := s.rhStorage.Get(key, new(penguin.Address)); {
 	case errors.Is(err, storage.ErrNotFound):
 		return s.rhStorage.Put(key, ref)
 	case err != nil:
@@ -99,10 +99,10 @@ func (s *Service) CreatePin(ctx context.Context, ref swarm.Address, traverse boo
 }
 
 // DeletePin implements Interface.DeletePin method.
-func (s *Service) DeletePin(ctx context.Context, ref swarm.Address) error {
+func (s *Service) DeletePin(ctx context.Context, ref penguin.Address) error {
 	var iterErr error
 	// iterFn is a unpinning iterator function over the leaves of the root.
-	iterFn := func(leaf swarm.Address) error {
+	iterFn := func(leaf penguin.Address) error {
 		err := s.pinStorage.Set(ctx, storage.ModeSetUnpin, leaf)
 		if err != nil {
 			iterErr = multierror.Append(err, fmt.Errorf("unable to unpin the chunk for leaf %q of root %q: %w", leaf, ref, err))
@@ -126,8 +126,8 @@ func (s *Service) DeletePin(ctx context.Context, ref swarm.Address) error {
 }
 
 // HasPin implements Interface.HasPin method.
-func (s *Service) HasPin(ref swarm.Address) (bool, error) {
-	key, val := rootPinKey(ref), swarm.NewAddress(nil)
+func (s *Service) HasPin(ref penguin.Address) (bool, error) {
+	key, val := rootPinKey(ref), penguin.NewAddress(nil)
 	switch err := s.rhStorage.Get(key, &val); {
 	case errors.Is(err, storage.ErrNotFound):
 		return false, nil
@@ -138,10 +138,10 @@ func (s *Service) HasPin(ref swarm.Address) (bool, error) {
 }
 
 // Pins implements Interface.Pins method.
-func (s *Service) Pins() ([]swarm.Address, error) {
-	var refs []swarm.Address
+func (s *Service) Pins() ([]penguin.Address, error) {
+	var refs []penguin.Address
 	err := s.rhStorage.Iterate(storePrefix, func(key, val []byte) (stop bool, err error) {
-		var ref swarm.Address
+		var ref penguin.Address
 		if err := json.Unmarshal(val, &ref); err != nil {
 			return true, fmt.Errorf("invalid reference value %q: %w", string(val), err)
 		}

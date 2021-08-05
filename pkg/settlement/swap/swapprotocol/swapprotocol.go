@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p/protobuf"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
 	"github.com/penguintop/penguin/pkg/settlement/swap/swapprotocol/pb"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
@@ -30,15 +30,15 @@ const (
 // Interface is the main interface to send messages over swap protocol.
 type Interface interface {
 	// EmitCheque sends a signed cheque to a peer.
-	EmitCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) error
+	EmitCheque(ctx context.Context, peer penguin.Address, cheque *chequebook.SignedCheque) error
 }
 
 // Swap is the interface the settlement layer should implement to receive cheques.
 type Swap interface {
 	// ReceiveCheque is called by the swap protocol if a cheque is received.
-	ReceiveCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) error
+	ReceiveCheque(ctx context.Context, peer penguin.Address, cheque *chequebook.SignedCheque) error
 	// Handshake is called by the swap protocol when a handshake is received.
-	Handshake(peer swarm.Address, beneficiary common.Address) error
+	Handshake(peer penguin.Address, beneficiary common.Address) error
 }
 
 // Service is the main implementation of the swap protocol.
@@ -174,7 +174,7 @@ func (s *Service) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) (e
 }
 
 // EmitCheque sends a signed cheque to a peer.
-func (s *Service) EmitCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) error {
+func (s *Service) EmitCheque(ctx context.Context, peer penguin.Address, cheque *chequebook.SignedCheque) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 

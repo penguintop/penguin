@@ -1,11 +1,11 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package mock
 
 import (
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 type MockPricer struct {
@@ -20,10 +20,10 @@ func NewMockService(price, peerPrice uint64) *MockPricer {
 	}
 }
 
-func (pricer *MockPricer) PeerPrice(peer, chunk swarm.Address) uint64 {
+func (pricer *MockPricer) PeerPrice(peer, chunk penguin.Address) uint64 {
 	return pricer.peerPrice
 }
 
-func (pricer *MockPricer) Price(chunk swarm.Address) uint64 {
+func (pricer *MockPricer) Price(chunk penguin.Address) uint64 {
 	return pricer.price
 }

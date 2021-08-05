@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/traversal"
 )
@@ -54,17 +54,17 @@ func checkPinHandlers(t *testing.T, client *http.Client, rootHash string) {
 
 	jsonhttptest.Request(t, client, http.MethodGet, pinsReferencePath, http.StatusOK,
 		jsonhttptest.WithExpectedJSONResponse(struct {
-			Reference swarm.Address `json:"reference"`
+			Reference penguin.Address `json:"reference"`
 		}{
-			Reference: swarm.MustParseHexAddress(rootHash),
+			Reference: penguin.MustParseHexAddress(rootHash),
 		}),
 	)
 
 	jsonhttptest.Request(t, client, http.MethodGet, pinsBasePath, http.StatusOK,
 		jsonhttptest.WithExpectedJSONResponse(struct {
-			References []swarm.Address `json:"references"`
+			References []penguin.Address `json:"references"`
 		}{
-			References: []swarm.Address{swarm.MustParseHexAddress(rootHash)},
+			References: []penguin.Address{penguin.MustParseHexAddress(rootHash)},
 		}),
 	)
 
@@ -94,10 +94,10 @@ func TestPinHandlers(t *testing.T) {
 	t.Run("bytes", func(t *testing.T) {
 		const rootHash = "838d0a193ecd1152d1bb1432d5ecc02398533b2494889e23b8bd5ace30ac2aeb"
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(strings.NewReader("this is a simple text")),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 		)
 		checkPinHandlers(t, client, rootHash)
@@ -105,29 +105,29 @@ func TestPinHandlers(t *testing.T) {
 
 	t.Run("pen", func(t *testing.T) {
 		tarReader := tarFiles(t, []f{{
-			data: []byte("<h1>Swarm"),
+			data: []byte("<h1>Penguin"),
 			name: "index.html",
 			dir:  "",
 		}})
 		rootHash := "9e178dbd1ed4b748379e25144e28dfb29c07a4b5114896ef454480115a56b237"
 		jsonhttptest.Request(t, client, http.MethodPost, "/pen", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(tarReader),
 			jsonhttptest.WithRequestHeader("Content-Type", api.ContentTypeTar),
-			jsonhttptest.WithRequestHeader(api.SwarmCollectionHeader, "True"),
+			jsonhttptest.WithRequestHeader(api.PenguinCollectionHeader, "True"),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 		)
 		checkPinHandlers(t, client, rootHash)
 
 		rootHash = "dd13a5a6cc9db3ef514d645e6719178dbfb1a90b49b9262cafce35b0d27cf245"
 		jsonhttptest.Request(t, client, http.MethodPost, "/pen?name=somefile.txt", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestHeader("Content-Type", "text/plain"),
 			jsonhttptest.WithRequestBody(strings.NewReader("this is a simple text")),
 			jsonhttptest.WithExpectedJSONResponse(api.PenUploadResponse{
-				Reference: swarm.MustParseHexAddress(rootHash),
+				Reference: penguin.MustParseHexAddress(rootHash),
 			}),
 		)
 		checkPinHandlers(t, client, rootHash)
@@ -139,7 +139,7 @@ func TestPinHandlers(t *testing.T) {
 			rootHash = chunk.Address().String()
 		)
 		jsonhttptest.Request(t, client, http.MethodPost, "/chunks", http.StatusCreated,
-			jsonhttptest.WithRequestHeader(api.SwarmPostageBatchIdHeader, batchOkStr),
+			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithExpectedJSONResponse(api.ChunkAddressResponse{
 				Reference: chunk.Address(),

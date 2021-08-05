@@ -26,7 +26,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/shed"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -132,9 +132,9 @@ func TestModePutRequestCache(t *testing.T) {
 	for _, tc := range multiChunkTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			db := newTestDB(t, nil)
-			var chunks []swarm.Chunk
+			var chunks []penguin.Chunk
 			for i := 0; i < tc.count; i++ {
-				chunk := generateTestRandomChunkAt(swarm.NewAddress(db.baseKey), 2)
+				chunk := generateTestRandomChunkAt(penguin.NewAddress(db.baseKey), 2)
 				chunks = append(chunks, chunk)
 			}
 			// call unreserve on the batch with radius 0 so that
@@ -304,7 +304,7 @@ func TestModePutUpload_parallel(t *testing.T) {
 			uploadsCount := 100
 			workerCount := 100
 
-			chunksChan := make(chan []swarm.Chunk)
+			chunksChan := make(chan []penguin.Chunk)
 			errChan := make(chan error)
 			doneChan := make(chan struct{})
 			defer close(doneChan)
@@ -330,7 +330,7 @@ func TestModePutUpload_parallel(t *testing.T) {
 				}(i)
 			}
 
-			chunks := make([]swarm.Chunk, 0)
+			chunks := make([]penguin.Chunk, 0)
 			var chunksMu sync.Mutex
 
 			// send chunks to workers
@@ -510,11 +510,11 @@ func TestPutDuplicateChunks(t *testing.T) {
 //
 // Measurements on MacBook Pro (Retina, 15-inch, Mid 2014)
 //
-// # go test -benchmem -run=none github.com/ethersphere/swarm/storage/localstore -bench BenchmarkPutUpload -v
+// # go test -benchmem -run=none github.com/ethersphere/penguin/storage/localstore -bench BenchmarkPutUpload -v
 //
 // goos: darwin
 // goarch: amd64
-// pkg: github.com/ethersphere/swarm/storage/localstore
+// pkg: github.com/ethersphere/penguin/storage/localstore
 // BenchmarkPutUpload/count_100_parallel_1-8         	     300	   5107704 ns/op	 2081461 B/op	    2374 allocs/op
 // BenchmarkPutUpload/count_100_parallel_2-8         	     300	   5411742 ns/op	 2081608 B/op	    2364 allocs/op
 // BenchmarkPutUpload/count_100_parallel_4-8         	     500	   3704964 ns/op	 2081696 B/op	    2324 allocs/op
@@ -571,7 +571,7 @@ func benchmarkPutUpload(b *testing.B, o *Options, count, maxParallelUploads int)
 	b.StopTimer()
 	db := newTestDB(b, o)
 
-	chunks := make([]swarm.Chunk, count)
+	chunks := make([]penguin.Chunk, count)
 	for i := 0; i < count; i++ {
 		chunks[i] = generateTestRandomChunk()
 	}

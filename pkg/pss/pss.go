@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import (
 	"github.com/penguintop/penguin/pkg/logging"
 	"github.com/penguintop/penguin/pkg/postage"
 	"github.com/penguintop/penguin/pkg/pushsync"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -38,7 +38,7 @@ type Interface interface {
 	// Register a Handler for a given Topic.
 	Register(Topic, Handler) func()
 	// TryUnwrap tries to unwrap a wrapped trojan message.
-	TryUnwrap(swarm.Chunk)
+	TryUnwrap(penguin.Chunk)
 
 	SetPushSyncer(pushSyncer pushsync.PushSyncer)
 	io.Closer
@@ -145,8 +145,8 @@ func (p *pss) topics() []Topic {
 }
 
 // TryUnwrap allows unwrapping a chunk as a trojan message and calling its handlers based on the topic.
-func (p *pss) TryUnwrap(c swarm.Chunk) {
-	if len(c.Data()) < swarm.ChunkWithSpanSize {
+func (p *pss) TryUnwrap(c penguin.Chunk) {
+	if len(c.Data()) < penguin.ChunkWithSpanSize {
 		return // chunk not full
 	}
 	ctx := context.Background()

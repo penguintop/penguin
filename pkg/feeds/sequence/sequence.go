@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/feeds"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 // DefaultLevels is the number of concurrent lookaheads
@@ -68,7 +68,7 @@ func NewFinder(getter storage.Getter, feed *feeds.Feed) feeds.Lookup {
 
 // At looks up the version valid at time `at`
 // after is a unix time hint of the latest known update
-func (f *finder) At(ctx context.Context, at, after int64) (ch swarm.Chunk, current, next feeds.Index, err error) {
+func (f *finder) At(ctx context.Context, at, after int64) (ch penguin.Chunk, current, next feeds.Index, err error) {
 	for i := uint64(0); ; i++ {
 		u, err := f.getter.Get(ctx, &index{i})
 		if err != nil {
@@ -140,15 +140,15 @@ func newInterval(base uint64) *interval {
 
 // results capture a chunk lookup on a interval
 type result struct {
-	chunk    swarm.Chunk // the chunk found
-	interval *interval   // the interval it belongs to
-	level    int         // the level within the interval
-	index    uint64      // the actual sequence index of the update
+	chunk    penguin.Chunk // the chunk found
+	interval *interval     // the interval it belongs to
+	level    int           // the level within the interval
+	index    uint64        // the actual sequence index of the update
 }
 
 // At looks up the version valid at time `at`
 // after is a unix time hint of the latest known update
-func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch swarm.Chunk, cur, next feeds.Index, err error) {
+func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk, cur, next feeds.Index, err error) {
 	// first lookup update at the 0 index
 	// TODO: consider receive after as uint
 	ch, err = f.get(ctx, at, uint64(after))
@@ -236,8 +236,8 @@ func (f *asyncFinder) at(ctx context.Context, at int64, min int, i *interval, c 
 	}
 }
 
-func (f *asyncFinder) asyncGet(ctx context.Context, at int64, index uint64) <-chan swarm.Chunk {
-	c := make(chan swarm.Chunk)
+func (f *asyncFinder) asyncGet(ctx context.Context, at int64, index uint64) <-chan penguin.Chunk {
+	c := make(chan penguin.Chunk)
 	go func() {
 		defer close(c)
 		ch, err := f.get(ctx, at, index)
@@ -250,7 +250,7 @@ func (f *asyncFinder) asyncGet(ctx context.Context, at int64, index uint64) <-ch
 }
 
 // get performs a lookup of an update chunk, returns nil (not error) if not found
-func (f *asyncFinder) get(ctx context.Context, at int64, idx uint64) (swarm.Chunk, error) {
+func (f *asyncFinder) get(ctx context.Context, at int64, idx uint64) (penguin.Chunk, error) {
 	u, err := f.getter.Get(ctx, &index{idx})
 	if err != nil {
 		if !errors.Is(err, storage.ErrNotFound) {

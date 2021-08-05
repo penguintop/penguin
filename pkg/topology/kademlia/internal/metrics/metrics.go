@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/hashicorp/go-multierror"
 	"github.com/syndtr/goleveldb/leveldb"
 	"go.uber.org/atomic"
@@ -140,7 +140,7 @@ type Counters struct {
 	sync.Mutex
 
 	// Bookkeeping.
-	peer     *swarm.Address
+	peer     *penguin.Address
 	loggedIn bool
 
 	// Watches in-memory counters which has to be persisted.
@@ -234,14 +234,14 @@ func NewCollector(db *shed.DB) *Collector {
 }
 
 // Collector collects various metrics about
-// peers specified be the swarm.Address.
+// peers specified be the penguin.Address.
 type Collector struct {
 	db       *shed.DB
 	counters sync.Map
 }
 
 // Record records a set of metrics for peer specified by the given address.
-func (c *Collector) Record(addr swarm.Address, rop ...RecordOp) {
+func (c *Collector) Record(addr penguin.Address, rop ...RecordOp) {
 	val, _ := c.counters.LoadOrStore(addr.ByteString(), &Counters{peer: &addr})
 	for _, op := range rop {
 		op(val.(*Counters))
@@ -256,7 +256,7 @@ func (c *Collector) Record(addr swarm.Address, rop ...RecordOp) {
 // be evaluated against the last seen time, which equals to the login time. If
 // the peer is logged out, then the session counters will reflect its last
 // session.
-func (c *Collector) Snapshot(t time.Time, addresses ...swarm.Address) map[string]*Snapshot {
+func (c *Collector) Snapshot(t time.Time, addresses ...penguin.Address) map[string]*Snapshot {
 	snapshot := make(map[string]*Snapshot)
 
 	for _, addr := range addresses {
@@ -281,7 +281,7 @@ func (c *Collector) Snapshot(t time.Time, addresses ...swarm.Address) map[string
 
 // Inspect allows to inspect current snapshot for the given
 // peer address by executing the inspection function.
-func (c *Collector) Inspect(addr swarm.Address, fn func(ss *Snapshot)) {
+func (c *Collector) Inspect(addr penguin.Address, fn func(ss *Snapshot)) {
 	snapshots := c.Snapshot(time.Now(), addr)
 	fn(snapshots[addr.ByteString()])
 }
@@ -290,7 +290,7 @@ func (c *Collector) Inspect(addr swarm.Address, fn func(ss *Snapshot)) {
 // underlying storage. If an address or a set of addresses is specified then
 // only counters related to them will be flushed, otherwise counters for all
 // peers will be flushed.
-func (c *Collector) Flush(addresses ...swarm.Address) error {
+func (c *Collector) Flush(addresses ...penguin.Address) error {
 	var (
 		mErr  error
 		dirty []string

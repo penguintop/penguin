@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	"github.com/penguintop/penguin/pkg/shed"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -40,7 +40,7 @@ func (db *DB) UnreserveBatch(id []byte, radius uint8) error {
 	oldRadius := i.Radius
 	var gcSizeChange int64 // number to add or subtract from gcSize
 	unpin := func(item shed.Item) (stop bool, err error) {
-		addr := swarm.NewAddress(item.Address)
+		addr := penguin.NewAddress(item.Address)
 		c, err := db.setUnpin(batch, addr)
 		if err != nil {
 			if !errors.Is(err, leveldb.ErrNotFound) {
@@ -70,7 +70,7 @@ func (db *DB) UnreserveBatch(id []byte, radius uint8) error {
 		if err := db.postageRadiusIndex.PutInBatch(batch, item); err != nil {
 			return err
 		}
-		if bin == swarm.MaxPO {
+		if bin == penguin.MaxPO {
 			if err := db.postageRadiusIndex.DeleteInBatch(batch, item); err != nil {
 				return err
 			}
@@ -95,6 +95,6 @@ func (db *DB) UnreserveBatch(id []byte, radius uint8) error {
 }
 
 func withinRadius(db *DB, item shed.Item) bool {
-	po := db.po(swarm.NewAddress(item.Address))
+	po := db.po(penguin.NewAddress(item.Address))
 	return po >= item.Radius
 }

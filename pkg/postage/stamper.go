@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ import (
 	"errors"
 
 	"github.com/penguintop/penguin/pkg/crypto"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -18,7 +18,7 @@ var (
 
 // Stamper can issue stamps from the given address.
 type Stamper interface {
-	Stamp(swarm.Address) (*Stamp, error)
+	Stamp(penguin.Address) (*Stamp, error)
 }
 
 // stamper connects a stampissuer with a signer.
@@ -35,7 +35,7 @@ func NewStamper(st *StampIssuer, signer crypto.Signer) Stamper {
 
 // Stamp takes chunk, see if the chunk can included in the batch and
 // signs it with the owner of the batch of this Stamp issuer.
-func (st *stamper) Stamp(addr swarm.Address) (*Stamp, error) {
+func (st *stamper) Stamp(addr penguin.Address) (*Stamp, error) {
 	toSign, err := toSignDigest(addr, st.issuer.batchID)
 	if err != nil {
 		return nil, err

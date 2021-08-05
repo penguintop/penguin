@@ -17,7 +17,7 @@
 // Package shed provides a simple abstraction components to compose
 // more complex operations on storage data organized in fields and indexes.
 //
-// Only type which holds logical information about swarm storage chunks data
+// Only type which holds logical information about penguin storage chunks data
 // and metadata is Item. This part is not generalized mostly for
 // performance reasons.
 package shed

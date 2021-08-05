@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -18,13 +18,13 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/manifest/mantaray"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // Traverser represents service which traverse through address dependent chunks.
 type Traverser interface {
 	// Traverse iterates through each address related to the supplied one, if possible.
-	Traverse(context.Context, swarm.Address, swarm.AddressIterFunc) error
+	Traverse(context.Context, penguin.Address, penguin.AddressIterFunc) error
 }
 
 // New constructs for a new Traverser.
@@ -38,8 +38,8 @@ type service struct {
 }
 
 // Traverse implements Traverser.Traverse method.
-func (s *service) Traverse(ctx context.Context, addr swarm.Address, iterFn swarm.AddressIterFunc) error {
-	processBytes := func(ref swarm.Address) error {
+func (s *service) Traverse(ctx context.Context, addr penguin.Address, iterFn penguin.AddressIterFunc) error {
+	processBytes := func(ref penguin.Address) error {
 		j, _, err := joiner.New(ctx, s.store, ref)
 		if err != nil {
 			return fmt.Errorf("traversal: joiner error on %q: %w", ref, err)

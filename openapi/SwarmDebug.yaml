@@ -1,25 +1,25 @@
 openapi: 3.0.3
 info:
   version: 0.6.0
-  title: Bee Debug API
-  description: "A list of the currently provided debug interfaces to interact with the bee node"
+  title: Pen Debug API
+  description: "A list of the currently provided debug interfaces to interact with the pen node"
 
 security:
   - {}
 
 externalDocs:
-  description: Browse the documentation @ the Swarm Docs
-  url: "https://docs.swarm.eth"
+  description: Browse the documentation @ the Penguin Docs
+  url: "https://docs.penguin.eth"
 
 servers:
   - url: "http://{apiRoot}:{port}"
     variables:
       apiRoot:
         default: "localhost"
-        description: Base address of the local bee node debug API
+        description: Base address of the local pen node debug API
       port:
         default: "1635"
-        description: Service port provided in bee node config
+        description: Service port provided in pen node config
 
 paths:
   "/addresses":
@@ -33,9 +33,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Addresses"
+                $ref: "PenguinCommon.yaml#/components/schemas/Addresses"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -50,9 +50,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Balances"
+                $ref: "PenguinCommon.yaml#/components/schemas/Balances"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -65,20 +65,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       responses:
         "200":
           description: Balance with the specific peer
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Balance"
+                $ref: "PenguinCommon.yaml#/components/schemas/Balance"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -93,9 +93,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Peers"
+                $ref: "PenguinCommon.yaml#/components/schemas/Peers"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -110,9 +110,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Balances"
+                $ref: "PenguinCommon.yaml#/components/schemas/Balances"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -125,20 +125,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       responses:
         "200":
           description: Past-due consumption balance with the specific peer
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Balance"
+                $ref: "PenguinCommon.yaml#/components/schemas/Balance"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ChequebookAddress"
+                $ref: "PenguinCommon.yaml#/components/schemas/ChequebookAddress"
 
   "/chequebook/balance":
     get:
@@ -166,9 +166,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ChequebookBalance"
+                $ref: "PenguinCommon.yaml#/components/schemas/ChequebookBalance"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -181,20 +181,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of chunk
+          description: Penguin address of chunk
       responses:
         "200":
           description: Chunk exists
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         default:
           description: Default response
     delete:
@@ -205,20 +205,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of chunk
+          description: Penguin address of chunk
       responses:
         "200":
           description: Chunk exists
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         default:
           description: Default response
 
@@ -232,7 +232,7 @@ paths:
           allowReserved: true
           name: multiAddress
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/MultiAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/MultiAddress"
           required: true
           description: Underlay address of peer
       responses:
@@ -241,11 +241,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Address"
+                $ref: "PenguinCommon.yaml#/components/schemas/Address"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -260,7 +260,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ReserveState"
+                $ref: "PenguinCommon.yaml#/components/schemas/ReserveState"
         default:
           description: Default response
 
@@ -275,7 +275,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ChainState"
+                $ref: "PenguinCommon.yaml#/components/schemas/ChainState"
         default:
           description: Default response
 
@@ -290,7 +290,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Status"
+                $ref: "PenguinCommon.yaml#/components/schemas/Status"
         default:
           description: Default response
 
@@ -305,7 +305,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Peers"
+                $ref: "PenguinCommon.yaml#/components/schemas/Peers"
         default:
           description: Default response
 
@@ -318,20 +318,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       responses:
         "200":
           description: Disconnected peer
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Response"
+                $ref: "PenguinCommon.yaml#/components/schemas/Response"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -344,22 +344,22 @@ paths:
         - in: path
           name: peer-id
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       responses:
         "200":
           description: Returns round trip time for given peer
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/RttMs"
+                $ref: "PenguinCommon.yaml#/components/schemas/RttMs"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -374,7 +374,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Status"
+                $ref: "PenguinCommon.yaml#/components/schemas/Status"
         default:
           description: Default response
 
@@ -387,20 +387,20 @@ paths:
         - in: path
           name: address
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       responses:
         "200":
           description: Amount of sent or received from settlements with a peer
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Settlement"
+                $ref: "PenguinCommon.yaml#/components/schemas/Settlement"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -415,9 +415,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Settlements"
+                $ref: "PenguinCommon.yaml#/components/schemas/Settlements"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -432,9 +432,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Settlements"
+                $ref: "PenguinCommon.yaml#/components/schemas/Settlements"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -446,11 +446,11 @@ paths:
         - Connectivity
       responses:
         "200":
-          description: Swarm topology of the bee node
+          description: Penguin topology of the pen node
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/PenTopology"
+                $ref: "PenguinCommon.yaml#/components/schemas/PenTopology"
 
   "/welcome-message":
     get:
@@ -463,9 +463,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/WelcomeMessage"
+                $ref: "PenguinCommon.yaml#/components/schemas/WelcomeMessage"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     post:
@@ -476,18 +476,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "SwarmCommon.yaml#/components/schemas/WelcomeMessage"
+              $ref: "PenguinCommon.yaml#/components/schemas/WelcomeMessage"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/Status"
+                $ref: "PenguinCommon.yaml#/components/schemas/Status"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -498,9 +498,9 @@ paths:
         - in: path
           name: peer-id
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       tags:
         - Chequebook
       responses:
@@ -509,11 +509,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/SwapCashoutStatus"
+                $ref: "PenguinCommon.yaml#/components/schemas/SwapCashoutStatus"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
     post:
@@ -522,11 +522,11 @@ paths:
         - in: path
           name: peer-id
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
-        - $ref: "SwarmCommon.yaml#/components/parameters/GasPriceParameter"
-        - $ref: "SwarmCommon.yaml#/components/parameters/GasLimitParameter"
+          description: Penguin address of peer
+        - $ref: "PenguinCommon.yaml#/components/parameters/GasPriceParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/GasLimitParameter"
       tags:
         - Chequebook
       responses:
@@ -535,11 +535,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/TransactionResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/TransactionResponse"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -550,9 +550,9 @@ paths:
         - in: path
           name: peer-id
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/SwarmAddress"
+            $ref: "PenguinCommon.yaml#/components/schemas/PenguinAddress"
           required: true
-          description: Swarm address of peer
+          description: Penguin address of peer
       tags:
         - Chequebook
       responses:
@@ -561,11 +561,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ChequePeerResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ChequePeerResponse"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -580,11 +580,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/ChequeAllPeersResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/ChequeAllPeersResponse"
         "404":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -598,7 +598,7 @@ paths:
             type: integer
           required: true
           description: amount of tokens to deposit
-        - $ref: "SwarmCommon.yaml#/components/parameters/GasPriceParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/GasPriceParameter"
       tags:
         - Chequebook
       responses:
@@ -607,11 +607,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/TransactionResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/TransactionResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -625,7 +625,7 @@ paths:
             type: integer
           required: true
           description: amount of tokens to withdraw
-        - $ref: "SwarmCommon.yaml#/components/parameters/GasPriceParameter"
+        - $ref: "PenguinCommon.yaml#/components/parameters/GasPriceParameter"
       tags:
         - Chequebook
       responses:
@@ -634,11 +634,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/TransactionResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/TransactionResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/404"
+          $ref: "PenguinCommon.yaml#/components/responses/404"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response
 
@@ -651,7 +651,7 @@ paths:
         - in: path
           name: uid
           schema:
-            $ref: "SwarmCommon.yaml#/components/schemas/Uid"
+            $ref: "PenguinCommon.yaml#/components/schemas/Uid"
           required: true
           description: Uid
       responses:
@@ -660,12 +660,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "SwarmCommon.yaml#/components/schemas/NewTagDebugResponse"
+                $ref: "PenguinCommon.yaml#/components/schemas/NewTagDebugResponse"
         "400":
-          $ref: "SwarmCommon.yaml#/components/responses/400"
+          $ref: "PenguinCommon.yaml#/components/responses/400"
         "403":
-          $ref: "SwarmCommon.yaml#/components/responses/403"
+          $ref: "PenguinCommon.yaml#/components/responses/403"
         "500":
-          $ref: "SwarmCommon.yaml#/components/responses/500"
+          $ref: "PenguinCommon.yaml#/components/responses/500"
         default:
           description: Default response

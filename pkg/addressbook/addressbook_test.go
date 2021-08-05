@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/pen"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 
 	ma "github.com/multiformats/go-multiaddr"
 )
@@ -28,8 +28,8 @@ func TestInMem(t *testing.T) {
 
 func run(t *testing.T, f bookFunc) {
 	store := f(t)
-	addr1 := swarm.NewAddress([]byte{0, 1, 2, 3})
-	addr2 := swarm.NewAddress([]byte{0, 1, 2, 4})
+	addr1 := penguin.NewAddress([]byte{0, 1, 2, 3})
+	addr2 := penguin.NewAddress([]byte{0, 1, 2, 4})
 	multiaddr, err := ma.NewMultiaddr("/ip4/1.1.1.1")
 	if err != nil {
 		t.Fatal(err)

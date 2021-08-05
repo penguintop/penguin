@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/p2p"
 	"github.com/penguintop/penguin/pkg/pricing"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -38,21 +38,21 @@ type Interface interface {
 	//
 	// This has to be called (always in combination with Release) before a
 	// Credit action to prevent overspending in case of concurrent requests.
-	Reserve(ctx context.Context, peer swarm.Address, price uint64) error
+	Reserve(ctx context.Context, peer penguin.Address, price uint64) error
 	// Release releases the reserved funds.
-	Release(peer swarm.Address, price uint64)
+	Release(peer penguin.Address, price uint64)
 	// Credit increases the balance the peer has with us (we "pay" the peer).
-	Credit(peer swarm.Address, price uint64) error
+	Credit(peer penguin.Address, price uint64) error
 	// PrepareDebit returns an accounting Action for the later debit to be executed on and to implement shadowing a possibly credited part of reserve on the other side.
-	PrepareDebit(peer swarm.Address, price uint64) Action
+	PrepareDebit(peer penguin.Address, price uint64) Action
 	// Balance returns the current balance for the given peer.
-	Balance(peer swarm.Address) (*big.Int, error)
+	Balance(peer penguin.Address) (*big.Int, error)
 	// SurplusBalance returns the current surplus balance for the given peer.
-	SurplusBalance(peer swarm.Address) (*big.Int, error)
+	SurplusBalance(peer penguin.Address) (*big.Int, error)
 	// Balances returns balances for all known peers.
 	Balances() (map[string]*big.Int, error)
 	// CompensatedBalance returns the current balance deducted by current surplus balance for the given peer.
-	CompensatedBalance(peer swarm.Address) (*big.Int, error)
+	CompensatedBalance(peer penguin.Address) (*big.Int, error)
 	// CompensatedBalances returns the compensated balances for all known peers.
 	CompensatedBalances() (map[string]*big.Int, error)
 }
@@ -69,16 +69,16 @@ type Action interface {
 type debitAction struct {
 	accounting     *Accounting
 	price          *big.Int
-	peer           swarm.Address
+	peer           penguin.Address
 	accountingPeer *accountingPeer
 	applied        bool
 }
 
 // PayFunc is the function used for async monetary settlement
-type PayFunc func(context.Context, swarm.Address, *big.Int)
+type PayFunc func(context.Context, penguin.Address, *big.Int)
 
 // RefreshFunc is the function used for sync time-based settlement
-type RefreshFunc func(context.Context, swarm.Address, *big.Int, *big.Int) (*big.Int, int64, error)
+type RefreshFunc func(context.Context, penguin.Address, *big.Int, *big.Int) (*big.Int, int64, error)
 
 // accountingPeer holds all in-memory accounting information for one peer.
 type accountingPeer struct {
@@ -157,7 +157,7 @@ func NewAccounting(
 }
 
 // Reserve reserves a portion of the balance for peer and attempts settlements if necessary.
-func (a *Accounting) Reserve(ctx context.Context, peer swarm.Address, price uint64) error {
+func (a *Accounting) Reserve(ctx context.Context, peer penguin.Address, price uint64) error {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -221,7 +221,7 @@ func (a *Accounting) Reserve(ctx context.Context, peer swarm.Address, price uint
 }
 
 // Release releases reserved funds.
-func (a *Accounting) Release(peer swarm.Address, price uint64) {
+func (a *Accounting) Release(peer penguin.Address, price uint64) {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -240,7 +240,7 @@ func (a *Accounting) Release(peer swarm.Address, price uint64) {
 
 // Credit increases the amount of credit we have with the given peer
 // (and decreases existing debt).
-func (a *Accounting) Credit(peer swarm.Address, price uint64) error {
+func (a *Accounting) Credit(peer penguin.Address, price uint64) error {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -270,7 +270,7 @@ func (a *Accounting) Credit(peer swarm.Address, price uint64) error {
 
 // Settle all debt with a peer. The lock on the accountingPeer must be held when
 // called.
-func (a *Accounting) settle(peer swarm.Address, balance *accountingPeer) error {
+func (a *Accounting) settle(peer penguin.Address, balance *accountingPeer) error {
 	now := a.timeNow().Unix()
 	timeElapsed := now - balance.refreshTimestamp
 
@@ -331,7 +331,7 @@ func (a *Accounting) settle(peer swarm.Address, balance *accountingPeer) error {
 }
 
 // Balance returns the current balance for the given peer.
-func (a *Accounting) Balance(peer swarm.Address) (balance *big.Int, err error) {
+func (a *Accounting) Balance(peer penguin.Address) (balance *big.Int, err error) {
 	err = a.store.Get(peerBalanceKey(peer), &balance)
 
 	if err != nil {
@@ -345,7 +345,7 @@ func (a *Accounting) Balance(peer swarm.Address) (balance *big.Int, err error) {
 }
 
 // SurplusBalance returns the current balance for the given peer.
-func (a *Accounting) SurplusBalance(peer swarm.Address) (balance *big.Int, err error) {
+func (a *Accounting) SurplusBalance(peer penguin.Address) (balance *big.Int, err error) {
 	err = a.store.Get(peerSurplusBalanceKey(peer), &balance)
 
 	if err != nil {
@@ -363,7 +363,7 @@ func (a *Accounting) SurplusBalance(peer swarm.Address) (balance *big.Int, err e
 }
 
 // CompensatedBalance returns balance decreased by surplus balance
-func (a *Accounting) CompensatedBalance(peer swarm.Address) (compensated *big.Int, err error) {
+func (a *Accounting) CompensatedBalance(peer penguin.Address) (compensated *big.Int, err error) {
 	surplus, err := a.SurplusBalance(peer)
 	if err != nil {
 		return nil, err
@@ -387,18 +387,18 @@ func (a *Accounting) CompensatedBalance(peer swarm.Address) (compensated *big.In
 }
 
 // peerBalanceKey returns the balance storage key for the given peer.
-func peerBalanceKey(peer swarm.Address) string {
+func peerBalanceKey(peer penguin.Address) string {
 	return fmt.Sprintf("%s%s", balancesPrefix, peer.String())
 }
 
 // peerSurplusBalanceKey returns the surplus balance storage key for the given peer
-func peerSurplusBalanceKey(peer swarm.Address) string {
+func peerSurplusBalanceKey(peer penguin.Address) string {
 	return fmt.Sprintf("%s%s", balancesSurplusPrefix, peer.String())
 }
 
-// getAccountingPeer returns the accountingPeer for a given swarm address.
+// getAccountingPeer returns the accountingPeer for a given penguin address.
 // If not found in memory it will initialize it.
-func (a *Accounting) getAccountingPeer(peer swarm.Address) *accountingPeer {
+func (a *Accounting) getAccountingPeer(peer penguin.Address) *accountingPeer {
 	a.accountingPeersMu.Lock()
 	defer a.accountingPeersMu.Unlock()
 
@@ -496,40 +496,40 @@ func (a *Accounting) CompensatedBalances() (map[string]*big.Int, error) {
 }
 
 // balanceKeyPeer returns the embedded peer from the balance storage key.
-func balanceKeyPeer(key []byte) (swarm.Address, error) {
+func balanceKeyPeer(key []byte) (penguin.Address, error) {
 	k := string(key)
 
 	split := strings.SplitAfter(k, balancesPrefix)
 	if len(split) != 2 {
-		return swarm.ZeroAddress, errors.New("no peer in key")
+		return penguin.ZeroAddress, errors.New("no peer in key")
 	}
 
-	addr, err := swarm.ParseHexAddress(split[1])
+	addr, err := penguin.ParseHexAddress(split[1])
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 
 	return addr, nil
 }
 
-func surplusBalanceKeyPeer(key []byte) (swarm.Address, error) {
+func surplusBalanceKeyPeer(key []byte) (penguin.Address, error) {
 	k := string(key)
 
 	split := strings.SplitAfter(k, balancesSurplusPrefix)
 	if len(split) != 2 {
-		return swarm.ZeroAddress, errors.New("no peer in key")
+		return penguin.ZeroAddress, errors.New("no peer in key")
 	}
 
-	addr, err := swarm.ParseHexAddress(split[1])
+	addr, err := penguin.ParseHexAddress(split[1])
 	if err != nil {
-		return swarm.ZeroAddress, err
+		return penguin.ZeroAddress, err
 	}
 
 	return addr, nil
 }
 
 // PeerDebt returns the positive part of the sum of the outstanding balance and the shadow reserve
-func (a *Accounting) PeerDebt(peer swarm.Address) (*big.Int, error) {
+func (a *Accounting) PeerDebt(peer penguin.Address) (*big.Int, error) {
 
 	accountingPeer := a.getAccountingPeer(peer)
 	accountingPeer.lock.Lock()
@@ -557,7 +557,7 @@ func (a *Accounting) PeerDebt(peer swarm.Address) (*big.Int, error) {
 
 // shadowBalance returns the current debt reduced by any potentially debitable amount stored in shadowReservedBalance
 // this represents how much less our debt could potentially be seen by the other party if it's ahead with processing credits corresponding to our shadow reserve
-func (a *Accounting) shadowBalance(peer swarm.Address) (shadowBalance *big.Int, err error) {
+func (a *Accounting) shadowBalance(peer penguin.Address) (shadowBalance *big.Int, err error) {
 	accountingPeer := a.getAccountingPeer(peer)
 	balance := new(big.Int)
 	zero := big.NewInt(0)
@@ -593,7 +593,7 @@ func (a *Accounting) shadowBalance(peer swarm.Address) (shadowBalance *big.Int, 
 }
 
 // NotifyPaymentSent is triggered by async monetary settlement to update our balance and remove it's price from the shadow reserve
-func (a *Accounting) NotifyPaymentSent(peer swarm.Address, amount *big.Int, receivedError error) {
+func (a *Accounting) NotifyPaymentSent(peer penguin.Address, amount *big.Int, receivedError error) {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -629,7 +629,7 @@ func (a *Accounting) NotifyPaymentSent(peer swarm.Address, amount *big.Int, rece
 }
 
 // NotifyPaymentThreshold should be called to notify accounting of changes in the payment threshold
-func (a *Accounting) NotifyPaymentThreshold(peer swarm.Address, paymentThreshold *big.Int) error {
+func (a *Accounting) NotifyPaymentThreshold(peer penguin.Address, paymentThreshold *big.Int) error {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -640,7 +640,7 @@ func (a *Accounting) NotifyPaymentThreshold(peer swarm.Address, paymentThreshold
 }
 
 // NotifyPayment is called by Settlement when we receive a payment.
-func (a *Accounting) NotifyPaymentReceived(peer swarm.Address, amount *big.Int) error {
+func (a *Accounting) NotifyPaymentReceived(peer penguin.Address, amount *big.Int) error {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -713,7 +713,7 @@ func (a *Accounting) NotifyPaymentReceived(peer swarm.Address, amount *big.Int) 
 }
 
 // NotifyRefreshmentReceived is called by pseudosettle when we receive a time based settlement.
-func (a *Accounting) NotifyRefreshmentReceived(peer swarm.Address, amount *big.Int) error {
+func (a *Accounting) NotifyRefreshmentReceived(peer penguin.Address, amount *big.Int) error {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -741,7 +741,7 @@ func (a *Accounting) NotifyRefreshmentReceived(peer swarm.Address, amount *big.I
 }
 
 // PrepareDebit prepares a debit operation by increasing the shadowReservedBalance
-func (a *Accounting) PrepareDebit(peer swarm.Address, price uint64) Action {
+func (a *Accounting) PrepareDebit(peer penguin.Address, price uint64) Action {
 	accountingPeer := a.getAccountingPeer(peer)
 
 	accountingPeer.lock.Lock()
@@ -760,7 +760,7 @@ func (a *Accounting) PrepareDebit(peer swarm.Address, price uint64) Action {
 	}
 }
 
-func (a *Accounting) increaseBalance(peer swarm.Address, accountingPeer *accountingPeer, price *big.Int) (*big.Int, error) {
+func (a *Accounting) increaseBalance(peer penguin.Address, accountingPeer *accountingPeer, price *big.Int) (*big.Int, error) {
 	cost := new(big.Int).Set(price)
 	// see if peer has surplus balance to deduct this transaction of
 

@@ -8,7 +8,7 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/penguintop/penguin/pkg/property"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/transaction"
 	"github.com/penguintop/penguin/pkg/xwcclient"
 	"github.com/penguintop/penguin/pkg/xwcfmt"
@@ -28,7 +28,7 @@ type Interface interface {
 
 type stakingContract struct {
 	owner                  common.Address
-	swarmNode              swarm.Address
+	penguinNode              penguin.Address
 	stakingContractAddress common.Address
 	penTokenAddress        common.Address
 	transactionService     transaction.Service
@@ -90,14 +90,14 @@ func (s *stakingContract) Staking(ctx context.Context) (bool, error) {
 
 func New(
 	owner common.Address,
-	swarmNode swarm.Address,
+	penguinNode penguin.Address,
 	stakingContractAddress common.Address,
 	penTokenAddress common.Address,
 	transactionService transaction.Service,
 ) Interface {
 	return &stakingContract{
 		owner:                  owner,
-		swarmNode:              swarmNode,
+		penguinNode:              penguinNode,
 		stakingContractAddress: stakingContractAddress,
 		penTokenAddress:        penTokenAddress,
 		transactionService:     transactionService,
@@ -144,7 +144,7 @@ func (s *stakingContract) sendStakingTransaction(ctx context.Context) (*xwctypes
 
 		TxType:     transaction.TxTypeInvokeContract,
 		InvokeApi:  "Staking",
-		InvokeArgs: s.swarmNode.String(),
+		InvokeArgs: s.penguinNode.String(),
 	}
 
 	txHash, err := s.transactionService.Send(ctx, request)

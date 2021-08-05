@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -37,7 +37,7 @@ func terminalPromptPassword(cmd *cobra.Command, r passwordReader, title string) 
 }
 
 func terminalPromptCreatePassword(cmd *cobra.Command, r passwordReader) (password string, err error) {
-	cmd.Println("Bee node is booting up for the first time. Please provide a new password.")
+	cmd.Println("Pen node is booting up for the first time. Please provide a new password.")
 	p1, err := terminalPromptPassword(cmd, r, "Password")
 	if err != nil {
 		return "", err

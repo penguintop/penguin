@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/penguintop/penguin/pkg/crypto"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/xwcfmt"
 	"github.com/penguintop/penguin/pkg/xwcspv"
 )
@@ -31,7 +31,7 @@ func NewMatcher(backend Backend, signer types.Signer) *Matcher {
 	}
 }
 
-func (m Matcher) Matches(ctx context.Context, tx []byte, networkID uint64, senderOverlay swarm.Address) (bool, error) {
+func (m Matcher) Matches(ctx context.Context, tx []byte, networkID uint64, senderOverlay penguin.Address) (bool, error) {
 	incomingTx := common.BytesToHash(tx)
 
 	nTx, isPending, err := m.backend.TransactionByHash(ctx, incomingTx)

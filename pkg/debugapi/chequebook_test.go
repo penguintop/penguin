@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook/mock"
 	swapmock "github.com/penguintop/penguin/pkg/settlement/swap/mock"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestChequebookBalance(t *testing.T) {
@@ -242,11 +242,11 @@ func TestChequebookDeposit(t *testing.T) {
 }
 
 func TestChequebookLastCheques(t *testing.T) {
-	addr1 := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
-	addr2 := swarm.MustParseHexAddress("2000000000000000000000000000000000000000000000000000000000000000")
-	addr3 := swarm.MustParseHexAddress("3000000000000000000000000000000000000000000000000000000000000000")
-	addr4 := swarm.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
-	addr5 := swarm.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
+	addr1 := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	addr2 := penguin.MustParseHexAddress("2000000000000000000000000000000000000000000000000000000000000000")
+	addr3 := penguin.MustParseHexAddress("3000000000000000000000000000000000000000000000000000000000000000")
+	addr4 := penguin.MustParseHexAddress("4000000000000000000000000000000000000000000000000000000000000000")
+	addr5 := penguin.MustParseHexAddress("5000000000000000000000000000000000000000000000000000000000000000")
 	beneficiary := common.HexToAddress("0xfff5")
 	beneficiary1 := common.HexToAddress("0xfff0")
 	beneficiary2 := common.HexToAddress("0xfff1")
@@ -403,7 +403,7 @@ func TestChequebookLastCheques(t *testing.T) {
 
 func TestChequebookLastChequesPeer(t *testing.T) {
 
-	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	addr := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
 	beneficiary0 := common.HexToAddress("0xfff5")
 	beneficiary1 := common.HexToAddress("0xfff0")
 	cumulativePayout1 := big.NewInt(700)
@@ -411,7 +411,7 @@ func TestChequebookLastChequesPeer(t *testing.T) {
 	chequebookAddress := common.HexToAddress("0xeee1")
 	sig := make([]byte, 65)
 
-	lastSentChequeFunc := func(swarm.Address) (*chequebook.SignedCheque, error) {
+	lastSentChequeFunc := func(penguin.Address) (*chequebook.SignedCheque, error) {
 
 		sig := make([]byte, 65)
 
@@ -427,7 +427,7 @@ func TestChequebookLastChequesPeer(t *testing.T) {
 		return lastSentCheque, nil
 	}
 
-	lastReceivedChequeFunc := func(swarm.Address) (*chequebook.SignedCheque, error) {
+	lastReceivedChequeFunc := func(penguin.Address) (*chequebook.SignedCheque, error) {
 
 		lastReceivedCheque := &chequebook.SignedCheque{
 			Cheque: chequebook.Cheque{
@@ -472,10 +472,10 @@ func TestChequebookLastChequesPeer(t *testing.T) {
 
 func TestChequebookCashout(t *testing.T) {
 
-	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	addr := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
 	deployCashingHash := common.HexToHash("0xffff")
 
-	cashChequeFunc := func(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+	cashChequeFunc := func(ctx context.Context, peer penguin.Address) (common.Hash, error) {
 		return deployCashingHash, nil
 	}
 
@@ -497,12 +497,12 @@ func TestChequebookCashout(t *testing.T) {
 
 func TestChequebookCashout_CustomGas(t *testing.T) {
 
-	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	addr := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
 	deployCashingHash := common.HexToHash("0xffff")
 
 	var price *big.Int
 	var limit uint64
-	cashChequeFunc := func(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+	cashChequeFunc := func(ctx context.Context, peer penguin.Address) (common.Hash, error) {
 		price = sctx.GetGasPrice(ctx)
 		limit = sctx.GetGasLimit(ctx)
 		return deployCashingHash, nil
@@ -537,14 +537,14 @@ func TestChequebookCashout_CustomGas(t *testing.T) {
 func TestChequebookCashoutStatus(t *testing.T) {
 
 	actionTxHash := common.HexToHash("0xacfe")
-	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	addr := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
 	beneficiary := common.HexToAddress("0xfff0")
 	recipientAddress := common.HexToAddress("efff")
 	totalPayout := big.NewInt(100)
 	cumulativePayout := big.NewInt(700)
 	uncashedAmount := big.NewInt(200)
 	chequebookAddress := common.HexToAddress("0xcfec")
-	peer := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	peer := penguin.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
 
 	sig := make([]byte, 65)
 	cheque := &chequebook.SignedCheque{
@@ -567,7 +567,7 @@ func TestChequebookCashoutStatus(t *testing.T) {
 	}
 
 	t.Run("with result", func(t *testing.T) {
-		cashoutStatusFunc := func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {
+		cashoutStatusFunc := func(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error) {
 			status := &chequebook.CashoutStatus{
 				Last: &chequebook.LastCashout{
 					TxHash:   actionTxHash,
@@ -611,7 +611,7 @@ func TestChequebookCashoutStatus(t *testing.T) {
 	})
 
 	t.Run("without result", func(t *testing.T) {
-		cashoutStatusFunc := func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {
+		cashoutStatusFunc := func(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error) {
 			status := &chequebook.CashoutStatus{
 				Last: &chequebook.LastCashout{
 					TxHash:   actionTxHash,
@@ -651,7 +651,7 @@ func TestChequebookCashoutStatus(t *testing.T) {
 	})
 
 	t.Run("without last", func(t *testing.T) {
-		cashoutStatusFunc := func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {
+		cashoutStatusFunc := func(ctx context.Context, peer penguin.Address) (*chequebook.CashoutStatus, error) {
 			status := &chequebook.CashoutStatus{
 				Last:           nil,
 				UncashedAmount: uncashedAmount,

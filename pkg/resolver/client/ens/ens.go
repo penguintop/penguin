@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -15,16 +15,16 @@ import (
 	goens "github.com/wealdtech/go-ens/v3"
 
 	"github.com/penguintop/penguin/pkg/resolver/client"
-	"github.com/penguintop/penguin/pkg/swarm"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 const (
 	defaultENSContractAddress = "00000000000C2E074eC69A0dFb2997BA6C7d2e1e"
-	swarmContentHashPrefix    = "/swarm/"
+	penguinContentHashPrefix    = "/penguin/"
 )
 
-// Address is the swarm pen address.
-type Address = swarm.Address
+// Address is the penguin pen address.
+type Address = penguin.Address
 
 // Make sure Client implements the resolver.Client interface.
 var _ client.Interface = (*Client)(nil)
@@ -37,7 +37,7 @@ var (
 	ErrResolveFailed = errors.New("resolve failed")
 	// ErrInvalidContentHash denotes that the value of the contenthash record is
 	// not valid.
-	ErrInvalidContentHash = errors.New("invalid swarm content hash")
+	ErrInvalidContentHash = errors.New("invalid penguin content hash")
 	// errNotImplemented denotes that the function has not been implemented.
 	errNotImplemented = errors.New("function not implemented")
 	// errNameNotRegistered denotes that the name is not registered.
@@ -111,22 +111,22 @@ func (c *Client) Endpoint() string {
 // Resolve implements the resolver.Client interface.
 func (c *Client) Resolve(name string) (Address, error) {
 	if c.resolveFn == nil {
-		return swarm.ZeroAddress, fmt.Errorf("resolveFn: %w", errNotImplemented)
+		return penguin.ZeroAddress, fmt.Errorf("resolveFn: %w", errNotImplemented)
 	}
 
 	hash, err := c.resolveFn(c.registry, common.HexToAddress(c.contractAddr), name)
 	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("%v: %w", err, ErrResolveFailed)
+		return penguin.ZeroAddress, fmt.Errorf("%v: %w", err, ErrResolveFailed)
 	}
 
 	// Ensure that the content hash string is in a valid format, eg.
-	// "/swarm/<address>".
-	if !strings.HasPrefix(hash, swarmContentHashPrefix) {
-		return swarm.ZeroAddress, fmt.Errorf("contenthash %s: %w", hash, ErrInvalidContentHash)
+	// "/penguin/<address>".
+	if !strings.HasPrefix(hash, penguinContentHashPrefix) {
+		return penguin.ZeroAddress, fmt.Errorf("contenthash %s: %w", hash, ErrInvalidContentHash)
 	}
 
 	// Trim the prefix and try to parse the result as a pen address.
-	return swarm.ParseHexAddress(strings.TrimPrefix(hash, swarmContentHashPrefix))
+	return penguin.ParseHexAddress(strings.TrimPrefix(hash, penguinContentHashPrefix))
 }
 
 // Close closes the RPC connection with the client, terminating all unfinished

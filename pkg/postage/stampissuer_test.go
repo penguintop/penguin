@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/postage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestStampIssuerMarshalling tests the idempotence  of binary marshal/unmarshal.
@@ -45,7 +45,7 @@ func newTestStampIssuer(t *testing.T) *postage.StampIssuer {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = st.Inc(swarm.NewAddress(addr))
+		err = st.Inc(penguin.NewAddress(addr))
 		if err != nil {
 			t.Fatal(err)
 		}

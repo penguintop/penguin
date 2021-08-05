@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,7 +8,7 @@ package bmtpool
 
 import (
 	"github.com/penguintop/penguin/pkg/bmt"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 const Capacity = 32
@@ -16,7 +16,7 @@ const Capacity = 32
 var instance *bmt.Pool
 
 func init() {
-	instance = bmt.NewPool(bmt.NewConf(swarm.NewHasher, swarm.BmtBranches, Capacity))
+	instance = bmt.NewPool(bmt.NewConf(penguin.NewHasher, penguin.BmtBranches, Capacity))
 }
 
 // Get a bmt Hasher instance.

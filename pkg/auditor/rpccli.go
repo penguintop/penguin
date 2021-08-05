@@ -48,7 +48,7 @@ func RequestServerTimestamp(baseUrl string, timeout uint64) (int64, error) {
 	return respServerTimestamp.Data, nil
 }
 
-func RequestTask(baseUrl string, timeout uint64, timestamp int64, xwcAddr string, xwcPubKey string, swarmNode string, signature string) (uint64, error) {
+func RequestTask(baseUrl string, timeout uint64, timestamp int64, xwcAddr string, xwcPubKey string, penguinNode string, signature string) (uint64, error) {
 	url := fmt.Sprintf("%s/api/getTask", baseUrl)
 
 	tr := &http.Transport{
@@ -62,7 +62,7 @@ func RequestTask(baseUrl string, timeout uint64, timestamp int64, xwcAddr string
 		Timestamp     int64  `json:"timestamp"`
 		XwcAddr       string `json:"xwc_addr"`
 		XwcSignPubkey string `json:"xwc_sign_pubkey"`
-		SwarmAddr     string `json:"swarm_addr"`
+		PenguinAddr     string `json:"penguin_addr"`
 		SignMsg       string `json:"sign_msg"`
 	}
 
@@ -70,7 +70,7 @@ func RequestTask(baseUrl string, timeout uint64, timestamp int64, xwcAddr string
 		Timestamp:     timestamp,
 		XwcAddr:       xwcAddr,
 		XwcSignPubkey: xwcPubKey,
-		SwarmAddr:     swarmNode,
+		PenguinAddr:     penguinNode,
 		SignMsg:       signature,
 	}
 	requestTaskBuf, err := json.Marshal(requestTaskJson)
@@ -110,7 +110,7 @@ func RequestTask(baseUrl string, timeout uint64, timestamp int64, xwcAddr string
 	return respTaskJson.Data.TaskId, nil
 }
 
-func RequestReportMerkleRoot(baseUrl string, timeout uint64, taskId uint64, xwcAddr string, xwcPubKey string, swarmNode string, signature string,
+func RequestReportMerkleRoot(baseUrl string, timeout uint64, taskId uint64, xwcAddr string, xwcPubKey string, penguinNode string, signature string,
 	pathData [][]string) (uint64, uint64, error) {
 	url := fmt.Sprintf("%s/api/reportMerkleRoot", baseUrl)
 
@@ -125,7 +125,7 @@ func RequestReportMerkleRoot(baseUrl string, timeout uint64, taskId uint64, xwcA
 		TaskId        uint64     `json:"task_id"`
 		XwcAddr       string     `json:"xwc_addr"`
 		XwcSignPubkey string     `json:"xwc_sign_pubkey"`
-		SwarmAddr     string     `json:"swarm_addr"`
+		PenguinAddr     string     `json:"penguin_addr"`
 		SignMsg       string     `json:"sign_msg"`
 		PathData      [][]string `json:"path_data"`
 	}
@@ -134,7 +134,7 @@ func RequestReportMerkleRoot(baseUrl string, timeout uint64, taskId uint64, xwcA
 		TaskId:        taskId,
 		XwcAddr:       xwcAddr,
 		XwcSignPubkey: xwcPubKey,
-		SwarmAddr:     swarmNode,
+		PenguinAddr:     penguinNode,
 		SignMsg:       signature,
 		PathData:      pathData,
 	}
@@ -176,8 +176,8 @@ func RequestReportMerkleRoot(baseUrl string, timeout uint64, taskId uint64, xwcA
 	return respReportMerkleRootJson.Data.TaskId, respReportMerkleRootJson.Data.PathInt, nil
 }
 
-func RequestReportPathData(baseUrl string, timeout uint64, taskId uint64, xwcAddr string, xwcPubKey string, swarmNode string, signature string,
-	pathData [][]string, swarmData string) error {
+func RequestReportPathData(baseUrl string, timeout uint64, taskId uint64, xwcAddr string, xwcPubKey string, penguinNode string, signature string,
+	pathData [][]string, penguinData string) error {
 	url := fmt.Sprintf("%s/api/reportPathData", baseUrl)
 
 	tr := &http.Transport{
@@ -191,20 +191,20 @@ func RequestReportPathData(baseUrl string, timeout uint64, taskId uint64, xwcAdd
 		TaskId        uint64     `json:"task_id"`
 		XwcAddr       string     `json:"xwc_addr"`
 		XwcSignPubkey string     `json:"xwc_sign_pubkey"`
-		SwarmAddr     string     `json:"swarm_addr"`
+		PenguinAddr     string     `json:"penguin_addr"`
 		SignMsg       string     `json:"sign_msg"`
 		PathData      [][]string `json:"path_data"`
-		SwarmData     string     `json:"swarm_data"`
+		PenguinData     string     `json:"penguin_data"`
 	}
 
 	requestReportPathDataJson := RequestReportPathDataJson{
 		TaskId:        taskId,
 		XwcAddr:       xwcAddr,
 		XwcSignPubkey: xwcPubKey,
-		SwarmAddr:     swarmNode,
+		PenguinAddr:     penguinNode,
 		SignMsg:       signature,
 		PathData:      pathData,
-		SwarmData:     swarmData,
+		PenguinData:     penguinData,
 	}
 
 	requestReportPathDataBuf, err := json.Marshal(requestReportPathDataJson)

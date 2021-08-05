@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,6 +7,7 @@ package debugapi_test
 import (
 	"crypto/ecdsa"
 	"encoding/hex"
+	pen "github.com/penguintop/penguin"
 	"github.com/penguintop/penguin/pkg/property"
 	"io/ioutil"
 	"net/http"
@@ -15,7 +16,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethersphere/bee"
 	accountingmock "github.com/penguintop/penguin/pkg/accounting/mock"
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/debugapi"
@@ -29,7 +29,7 @@ import (
 	chequebookmock "github.com/penguintop/penguin/pkg/settlement/swap/chequebook/mock"
 	swapmock "github.com/penguintop/penguin/pkg/settlement/swap/mock"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 	topologymock "github.com/penguintop/penguin/pkg/topology/mock"
@@ -38,7 +38,7 @@ import (
 )
 
 type testServerOptions struct {
-	Overlay            swarm.Address
+	Overlay            penguin.Address
 	PublicKey          ecdsa.PublicKey
 	PSSPublicKey       ecdsa.PublicKey
 	EthereumAddress    common.Address
@@ -111,7 +111,7 @@ func TestServer_Configure(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	overlay := swarm.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
+	overlay := penguin.MustParseHexAddress("ca1e9f3938cc1425c6061b96ad9eb93e134dfe8734ad490164ef20af9d1cf59c")
 	addresses := []multiaddr.Multiaddr{
 		mustMultiaddr(t, "/ip4/127.0.0.1/tcp/7071/p2p/16Uiu2HAmTBuJT9LvNmBiQiNoTsxE5mtNy6YG3paw79m94CRa9sRb"),
 		mustMultiaddr(t, "/ip4/192.168.0.101/tcp/7071/p2p/16Uiu2HAmTBuJT9LvNmBiQiNoTsxE5mtNy6YG3paw79m94CRa9sRb"),
@@ -174,7 +174,7 @@ func TestServer_Configure(t *testing.T) {
 	jsonhttptest.Request(t, client, http.MethodGet, "/readiness", http.StatusOK,
 		jsonhttptest.WithExpectedJSONResponse(debugapi.StatusResponse{
 			Status:  "ok",
-			Version: bee.Version,
+			Version: pen.Version,
 		}),
 	)
 	jsonhttptest.Request(t, client, http.MethodGet, "/addresses", http.StatusOK,
@@ -195,7 +195,7 @@ func testBasicRouter(t *testing.T, client *http.Client) {
 	jsonhttptest.Request(t, client, http.MethodGet, "/health", http.StatusOK,
 		jsonhttptest.WithExpectedJSONResponse(debugapi.StatusResponse{
 			Status:  "ok",
-			Version: bee.Version,
+			Version: pen.Version,
 		}),
 	)
 

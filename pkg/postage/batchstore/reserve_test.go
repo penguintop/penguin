@@ -1,4 +1,4 @@
-// Copyright 2021 The Swarm Authors. All rights reserved.
+// Copyright 2021 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import (
 	postagetest "github.com/penguintop/penguin/pkg/postage/testing"
 	"github.com/penguintop/penguin/pkg/statestore/leveldb"
 	"github.com/penguintop/penguin/pkg/storage"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // random advance on the blockchain
@@ -64,7 +64,7 @@ func TestBatchStoreUnreserveEvents(t *testing.T) {
 	t.Run("new batches only", func(t *testing.T) {
 		// iterate starting from batchstore.DefaultDepth to maxPO
 		_, radius := batchstore.GetReserve(bStore)
-		for step := 0; radius < swarm.MaxPO; step++ {
+		for step := 0; radius < penguin.MaxPO; step++ {
 			cs, err := nextChainState(bStore)
 			if err != nil {
 				t.Fatal(err)
@@ -146,7 +146,7 @@ func TestBatchStoreUnreserveAll(t *testing.T) {
 	var batches [][]byte
 	// iterate starting from batchstore.DefaultDepth to maxPO
 	_, depth := batchstore.GetReserve(bStore)
-	for step := 0; depth < swarm.MaxPO; step++ {
+	for step := 0; depth < penguin.MaxPO; step++ {
 		cs, err := nextChainState(bStore)
 		if err != nil {
 			t.Fatal(err)
@@ -298,7 +298,7 @@ func checkReserve(bStore postage.Storer, unreserved map[string]uint8) (uint8, er
 				return true, fmt.Errorf("inconsistent reserve radius: %d <= %d", outer.Uint64(), inner.Uint64())
 			}
 			size += batchstore.Exp2(b.Depth - bDepth - 1)
-		} else if bDepth != swarm.MaxPO {
+		} else if bDepth != penguin.MaxPO {
 			return true, fmt.Errorf("batch below limit expected to be fully unreserved. got found=%v, radius=%d", found, bDepth)
 		}
 		return false, nil
@@ -831,7 +831,7 @@ func TestBatchStore_EvictExpired(t *testing.T) {
 	}
 
 	// expect the 5 to be preserved and the rest to be unreserved
-	checkUnreserved(t, unreserved, batches[:3], swarm.MaxPO+1)
+	checkUnreserved(t, unreserved, batches[:3], penguin.MaxPO+1)
 	checkUnreserved(t, unreserved, batches[3:], 4)
 
 	// check that the batches is actually deleted from

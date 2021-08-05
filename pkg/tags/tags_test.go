@@ -25,7 +25,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/logging"
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestAll(t *testing.T) {
@@ -147,7 +147,7 @@ func TestPersistence(t *testing.T) {
 	ta.Seen = 2
 	ta.Split = 10
 	ta.Stored = 8
-	_, err = ta.DoneSplit(swarm.ZeroAddress)
+	_, err = ta.DoneSplit(penguin.ZeroAddress)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -12,7 +12,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/postage"
 	postagetesting "github.com/penguintop/penguin/pkg/postage/testing"
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 // TestStamperStamping tests if the stamp created by the stamper is valid.
@@ -27,14 +27,14 @@ func TestStamperStamping(t *testing.T) {
 		t.Fatal(err)
 	}
 	signer := crypto.NewDefaultSigner(privKey)
-	createStamp := func(t *testing.T, stamper postage.Stamper) (swarm.Address, *postage.Stamp) {
+	createStamp := func(t *testing.T, stamper postage.Stamper) (penguin.Address, *postage.Stamp) {
 		t.Helper()
 		h := make([]byte, 32)
 		_, err = io.ReadFull(crand.Reader, h)
 		if err != nil {
 			t.Fatal(err)
 		}
-		chunkAddr := swarm.NewAddress(h)
+		chunkAddr := penguin.NewAddress(h)
 		stamp, err := stamper.Stamp(chunkAddr)
 		if err != nil {
 			t.Fatal(err)
@@ -59,7 +59,7 @@ func TestStamperStamping(t *testing.T) {
 		chunkAddr, stamp := createStamp(t, stamper)
 		a := chunkAddr.Bytes()
 		a[0] ^= 0xff
-		if err := stamp.Valid(swarm.NewAddress(a), owner); err != postage.ErrOwnerMismatch {
+		if err := stamp.Valid(penguin.NewAddress(a), owner); err != postage.ErrOwnerMismatch {
 			t.Fatalf("expected ErrOwnerMismatch, got %v", err)
 		}
 	})
@@ -87,7 +87,7 @@ func TestStamperStamping(t *testing.T) {
 			// i.e., fall into the same collision bucket
 			h[0] = chunkAddr.Bytes()[0]
 			// calling Inc we pretend a stamp was issued to the address
-			err = st.Inc(swarm.NewAddress(h))
+			err = st.Inc(penguin.NewAddress(h))
 			if err != nil {
 				t.Fatal(err)
 			}

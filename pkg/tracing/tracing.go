@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -38,10 +38,10 @@ const LogField = "traceid"
 
 const (
 	// TraceContextHeaderName is the http header name used to propagate tracing context.
-	TraceContextHeaderName = "swarm-trace-id"
+	TraceContextHeaderName = "penguin-trace-id"
 
 	// TraceBaggageHeaderPrefix is the prefix for http headers used to propagate baggage.
-	TraceBaggageHeaderPrefix = "swarmctx-"
+	TraceBaggageHeaderPrefix = "penguinctx-"
 )
 
 // Tracer connect to a tracing server and handles tracing spans and contexts

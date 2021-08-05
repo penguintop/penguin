@@ -1,4 +1,4 @@
-// Copyright 2020 The Swarm Authors. All rights reserved.
+// Copyright 2020 The Penguin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -11,7 +11,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/penguintop/penguin/pkg/swarm"
+    "github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -34,7 +34,7 @@ type Driver interface {
 
 type PeerAdder interface {
 	// AddPeers is called when peers are added to the topology backlog
-	AddPeers(addr ...swarm.Address)
+	AddPeers(addr ...penguin.Address)
 }
 
 type ClosestPeerer interface {
@@ -42,7 +42,7 @@ type ClosestPeerer interface {
 	// given chunk address.
 	// This function will ignore peers with addresses provided in skipPeers.
 	// Returns topology.ErrWantSelf in case base is the closest to the address.
-	ClosestPeer(addr swarm.Address, includeSelf bool, skipPeers ...swarm.Address) (peerAddr swarm.Address, err error)
+	ClosestPeer(addr penguin.Address, includeSelf bool, skipPeers ...penguin.Address) (peerAddr penguin.Address, err error)
 }
 
 type EachPeerer interface {
@@ -58,15 +58,15 @@ type EachNeighbor interface {
 	// EachNeighborRev iterates from farthest bin to closest within the neighborhood.
 	EachNeighborRev(EachPeerFunc) error
 	// IsWithinDepth checks if an address is the within neighborhood.
-	IsWithinDepth(swarm.Address) bool
+	IsWithinDepth(penguin.Address) bool
 }
 
 // EachPeerFunc is a callback that is called with a peer and its PO
-type EachPeerFunc func(swarm.Address, uint8) (stop, jumpToNext bool, err error)
+type EachPeerFunc func(penguin.Address, uint8) (stop, jumpToNext bool, err error)
 
 // PeerInfo is a view of peer information exposed to a user.
 type PeerInfo struct {
-	Address swarm.Address       `json:"address"`
+	Address penguin.Address     `json:"address"`
 	Metrics *MetricSnapshotView `json:"metrics,omitempty"`
 }
 
