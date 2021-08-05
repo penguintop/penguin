@@ -28,13 +28,17 @@ def request(method,params):
 
 def safe_request(method,params):
     while True:
-        res = request(method,params)
-        #print(res.text)
-        if res.status_code!=200 or "result" not in res.json():
+        try:
+            res = request(method,params)
+            #print(res.text)
+            if res.status_code!=200 or "result" not in res.json():
+                time.sleep(5)
+                print('unkown rpc error code:%d,res:%s,req:'%(res.status_code,res.text),method,params)
+            else:
+                return res.json()
+        except Exception as ex:
+            print(ex)
             time.sleep(5)
-            print('unkown rpc error code:%d,res:%s,req:'%(res.status_code,res.text),method,params)
-        else:
-            return res.json()
 
 def handle_call_params(params):
     call_params = params
