@@ -267,4 +267,18 @@ offline function M:PenToken()
     return self.storage.penToken
 end
 
+function M:withdraw(amount:string)
+    checkAdmin(self)
+    let PENTOKEN = import_contract_from_address(self.storage.penToken)
+    let from = get_from_address()
+    let am = tointeger(amount)
+    require(am>tointeger(0),"amount not valid")
+
+    PENTOKEN:transfer(from..","..tostring(amount))
+
+    emit AdminWithdraw(json.dumps({to:from,amount:amount}))
+    
+
+end
+
 return M
