@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	GOERLI_CHAIN_ID     string = "b8a2de81756468753e02e2212da5f7ac9294532c777eb68099edd52e02732baa"
-	GOERLI_CHAIN_ID_NUM int64  = 41656
+	GOERLI_CHAIN_ID     string = "a3c762d4c7bcbbfa59327c35c2a6e98558f6ca90d9fd71dfc59a15d09c8c52e4"
+	GOERLI_CHAIN_ID_NUM int64  = 24883
 	XWC_ASSET_ID               = "1.3.0"
 	XWC_ASSET_ID_NUM           = 0
 
@@ -19,33 +19,33 @@ var CHAIN_ID string = GOERLI_CHAIN_ID
 var CHAIN_ID_NUM int64 = GOERLI_CHAIN_ID_NUM
 var DOMAIN_ID string = ""
 
-var OfflineCaller string = "caller0"
+var OfflineCaller string = "pen-caller"
 
-// factory contract
-var FactoryAddress string = "XWCCL3Jsf32yGfcHjnB3mu8DEPjL3nerUnjrR"
+// [Test]factory contract
+var FactoryAddress string = "XWCCSWRZiWHvxnLFq7Nf4tyghUGtJ6pKRHwBK"
 
-var EntranceAddress string = "XWCNhv8RU2cwPnLp1QEPDbsthL84ScYQNnpSY"
+var EntranceAddress string = "XWCNRLpDWifjQeTz27Kf5Sos5iH9LRgcbZo6D"
 
-// postage stamp contract
-var PostageStampAddress string = "XWCCR8hm6VueidBYC9GKkqQyXL2AhvKqyuzMt"
+// [Test]postage stamp contract
+var PostageStampAddress string = "XWCCW9Tt1bfzpo1KRns1rhfUE4VTNaZGXq927"
 
-// staking contract
-var StakingAddress string = "XWCCYyCKBTE6dVt8cPSTw1PxZYTs5NXvht3Fg"
+// [Test]staking contract
+var StakingAddress string = "XWCCMra9Xo7q63tpmWsnZadDTWsYfAc6bBcFi"
 
-// factory contract code hash
-var FactoryDeployedCodeHash = []byte("f72c6b8fefe2410a9e3cf0caff1b53d068647f59")
+// [Test]factory contract code hash
+var FactoryDeployedCodeHash = []byte("0d17f58ca648876af170ebed1a697cdbba8680cd")
 
-// cheque book contract code hash
-var ChequeBookDeployedCodeHash = []byte("8ade25fa0ddc62fc5e1765fba1cfe606160c5d74")
+// [Test]cheque book contract code hash(refer: XRC20SimpleSwap.glua, python service will create it)
+var ChequeBookDeployedCodeHash = []byte("482186ef6e356cf90b087e4d300c776d7ec3e39a")
 
-// postage stamp contract code hash
-var PostageStampDeployedCodeHash = []byte("c8be25557e765d5c1fa26610c3ee93ed1ce7a065")
+// [Test]postage stamp contract code hash
+var PostageStampDeployedCodeHash = []byte("b8ce22d64dcf5df1bb0b2cc5e94c6d3e4020a76b")
 
-// staking contract code hash
+// [Test]staking contract code hash
 var StakingAddressDeployedCodeHash = []byte("a9b34ce16a1be02469729ad0cbd5ac79e8560929")
 
-// staking admin
-var StakingAdmin = []byte("XWCNdbgFmQia2i58PcH918kSPMLrtwZ4kwK2V")
+// [Test]staking admin
+var StakingAdmin = []byte("XWCNRLpDWifjQeTz27Kf5Sos5iH9LRgcbZo6D")
 
 func RFC3339ToUTC(timeFormatStr string) (uint64, error) {
 	t, err := time.Parse(
