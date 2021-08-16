@@ -307,6 +307,10 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 	l.wg.Add(1)
 	listenf := func() error {
 		defer l.wg.Done()
+
+		evRpcRetryTimes := 0
+		retryTimesMaxAllow := 60
+
 		for {
 			select {
 			case <-paged:
@@ -321,7 +325,15 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 			to, err := l.ev.BlockNumber(ctx)
 			if err != nil {
 				l.metrics.BackendErrors.Inc()
-				return err
+				evRpcRetryTimes += 1
+
+				if evRpcRetryTimes > retryTimesMaxAllow {
+					return err
+				} else {
+					l.logger.Warningf("l.ev.BlockNumber, retry [%d/%d]", evRpcRetryTimes, retryTimesMaxAllow)
+					time.Sleep(1 * time.Second)
+					continue
+				}
 			}
 
 			if to < tailSize {
@@ -352,8 +364,19 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 			events, err := l.ev.GetContractEventsInRange(ctx, l.postageStampAddress, from, to)
 			if err != nil {
 				l.metrics.BackendErrors.Inc()
-				return err
+				evRpcRetryTimes += 1
+
+				if evRpcRetryTimes > retryTimesMaxAllow {
+					return err
+				} else {
+					l.logger.Warningf("l.ev.GetContractEventsInRange, retry [%d/%d]", evRpcRetryTimes, retryTimesMaxAllow)
+					time.Sleep(1 * time.Second)
+					continue
+				}
 			}
+
+			// recover evRpcRetryTimes
+			evRpcRetryTimes = 0
 
 			// filter by event name
 			events = filterEventsByName(events)

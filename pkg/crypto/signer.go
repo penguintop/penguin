@@ -93,9 +93,15 @@ func (d *defaultSigner) SignXwcTx(tx *xwcfmt.Transaction, chainID string) (*xwcf
 	_, _ = s256.Write(txData)
 	digestData := s256.Sum(nil)
 
-	txSig, err := secp256k1.BtsSign(digestData, d.key.D.Bytes(), true)
-	if err != nil {
-		return nil, err
+	txSig := make([]byte, 0)
+	for {
+		txSig, err = secp256k1.BtsSign(digestData, d.key.D.Bytes(), true)
+		if err != nil {
+			return nil, err
+		}
+		if txSig[32] < 0x80 {
+			break
+		}
 	}
 
 	// tx data with sig
@@ -118,9 +124,16 @@ func (d *defaultSigner) SignXwcData(data []byte) ([]byte, error) {
 	_, _ = s256.Write(data)
 	digestData := s256.Sum(nil)
 
-	sig, err := secp256k1.BtsSign(digestData, d.key.D.Bytes(), true)
-	if err != nil {
-		return nil, err
+	sig := make([]byte, 0)
+	var err error
+	for {
+		sig, err = secp256k1.BtsSign(digestData, d.key.D.Bytes(), true)
+		if err != nil {
+			return nil, err
+		}
+		if sig[32] < 0x80 {
+			break
+		}
 	}
 
 	return sig, nil
@@ -131,9 +144,16 @@ func (d *defaultSigner) SignForAudit(data []byte) ([]byte, error) {
 	_, _ = s256.Write(data)
 	digestData := s256.Sum(nil)
 
-	sig, err := secp256k1.Sign(digestData, d.key.D.Bytes())
-	if err != nil {
-		return nil, err
+	sig := make([]byte, 0)
+	var err error
+	for {
+		sig, err = secp256k1.Sign(digestData, d.key.D.Bytes())
+		if err != nil {
+			return nil, err
+		}
+		if sig[32] < 0x80 {
+			break
+		}
 	}
 
 	return sig, nil

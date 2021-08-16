@@ -165,7 +165,7 @@ func (t *transactionService) Send(ctx context.Context, request *TxRequest) (txHa
 	}
 
 	txJson, _ := json.Marshal(txSigned)
-	fmt.Printf("signed transaction: %s", string(txJson))
+	fmt.Printf("signed transaction: %s\n", string(txJson))
 
 	txHash, err = t.backend.SendXwcTransaction(ctx, txSigned)
 	if err != nil {
