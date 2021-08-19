@@ -7,7 +7,7 @@ import (
 
 const (
 	GOERLI_CHAIN_ID     string = "a3c762d4c7bcbbfa59327c35c2a6e98558f6ca90d9fd71dfc59a15d09c8c52e4"
-	GOERLI_CHAIN_ID_NUM int64  = 24883
+	GOERLI_CHAIN_ID_NUM int64  = 51107           //compute: (0xc7<<8) + (0xa3)
 	XWC_ASSET_ID               = "1.3.0"
 	XWC_ASSET_ID_NUM           = 0
 
@@ -21,28 +21,29 @@ var DOMAIN_ID string = ""
 
 var OfflineCaller string = "pen-caller"
 
-// [Test]factory contract
-var FactoryAddress string = "XWCCSWRZiWHvxnLFq7Nf4tyghUGtJ6pKRHwBK"
+// [Test] The receiver account's address
+var EntranceAddress string = "XWCNhr1NeszTwe75B8qGehaTPPku6TVJEg9kU"
 
-var EntranceAddress string = "XWCNRLpDWifjQeTz27Kf5Sos5iH9LRgcbZo6D"
+// [Test]factory contract
+var FactoryAddress string = "XWCCJ8pa6Bz2Un3fTT8QRu7u1XRUG5QpVbRsd"
 
 // [Test]postage stamp contract
-var PostageStampAddress string = "XWCCW9Tt1bfzpo1KRns1rhfUE4VTNaZGXq927"
+var PostageStampAddress string = "XWCCYzE9banNUQhXB1JYVvWL4ynmxoBRh2j9W"
 
 // [Test]staking contract
-var StakingAddress string = "XWCCMra9Xo7q63tpmWsnZadDTWsYfAc6bBcFi"
+var StakingAddress string = "XWCCJy83LxyFm1zFZ9SxfJw18orqbNjP4R3ZM"
 
 // [Test]factory contract code hash
 var FactoryDeployedCodeHash = []byte("0d17f58ca648876af170ebed1a697cdbba8680cd")
-
-// [Test]cheque book contract code hash(refer: XRC20SimpleSwap.glua, python service will create it)
-var ChequeBookDeployedCodeHash = []byte("482186ef6e356cf90b087e4d300c776d7ec3e39a")
 
 // [Test]postage stamp contract code hash
 var PostageStampDeployedCodeHash = []byte("b8ce22d64dcf5df1bb0b2cc5e94c6d3e4020a76b")
 
 // [Test]staking contract code hash
 var StakingAddressDeployedCodeHash = []byte("a9b34ce16a1be02469729ad0cbd5ac79e8560929")
+
+// [Test]cheque book contract code hash(refer: XRC20SimpleSwap.glua, python service will create it)
+var ChequeBookDeployedCodeHash = []byte("482186ef6e356cf90b087e4d300c776d7ec3e39a")
 
 // [Test]staking admin
 var StakingAdmin = []byte("XWCNRLpDWifjQeTz27Kf5Sos5iH9LRgcbZo6D")
