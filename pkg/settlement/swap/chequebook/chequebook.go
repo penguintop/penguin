@@ -109,7 +109,7 @@ func (s *service) Deposit(ctx context.Context, amount *big.Int) (hash common.Has
 		return common.Hash{}, ErrInsufficientFunds
 	}
 
-	return s.erc20Service.Transfer(ctx, s.address, amount)
+	return s.erc20Service.TransferToContract(ctx, s.address, amount)
 }
 
 // Balance returns the token balance of the chequebook.
@@ -320,17 +320,21 @@ func (s *service) Withdraw(ctx context.Context, amount *big.Int) (hash common.Ha
 		return common.Hash{}, ErrInsufficientFunds
 	}
 
-	callData, err := chequebookABI.Pack("withdraw", amount)
-	if err != nil {
-		return common.Hash{}, err
-	}
+	//callData, err := chequebookABI.Pack("withdraw", amount)
+	//if err != nil {
+	//	return common.Hash{}, err
+	//}
 
 	request := &transaction.TxRequest{
 		To:       &s.address,
-		Data:     callData,
+		//Data:     callData,
 		GasPrice: big.NewInt(10),
 		GasLimit: 100000,
 		Value:    big.NewInt(0),
+
+		TxType:     transaction.TxTypeInvokeContract,
+		InvokeApi:  "withdraw",
+		InvokeArgs: amount.String(),
 	}
 
 	txHash, err := s.transactionService.Send(ctx, request)

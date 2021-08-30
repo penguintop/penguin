@@ -25,6 +25,7 @@ var (
 type Service interface {
 	BalanceOf(ctx context.Context, address common.Address) (*big.Int, error)
 	Transfer(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error)
+	TransferToContract(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error)
 }
 
 type erc20Service struct {
@@ -110,6 +111,50 @@ func (c *erc20Service) Transfer(ctx context.Context, address common.Address, val
 	//return txHash, nil
 
 	erc20To, _ := xwcfmt.HexAddrToXwcAddr(hex.EncodeToString(address[:]))
+
+	conApi := "transfer"
+	conArg := fmt.Sprintf("%s,%d", erc20To, value.Uint64())
+
+	request := &transaction.TxRequest{
+		To:       &c.address,
+		GasPrice: big.NewInt(10),
+		GasLimit: 100000,
+
+		TxType:     transaction.TxTypeInvokeContract,
+		InvokeApi:  conApi,
+		InvokeArgs: conArg,
+	}
+
+	txHash, err := c.transactionService.Send(ctx, request)
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	return txHash, nil
+}
+
+func (c *erc20Service) TransferToContract(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error) {
+	//callData, err := erc20ABI.Pack("transfer", address, value)
+	//if err != nil {
+	//	return common.Hash{}, err
+	//}
+	//
+	//request := &transaction.TxRequest{
+	//	To:       &c.address,
+	//	Data:     callData,
+	//	GasPrice: sctx.GetGasPrice(ctx),
+	//	GasLimit: 0,
+	//	Value:    big.NewInt(0),
+	//}
+	//
+	//txHash, err := c.transactionService.Send(ctx, request)
+	//if err != nil {
+	//	return common.Hash{}, err
+	//}
+	//
+	//return txHash, nil
+
+	erc20To, _ := xwcfmt.HexAddrToXwcConAddr(hex.EncodeToString(address[:]))
 
 	conApi := "transfer"
 	conArg := fmt.Sprintf("%s,%d", erc20To, value.Uint64())

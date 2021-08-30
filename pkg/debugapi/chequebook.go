@@ -7,6 +7,7 @@ package debugapi
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/penguintop/penguin/pkg/xwcfmt"
 	"math/big"
 	"net/http"
@@ -330,8 +331,12 @@ func (s *Service) swapCashoutStatusHandler(w http.ResponseWriter, r *http.Reques
 	})
 }
 
+//type chequebookTxResponse struct {
+//	TransactionHash common.Hash `json:"transactionHash"`
+//}
+
 type chequebookTxResponse struct {
-	TransactionHash common.Hash `json:"transactionHash"`
+	TransactionHash string `json:"transactionHash"`
 }
 
 func (s *Service) chequebookWithdrawHandler(w http.ResponseWriter, r *http.Request) {
@@ -374,7 +379,8 @@ func (s *Service) chequebookWithdrawHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	jsonhttp.OK(w, chequebookTxResponse{TransactionHash: txHash})
+	txHashStr := fmt.Sprintf("%x", txHash[12:])
+	jsonhttp.OK(w, chequebookTxResponse{TransactionHash: txHashStr})
 }
 
 func (s *Service) chequebookDepositHandler(w http.ResponseWriter, r *http.Request) {
@@ -417,5 +423,6 @@ func (s *Service) chequebookDepositHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	jsonhttp.OK(w, chequebookTxResponse{TransactionHash: txHash})
+	txHashStr := fmt.Sprintf("%x", txHash[12:])
+	jsonhttp.OK(w, chequebookTxResponse{TransactionHash: txHashStr})
 }

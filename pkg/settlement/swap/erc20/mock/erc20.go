@@ -18,6 +18,10 @@ type Service struct {
 	transferFunc  func(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error)
 }
 
+func (s *Service) TransferToContract(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error) {
+	panic("implement me")
+}
+
 func WithBalanceOfFunc(f func(ctx context.Context, address common.Address) (*big.Int, error)) Option {
 	return optionFunc(func(s *Service) {
 		s.balanceOfFunc = f
