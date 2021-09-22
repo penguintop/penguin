@@ -78,11 +78,13 @@ When you add the file you will see in left bottom corner notification about it, 
 
 after it you should click button "Upload" below.
 
-Than you'll see something like on this gif video, hash of your file. 
+Than you'll see something like on this gif video, hash of your file.
+https://i.gyazo.com/80eb8aeaacc3e4b784e5a4ccdeb13321.mp4
 ![alt text](https://i.gyazo.com/80eb8aeaacc3e4b784e5a4ccdeb13321.mp4?raw=true)
 
 
 When you go to the "Download" tab and the copy paste hash of your file and click search. You'll get the link to your file in the Penguin PEN blockchain. Please see illustration in the video below
+https://i.gyazo.com/390210ddff095523d391b59d24c4868c.mp4
 ![alt text](https://i.gyazo.com/390210ddff095523d391b59d24c4868c.mp4?raw=true)
 
 
