@@ -59,13 +59,13 @@ In this manual we will use following folder structure, so you should to prepare 
 
 After entering and confirming the password, the terminal will print out the private key of the XWC account, which needs to be backed up
 
-[https://lh3.googleusercontent.com/pw/AM-JKLUWiBZJW0rCHXpYlzxY0UpLqFG2G7dAV7yN5QGT0cSgr9H-yk8sDjYAHL4ix3tnCDAbPD5L29Glz_a0KAHK6aDkDF9h5ilLlNSsTaQglRwS9l5jM5Nz7V7OV20qZz0Jfsg5GxotA1ZuEz_XxK8LT9Yn=w993-h218-no?authuser=0](https://lh3.googleusercontent.com/pw/AM-JKLUWiBZJW0rCHXpYlzxY0UpLqFG2G7dAV7yN5QGT0cSgr9H-yk8sDjYAHL4ix3tnCDAbPD5L29Glz_a0KAHK6aDkDF9h5ilLlNSsTaQglRwS9l5jM5Nz7V7OV20qZz0Jfsg5GxotA1ZuEz_XxK8LT9Yn=w993-h218-no?authuser=0)
+![alt text](https://lh3.googleusercontent.com/pw/AM-JKLUWiBZJW0rCHXpYlzxY0UpLqFG2G7dAV7yN5QGT0cSgr9H-yk8sDjYAHL4ix3tnCDAbPD5L29Glz_a0KAHK6aDkDF9h5ilLlNSsTaQglRwS9l5jM5Nz7V7OV20qZz0Jfsg5GxotA1ZuEz_XxK8LT9Yn=w993-h218-no?authuser=0?raw=true)
 
 # Fill up an node wallet
 
 3. After the private key backup is completed, press any key, you can see the following print
 
-[https://lh3.googleusercontent.com/pw/AM-JKLWLG6J3qH-8uRnhS-fqiWngU-cFNaomp-z6oCC1OuAhgIuZo-o8RDQd0jg2COlYjKtwg1CAIYS-Y8yqQJZjIGCAzu4CurpW-ZCn47iY8cBFsjJHGyJ5lxOh7buycdKS_fcmAZTLwHVu0Lpd1ZPVdtSd=w2107-h433-no?authuser=0](https://lh3.googleusercontent.com/pw/AM-JKLWLG6J3qH-8uRnhS-fqiWngU-cFNaomp-z6oCC1OuAhgIuZo-o8RDQd0jg2COlYjKtwg1CAIYS-Y8yqQJZjIGCAzu4CurpW-ZCn47iY8cBFsjJHGyJ5lxOh7buycdKS_fcmAZTLwHVu0Lpd1ZPVdtSd=w2107-h433-no?authuser=0)
+![alt text](https://lh3.googleusercontent.com/pw/AM-JKLWLG6J3qH-8uRnhS-fqiWngU-cFNaomp-z6oCC1OuAhgIuZo-o8RDQd0jg2COlYjKtwg1CAIYS-Y8yqQJZjIGCAzu4CurpW-ZCn47iY8cBFsjJHGyJ5lxOh7buycdKS_fcmAZTLwHVu0Lpd1ZPVdtSd=w2107-h433-no?authuser=0?raw=true)
 
 - [ ]  If you do not participate in PEN mining, you need to transfer 1 XWC (for handling fees) and no less than 1 PEN to the relevant address
 That's it.
@@ -76,19 +76,17 @@ PEN.
 
 4. If you can see the following prints later, it means that the PEN node has been started normally
 
-[https://lh3.googleusercontent.com/pw/AM-JKLVIAE05XpRJ_OHDeG0wfSaeYcBwVKVjyHeIvYwXJQ2zgimXJo2uTc1Ux0in9yyZ82X3XQOHGOTWKf-Q8GgzQV-SguWXDt57xyOO-5IkNFoV1jePYI-XVqGZkxKDNyeI6DBUEIq3rvILPm-h4C9qL4Ur=w993-h485-no?authuser=0](https://lh3.googleusercontent.com/pw/AM-JKLVIAE05XpRJ_OHDeG0wfSaeYcBwVKVjyHeIvYwXJQ2zgimXJo2uTc1Ux0in9yyZ82X3XQOHGOTWKf-Q8GgzQV-SguWXDt57xyOO-5IkNFoV1jePYI-XVqGZkxKDNyeI6DBUEIq3rvILPm-h4C9qL4Ur=w993-h485-no?authuser=0)
+![alt text](https://lh3.googleusercontent.com/pw/AM-JKLVIAE05XpRJ_OHDeG0wfSaeYcBwVKVjyHeIvYwXJQ2zgimXJo2uTc1Ux0in9yyZ82X3XQOHGOTWKf-Q8GgzQV-SguWXDt57xyOO-5IkNFoV1jePYI-XVqGZkxKDNyeI6DBUEIq3rvILPm-h4C9qL4Ur=w993-h485-no?authuser=0?raw=true)
 
 5. If you see the following print, it means that the PEN node has turned on the mining mode
 
-[https://lh3.googleusercontent.com/pw/AM-JKLUxl6iPD1EGi0gTM4VGlnvibwBl5Vqv00BYn-yxTkH010T-hkIV2R7AbxJiaY2Q4LAdzg07_zjXXd0ilcIV6YeOlWyZ5I9tNMZNWsVzj7siML7owpdH5dvxWNW4LktnWB2lNGZX2_BzaOvkfA9Y0XpJ=w993-h252-no?authuser=0](https://lh3.googleusercontent.com/pw/AM-JKLUxl6iPD1EGi0gTM4VGlnvibwBl5Vqv00BYn-yxTkH010T-hkIV2R7AbxJiaY2Q4LAdzg07_zjXXd0ilcIV6YeOlWyZ5I9tNMZNWsVzj7siML7owpdH5dvxWNW4LktnWB2lNGZX2_BzaOvkfA9Y0XpJ=w993-h252-no?authuser=0)
+![alt text](https://lh3.googleusercontent.com/pw/AM-JKLUxl6iPD1EGi0gTM4VGlnvibwBl5Vqv00BYn-yxTkH010T-hkIV2R7AbxJiaY2Q4LAdzg07_zjXXd0ilcIV6YeOlWyZ5I9tNMZNWsVzj7siML7owpdH5dvxWNW4LktnWB2lNGZX2_BzaOvkfA9Y0XpJ=w993-h252-no?authuser=0?raw=true)
 
 # Backups
 
 6. How to export and backup PEN's XWC account private key if you forget to back up the private key when running PEN for the first time
-
 `./pen dumpkey --data-dir=/home/pen/pen_data`
-
-[https://lh3.googleusercontent.com/pw/AM-JKLVh_47pEIn9t0OKbUgXVDMgFlhvG3xLbd2v5Zev8iUf1OPThNVX561tcUF-h-NUWlKgmj_kjzxDGFHALKuVFgoKPdrr-EByrEgv3LMKM24UVmCXOLqmxSkFGOtP19T2Ek0ImCUxXE4RoZcuLFS15E9F=w993-h140-no?authuser=0](https://lh3.googleusercontent.com/pw/AM-JKLVh_47pEIn9t0OKbUgXVDMgFlhvG3xLbd2v5Zev8iUf1OPThNVX561tcUF-h-NUWlKgmj_kjzxDGFHALKuVFgoKPdrr-EByrEgv3LMKM24UVmCXOLqmxSkFGOtP19T2Ek0ImCUxXE4RoZcuLFS15E9F=w993-h140-no?authuser=0)
+![alt text](https://lh3.googleusercontent.com/pw/AM-JKLVh_47pEIn9t0OKbUgXVDMgFlhvG3xLbd2v5Zev8iUf1OPThNVX561tcUF-h-NUWlKgmj_kjzxDGFHALKuVFgoKPdrr-EByrEgv3LMKM24UVmCXOLqmxSkFGOtP19T2Ek0ImCUxXE4RoZcuLFS15E9F=w993-h140-no?authuser=0?raw=true)
 
 # PEN startup parameters:
 
