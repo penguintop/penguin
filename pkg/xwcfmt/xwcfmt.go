@@ -85,7 +85,7 @@ func XwcAddrToHexAddr(xwcAddr string) (string, error) {
 
 func XwcConAddrToHexAddr(xwcConAddr string) (string, error) {
 	if len(xwcConAddr) <= len(XWC_PREFIX) || xwcConAddr[0:len(XWC_PREFIX)] != XWC_PREFIX {
-		return "", fmt.Errorf("invalid xwc contract key")
+		return "", fmt.Errorf("invalid xwc contract key:%s", xwcConAddr)
 	}
 	addrBytes, err := base58.Decode(xwcConAddr[len(XWC_PREFIX):])
 	if err != nil {
