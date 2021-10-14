@@ -57,7 +57,7 @@ Here is WEB GUI for Penguin [http://112.47.58.10:8888/](http://112.47.58.10:8888
 It contains following sections
 
 - Settings
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLXpsYtBRyjGyyvJiHlTsQm-mTgAVimsoC5VX61zZxY3-fo0ESlWlCdbzp8dXugUi07jUiIOdar8D7HpQOv-Mb6rRdcfN9aV6_nozXA3yaFL35ko_qkAUrCbx13fCfYDQQkhx2bd9XKVoSRUJO83_lv-=w752-h498-no?authuser=0?raw=true)
+![alt text](/resources/images/guide_setting.png)
 
 You can use DEMO IP of PEN Node[`http://112.47.58.10:1633`](http://112.47.58.10:1633/) for API and [`http://112.47.58.10:1635`](http://112.47.58.10:1635/) for Debug
 
@@ -66,15 +66,15 @@ Or you can use own server or pc `IP` of your PEN node.
 - Status
 
 Here is information about your connected node
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLVcN_0ogZNJxfYzHjFoMbdR-UMUofveCNdlSMWGF3NsVWmcuFjfjcjUg3B7GdeQqit3q8NwkAOOFr9St3kGlWpTJMMzP4NuM86gz5lLL-Ovw_tabm9x7TbmaKBjJ6k_aQlVrNEJc78ainympAGEOm_o=w994-h1213-no?authuser=0?raw=true)
+![alt text](/resources/images/guide_status.png)
 
 - Files
 
 Here is upload/download manager
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLVcmcLRB3jjYcWNfGdDQ3AOLjfGzgod_iyi9_m_m_I__m7UnCnOOEDsMS7x9_kjuNzPeJ-K7gLVlrrV5CKd_zBw4WRkPW1zVP453zNNHFLdp6g6jZHpDf2uEw5-78UYOR_PTVD_cfqA4PIw-tWYFJ2E=w994-h622-no?authuser=0?raw=true)
+![alt text](/resources/images/guide-files-operation-1.png)
 
 When you add the file you will see in left bottom corner notification about it, check the screenshot
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLW-1k_8zU_EEJj426efJv3IUi-ihWK1eIZHk813cCZc62i2a07EXYAjzDuXNWvmjVUjQhCxZ1WkiqPjKCDU1DRHPxjYVILXDNPQS6j_7zodvKX_nK0lMbkfP02zMv3boMj_PGKbZ0ueBUGgEkN-r6r2=w994-h1398-no?authuser=0?raw=true)
+![alt text](/resources/images/guide-files-operation-2.png)
 
 after it you should click button "Upload" below.
 
