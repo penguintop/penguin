@@ -92,10 +92,10 @@ func XwcConAddrToHexAddr(xwcConAddr string) (string, error) {
 		return "", err
 	}
 	if len(addrBytes) != 25 {
-		return "", fmt.Errorf("invalid contract key")
+		return "", fmt.Errorf("invalid contract key:%s", xwcConAddr)
 	}
 	if addrBytes[0] != ADDR_CONTRACT {
-		return "", fmt.Errorf("invalid contract key")
+		return "", fmt.Errorf("invalid contract key:%s", xwcConAddr)
 	}
 	return hex.EncodeToString(addrBytes[1:21]), nil
 }
