@@ -245,7 +245,6 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 	cmd.Flags().Uint64(optionNameBlockTime, 15, "chain block time")
 	cmd.Flags().String(optionNameSwapDeploymentGasPrice, "", "gas price in wei to use for deployment and funding")
 
-	//
 	cmd.Flags().Bool(optionNameAuditMode, false, "enable audit")
 	cmd.Flags().String(optionNameAuditEndpoints, "", "audit endpoint")
 }
@@ -253,20 +252,20 @@ func (c *command) setAllFlags(cmd *cobra.Command) {
 func newLogger(cmd *cobra.Command, verbosity string) (logging.Logger, error) {
 	var logger logging.Logger
 	switch verbosity {
-	case "0", "silent":
-		logger = logging.New(ioutil.Discard, 0)
-	case "1", "error":
-		logger = logging.New(cmd.OutOrStdout(), logrus.ErrorLevel)
-	case "2", "warn":
-		logger = logging.New(cmd.OutOrStdout(), logrus.WarnLevel)
-	case "3", "info":
-		logger = logging.New(cmd.OutOrStdout(), logrus.InfoLevel)
-	case "4", "debug":
-		logger = logging.New(cmd.OutOrStdout(), logrus.DebugLevel)
-	case "5", "trace":
-		logger = logging.New(cmd.OutOrStdout(), logrus.TraceLevel)
-	default:
-		return nil, fmt.Errorf("unknown verbosity level %q", verbosity)
+		case "0", "silent":
+			logger = logging.New(ioutil.Discard, 0)
+		case "1", "error":
+			logger = logging.New(cmd.OutOrStdout(), logrus.ErrorLevel)
+		case "2", "warn":
+			logger = logging.New(cmd.OutOrStdout(), logrus.WarnLevel)
+		case "3", "info":
+			logger = logging.New(cmd.OutOrStdout(), logrus.InfoLevel)
+		case "4", "debug":
+			logger = logging.New(cmd.OutOrStdout(), logrus.DebugLevel)
+		case "5", "trace":
+			logger = logging.New(cmd.OutOrStdout(), logrus.TraceLevel)
+		default:
+			return nil, fmt.Errorf("unknown verbosity level %q", verbosity)
 	}
 	return logger, nil
 }
