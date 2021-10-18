@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/penguintop/penguin/pkg/logging"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
