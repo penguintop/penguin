@@ -54,8 +54,8 @@ type TxRequest struct {
 
 	TxType     int    // 100: transfer   101: transfer to contract   102: invoke contract
 	Memo       string // transfer memo
-	InvokeApi  string // used for contract invoke
-	InvokeArgs string // used for contract invoke
+	InvokeApi  string // used for invoking contract
+	InvokeArgs string // used for invoking contract
 }
 
 type storedTransaction struct {
