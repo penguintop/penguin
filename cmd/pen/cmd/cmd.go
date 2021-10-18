@@ -141,7 +141,7 @@ func (c *command) Execute() (err error) {
 	return c.root.Execute()
 }
 
-// Execute parses command line arguments and runs appropriate functions.
+// Parsing the command line arguments and executing the appropriate functions.
 func Execute() (err error) {
 	c, err := newCommand()
 	if err != nil {
