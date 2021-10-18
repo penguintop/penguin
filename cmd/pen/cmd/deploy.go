@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// In seconds.
 const blocktime = 15
 
 func (c *command) initDeployCmd() error {
