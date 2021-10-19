@@ -36,7 +36,7 @@ type store struct {
 }
 
 // New constructs a new postage batch store.
-// It initialises both chain state and reserve state from the persistent state store
+// It will initialize both chain state and reserve state from the persistent state store
 func New(st storage.StateStorer, unreserveFunc unreserveFn) (postage.Storer, error) {
 	cs := &postage.ChainState{}
 	err := st.Get(chainStateKey, cs)
