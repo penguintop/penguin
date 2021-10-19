@@ -59,7 +59,7 @@ func (c *command) initStartCmd() (err error) {
 
 			isWindowsService, err := isWindowsService()
 			if err != nil {
-				return fmt.Errorf("failed to determine if we are running in service: %w", err)
+				return fmt.Errorf("Failed to determine if we are running as system service: %w", err)
 			}
 
 			if isWindowsService {
@@ -106,7 +106,7 @@ HHHHHHHHHHHHHHHHHHHHH
 
 		   `
 			fmt.Println(penASCII)
-			logger.Infof("version: %v", pen.Version)
+			logger.Infof("Version: %v", pen.Version)
 
 			debugAPIAddr := c.config.GetString(optionNameDebugAPIAddr)
 			if !c.config.GetBool(optionNameDebugAPIEnable) {
@@ -123,7 +123,7 @@ HHHHHHHHHHHHHHHHHHHHH
 			auditNode := c.config.GetBool(optionNameAuditMode)
 
 			if bootNode && !fullNode {
-				return errors.New("boot node must be started as a full node")
+				return errors.New("Boot-node must be started as a full-node")
 			}
 
 			b, err := node.NewPen(c.config.GetString(optionNameP2PAddr), signerConfig.address, *signerConfig.publicKey, signerConfig.signer, uint64(property.CHAIN_ID_NUM), logger, signerConfig.libp2pPrivateKey, signerConfig.pssPrivateKey, node.Options{
@@ -166,7 +166,6 @@ HHHHHHHHHHHHHHHHHHHHH
 				BlockTime:                  c.config.GetUint64(optionNameBlockTime),
 				DeployGasPrice:             c.config.GetString(optionNameSwapDeploymentGasPrice),
 
-				//
 				AuditNodeMode: auditNode,
 				AuditEndpoint: c.config.GetString(optionNameAuditEndpoints),
 			})
@@ -174,7 +173,7 @@ HHHHHHHHHHHHHHHHHHHHH
 				return err
 			}
 
-			// Wait for termination or interrupt signals.
+			// Wait for termination or interruption signals.
 			// We want to clean up things at the end.
 			interruptChannel := make(chan os.Signal, 1)
 			signal.Notify(interruptChannel, syscall.SIGINT, syscall.SIGTERM)
@@ -184,8 +183,8 @@ HHHHHHHHHHHHHHHHHHHHH
 					// Block main goroutine until it is interrupted
 					sig := <-interruptChannel
 
-					logger.Debugf("received signal: %v", sig)
-					logger.Info("shutting down")
+					logger.Debugf("Received signal: %v", sig)
+					logger.Info("Shutting down")
 				},
 				stop: func() {
 					// Shutdown
@@ -197,16 +196,16 @@ HHHHHHHHHHHHHHHHHHHHH
 						defer cancel()
 
 						if err := b.Shutdown(ctx); err != nil {
-							logger.Errorf("shutdown: %v", err)
+							logger.Errorf("Shutdown: %v", err)
 						}
 					}()
 
-					// If shutdown function is blocking too long,
+					// If shutdown function is blocked too long,
 					// allow process termination by receiving another signal.
 					select {
-					case sig := <-interruptChannel:
-						logger.Debugf("received signal: %v", sig)
-					case <-done:
+						case sig := <-interruptChannel:
+							logger.Debugf("Received signal: %v", sig)
+						case <-done:
 					}
 				},
 			}
@@ -225,7 +224,7 @@ HHHHHHHHHHHHHHHHHHHHH
 					return err
 				}
 			} else {
-				// start blocks until some interrupt is received
+				// Start blocks until some interrupt is received
 				p.start()
 				p.stop()
 			}
@@ -395,15 +394,15 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 				return nil, err
 			}
 			logger.Info("********************************************************************")
-			logger.Infof("!!! PrivateKey: %s !!!", privKeyWif)
-			logger.Infof("!!! Please backup your PrivateKey, and Do not tell it to anyone else !!!")
+			logger.Infof("!!! Private key: %s !!!", privKeyWif)
+			logger.Infof("!!! Please backup your Private key, and do not tell it to anyone else !!!")
 			logger.Info("********************************************************************")
 			logger.Infof("Press any key to continue...")
 			reader := bufio.NewReader(os.Stdin)
 			_, _ = reader.ReadByte()
 
 		} else {
-			logger.Infof("using existing penguin network address: %s", address)
+			logger.Infof("Using existing penguin network address: %s", address)
 		}
 	}
 
@@ -411,27 +410,27 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 
 	libp2pPrivateKey, created, err := keystore.Key("libp2p", password)
 	if err != nil {
-		return nil, fmt.Errorf("libp2p key: %w", err)
+		return nil, fmt.Errorf("The libp2p key: %w", err)
 	}
 	if created {
-		logger.Debugf("new libp2p key created")
+		logger.Debugf("New libp2p key was created")
 	} else {
-		logger.Debugf("using existing libp2p key")
+		logger.Debugf("Using existing libp2p key")
 	}
 
 	pssPrivateKey, created, err := keystore.Key("pss", password)
 	if err != nil {
-		return nil, fmt.Errorf("pss key: %w", err)
+		return nil, fmt.Errorf("The pss key: %w", err)
 	}
 	if created {
-		logger.Debugf("new pss key created")
+		logger.Debugf("New pss key was created")
 	} else {
-		logger.Debugf("using existing pss key")
+		logger.Debugf("Using existing pss key")
 	}
 
-	logger.Infof("pss public key %x", crypto.EncodeSecp256k1PublicKey(&pssPrivateKey.PublicKey))
+	logger.Infof("The pss public key %x", crypto.EncodeSecp256k1PublicKey(&pssPrivateKey.PublicKey))
 
-	// postinst and post scripts inside packaging/{deb,rpm} depend and parse on this log output
+	// Postinst and post scripts inside packaging/{deb,rpm} depend and parse on this log output
 	overlayXwcAddress, err := signer.XwcAddress()
 	if err != nil {
 		return nil, err

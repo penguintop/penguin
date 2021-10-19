@@ -15,7 +15,7 @@ import (
 func (c *command) initInitCmd() (err error) {
 	cmd := &cobra.Command{
 		Use:   "init",
-		Short: "Initialise a Penguin node",
+		Short: "Initialize a Penguin node",
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			if len(args) > 0 {
 				return cmd.Help()

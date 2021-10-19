@@ -92,7 +92,7 @@ func checkBalance(
 	}
 }
 
-// Init initialises the chequebook service.
+// Function Init will initialize the chequebook service.
 func Init(
 	ctx context.Context,
 	chequebookFactory Factory,
@@ -207,7 +207,7 @@ func Init(
 	//	logger.Infof("using existing chequebook %x", chequebookAddress)
 	//}
 	//
-	//// regardless of how the chequebook service was initialised make sure that the chequebook is valid
+	//// regardless of how the chequebook service was initialized make sure that the chequebook is valid
 	//err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())
 	//if err != nil {
 	//	return nil, err
@@ -296,7 +296,7 @@ func Init(
 		logger.Infof("using existing chequebook %s", chequebookXwcAddr)
 	}
 
-	// regardless of how the chequebook service was initialised make sure that the chequebook is valid
+	// regardless of how the chequebook service was initialized make sure that the chequebook is valid
 	err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())
 	if err != nil {
 		return nil, err
