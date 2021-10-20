@@ -33,7 +33,7 @@ def safe_request(method,params):
         #print(res.text)
         if res.status_code!=200 or "result" not in res.json():
             time.sleep(5)
-            print('unkown rpc error code:%d,res:%s,req:'%(res.status_code,res.text),method,params)
+            print('Unknown RPC error code:%d,res:%s,req:'%(res.status_code,res.text),method,params)
         else:
             return res.json()
 
@@ -65,10 +65,10 @@ def check_transaction_on_chain(trxid):
             if int(res["result"]["block_num"])>0:
                 return True
             else:
-                print("transaction unkown not onchain trxId:",trxid)
+                print("The transaction is not found on the chain with trxId:",trxid)
                 time.sleep(5)
         except Exception as ex:
-            print("transaction unkown not onchain exception:",ex)
+            print("Unknown exception occured in checking transaction on chain:",ex)
             time.sleep(5)
 
 if __name__ == "__main__":
