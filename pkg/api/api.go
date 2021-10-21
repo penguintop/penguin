@@ -213,7 +213,7 @@ func (s *server) resolveNameOrAddress(str string) (penguin.Address, error) {
 	return penguin.ZeroAddress, fmt.Errorf("%w: %v", errInvalidNameOrAddress, err)
 }
 
-// requestModePut returns the desired storage.ModePut for this request based on the request headers.
+// requestModePut returns the expected storage.ModePut for this request based on the request headers.
 func requestModePut(r *http.Request) storage.ModePut {
 	if h := strings.ToLower(r.Header.Get(PenguinPinHeader)); h == "true" {
 		return storage.ModePutUploadPin
