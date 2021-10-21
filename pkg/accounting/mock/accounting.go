@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/penguintop/penguin/pkg/accounting"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 // Service is the mock Accounting service.
