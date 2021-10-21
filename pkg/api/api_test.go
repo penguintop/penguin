@@ -33,7 +33,7 @@ import (
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/traversal"
 	"github.com/gorilla/websocket"
