@@ -26,7 +26,7 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/ethersphere/langos"
@@ -69,7 +69,7 @@ func (s *server) penUploadHandler(w http.ResponseWriter, r *http.Request) {
 	s.fileUploadHandler(w, r, putter)
 }
 
-// fileUploadResponse is returned when an HTTP request to upload a file is successful
+// penUploadResponse will be returned when HTTP requests to upload a file successfully.
 type penUploadResponse struct {
 	Reference penguin.Address `json:"reference"`
 }
