@@ -32,7 +32,7 @@ import (
 	"github.com/penguintop/penguin/pkg/resolver"
 	"github.com/penguintop/penguin/pkg/steward"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/penguintop/penguin/pkg/traversal"
@@ -118,7 +118,7 @@ const (
 	TargetsRecoveryHeader = "penguin-recovery-targets"
 )
 
-// New will create a and initialize a new API service.
+// New will create and initialize a new API service.
 func New(tags *tags.Tags, storer storage.Storer, resolver resolver.Interface, pss pss.Interface, traversalService traversal.Traverser, pinning pinning.Interface, feedFactory feeds.Factory, post postage.Service, postageContract postagecontract.Interface, steward steward.Reuploader, signer crypto.Signer, logger logging.Logger, tracer *tracing.Tracer, o Options) Service {
 	s := &server{
 		tags:            tags,
@@ -146,7 +146,7 @@ func New(tags *tags.Tags, storer storage.Storer, resolver resolver.Interface, ps
 
 // Close hangs up running websockets on shutdown.
 func (s *server) Close() error {
-	s.logger.Info("api shutting down")
+	s.logger.Info("API shutting down")
 	close(s.quit)
 
 	done := make(chan struct{})
@@ -156,9 +156,9 @@ func (s *server) Close() error {
 	}()
 
 	select {
-	case <-done:
-	case <-time.After(1 * time.Second):
-		return errors.New("api shutting down with open websockets")
+		case <-done:
+		case <-time.After(1 * time.Second):
+			return errors.New("API shutting down with open websockets")
 	}
 
 	return nil
@@ -167,7 +167,7 @@ func (s *server) Close() error {
 // getOrCreateTag attempts to get the tag if an id is supplied, and returns an error if it does not exist.
 // If no id is supplied, it will attempt to create a new tag with a generated name and return it.
 func (s *server) getOrCreateTag(tagUid string) (*tags.Tag, bool, error) {
-	// if tag ID is not supplied, create a new tag
+	// If tag ID is not supplied, create a new tag
 	if tagUid == "" {
 		tag, err := s.tags.Create(0)
 		if err != nil {
@@ -193,27 +193,27 @@ func (s *server) resolveNameOrAddress(str string) (penguin.Address, error) {
 	// Try and parse the name as a pen address.
 	addr, err := penguin.ParseHexAddress(str)
 	if err == nil {
-		log.Tracef("name resolve: valid pen address %q", str)
+		log.Tracef("Name resolve: valid pen address %q", str)
 		return addr, nil
 	}
 
-	// If no resolver is not available, return an error.
+	// If resolver is not available, return an error.
 	if s.resolver == nil {
 		return penguin.ZeroAddress, errNoResolver
 	}
 
-	// Try and resolve the name using the provided resolver.
-	log.Debugf("name resolve: attempting to resolve %s to pen address", str)
+	// Try and resolve the name with the provided resolver.
+	log.Debugf("Name resolve: attempting to resolve %s to pen address", str)
 	addr, err = s.resolver.Resolve(str)
 	if err == nil {
-		log.Tracef("name resolve: resolved name %s to %s", str, addr)
+		log.Tracef("Name resolve: resolved name %s to %s", str, addr)
 		return addr, nil
 	}
 
 	return penguin.ZeroAddress, fmt.Errorf("%w: %v", errInvalidNameOrAddress, err)
 }
 
-// requestModePut returns the desired storage.ModePut for this request based on the request headers.
+// requestModePut returns the expected storage.ModePut for this request based on the request headers.
 func requestModePut(r *http.Request) storage.ModePut {
 	if h := strings.ToLower(r.Header.Get(PenguinPinHeader)); h == "true" {
 		return storage.ModePutUploadPin
