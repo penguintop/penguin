@@ -25,24 +25,24 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 )
 
-// dirUploadHandler uploads a directory supplied as a tar in an HTTP request
+// dirUploadHandler uploads a directory supplied as a tar in a HTTP request
 func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer storage.Storer) {
 	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger)
 	if r.Body == http.NoBody {
-		logger.Error("pen upload dir: request has no body")
+		logger.Error("Pen upload dir: request has no body")
 		jsonhttp.BadRequest(w, errInvalidRequest)
 		return
 	}
 	contentType := r.Header.Get(contentTypeHeader)
 	mediaType, params, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		logger.Errorf("pen upload dir: invalid content-type")
-		logger.Debugf("pen upload dir: invalid content-type err: %v", err)
+		logger.Errorf("Pen upload dir: invalid content-type")
+		logger.Debugf("Pen upload dir: invalid content-type err: %v", err)
 		jsonhttp.BadRequest(w, errInvalidContentType)
 		return
 	}
