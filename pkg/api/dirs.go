@@ -25,24 +25,24 @@ import (
 	"github.com/penguintop/penguin/pkg/manifest"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 )
 
-// dirUploadHandler uploads a directory supplied as a tar in an HTTP request
+// dirUploadHandler uploads a directory supplied as a tar in a HTTP request
 func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer storage.Storer) {
 	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger)
 	if r.Body == http.NoBody {
-		logger.Error("pen upload dir: request has no body")
+		logger.Error("Pen upload dir: request has no body")
 		jsonhttp.BadRequest(w, errInvalidRequest)
 		return
 	}
 	contentType := r.Header.Get(contentTypeHeader)
 	mediaType, params, err := mime.ParseMediaType(contentType)
 	if err != nil {
-		logger.Errorf("pen upload dir: invalid content-type")
-		logger.Debugf("pen upload dir: invalid content-type err: %v", err)
+		logger.Errorf("Pen upload dir: invalid content-type")
+		logger.Debugf("Pen upload dir: invalid content-type err: %v", err)
 		jsonhttp.BadRequest(w, errInvalidContentType)
 		return
 	}
@@ -54,7 +54,7 @@ func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer
 	case multiPartFormData:
 		dReader = &multipartReader{r: multipart.NewReader(r.Body, params["boundary"])}
 	default:
-		logger.Error("pen upload dir: invalid content-type for directory upload")
+		logger.Error("Pen upload dir: invalid content-type for directory upload")
 		jsonhttp.BadRequest(w, errInvalidContentType)
 		return
 	}
@@ -62,8 +62,8 @@ func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer
 
 	tag, created, err := s.getOrCreateTag(r.Header.Get(PenguinTagHeader))
 	if err != nil {
-		logger.Debugf("pen upload dir: get or create tag: %v", err)
-		logger.Error("pen upload dir: get or create tag")
+		logger.Debugf("Pen upload dir: get or create tag: %v", err)
+		logger.Error("Pen upload dir: get or create tag")
 		jsonhttp.InternalServerError(w, nil)
 		return
 	}
@@ -84,16 +84,16 @@ func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer
 		created,
 	)
 	if err != nil {
-		logger.Debugf("pen upload dir: store dir err: %v", err)
-		logger.Errorf("pen upload dir: store dir")
+		logger.Debugf("Pen upload dir: store dir err: %v", err)
+		logger.Errorf("Pen upload dir: store dir")
 		jsonhttp.InternalServerError(w, errDirectoryStore)
 		return
 	}
 	if created {
 		_, err = tag.DoneSplit(reference)
 		if err != nil {
-			logger.Debugf("pen upload dir: done split: %v", err)
-			logger.Error("pen upload dir: done split failed")
+			logger.Debugf("Pen upload dir: done split: %v", err)
+			logger.Error("Pen upload dir: done split failed")
 			jsonhttp.InternalServerError(w, nil)
 			return
 		}
@@ -101,8 +101,8 @@ func (s *server) dirUploadHandler(w http.ResponseWriter, r *http.Request, storer
 
 	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(r.Context(), reference, false); err != nil {
-			logger.Debugf("pen upload dir: creation of pin for %q failed: %v", reference, err)
-			logger.Error("pen upload dir: creation of pin failed")
+			logger.Debugf("Pen upload dir: creation of pin for %q failed: %v", reference, err)
+			logger.Error("Pen upload dir: creation of pin failed")
 			jsonhttp.InternalServerError(w, nil)
 			return
 		}
@@ -141,7 +141,7 @@ func storeDir(
 
 	filesAdded := 0
 
-	// iterate through the files in the supplied tar
+	// Iterate through the files in the supplied tar
 	for {
 		fileInfo, err := reader.Next()
 		if err == io.EOF {
@@ -151,7 +151,7 @@ func storeDir(
 		}
 
 		if !tagCreated {
-			// only in the case when tag is sent via header (i.e. not created by this request)
+			// Only in the case when tag is sent via header (i.e. not created by this request)
 			// for each file
 			if estimatedTotalChunks := calculateNumberOfChunks(fileInfo.Size, encrypt); estimatedTotalChunks > 0 {
 				err = tag.IncN(tags.TotalChunks, estimatedTotalChunks)
@@ -165,13 +165,13 @@ func storeDir(
 		if err != nil {
 			return penguin.ZeroAddress, fmt.Errorf("store dir file: %w", err)
 		}
-		logger.Tracef("uploaded dir file %v with reference %v", fileInfo.Path, fileReference)
+		logger.Tracef("Uploaded dir file %v with reference %v", fileInfo.Path, fileReference)
 
 		fileMtdt := map[string]string{
 			manifest.EntryMetadataContentTypeKey: fileInfo.ContentType,
 			manifest.EntryMetadataFilenameKey:    fileInfo.Name,
 		}
-		// add file entry to dir manifest
+		// Add file entry to dir manifest
 		err = dirManifest.Add(ctx, fileInfo.Path, manifest.NewEntry(fileReference, fileMtdt))
 		if err != nil {
 			return penguin.ZeroAddress, fmt.Errorf("add to manifest: %w", err)
@@ -180,12 +180,12 @@ func storeDir(
 		filesAdded++
 	}
 
-	// check if files were uploaded through the manifest
+	// Check if files were uploaded through the manifest
 	if filesAdded == 0 {
 		return penguin.ZeroAddress, fmt.Errorf("no files in tar")
 	}
 
-	// store website information
+	// Store website information
 	if indexFilename != "" || errorFilename != "" {
 		metadata := map[string]string{}
 		if indexFilename != "" {
@@ -203,7 +203,7 @@ func storeDir(
 
 	storeSizeFn := []manifest.StoreSizeFunc{}
 	if !tagCreated {
-		// only in the case when tag is sent via header (i.e. not created by this request)
+		// Only in the case when tag is sent via header (i.e. not created by this request)
 		// each content that is saved for manifest
 		storeSizeFn = append(storeSizeFn, func(dataSize int64) error {
 			if estimatedTotalChunks := calculateNumberOfChunks(dataSize, encrypt); estimatedTotalChunks > 0 {
@@ -216,12 +216,12 @@ func storeDir(
 		})
 	}
 
-	// save manifest
+	// Save manifest
 	manifestReference, err := dirManifest.Store(ctx, storeSizeFn...)
 	if err != nil {
 		return penguin.ZeroAddress, fmt.Errorf("store manifest: %w", err)
 	}
-	logger.Tracef("finished uploaded dir with reference %v", manifestReference)
+	logger.Tracef("Finished uploaded dir with reference %v", manifestReference)
 
 	return manifestReference, nil
 }
@@ -256,16 +256,16 @@ func (t *tarReader) Next() (*FileInfo, error) {
 		filePath := filepath.Clean(fileHeader.Name)
 
 		if filePath == "." {
-			t.logger.Warning("skipping file upload empty path")
+			t.logger.Warning("Skipping file upload empty path")
 			continue
 		}
 		if runtime.GOOS == "windows" {
-			// always use Unix path separator
+			// Always use Unix path separator
 			filePath = filepath.ToSlash(filePath)
 		}
 		// only store regular files
 		if !fileHeader.FileInfo().Mode().IsRegular() {
-			t.logger.Warningf("skipping file upload for %s as it is not a regular file", filePath)
+			t.logger.Warningf("Skipping file upload for %s as it is not a regular file", filePath)
 			continue
 		}
 
