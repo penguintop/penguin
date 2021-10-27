@@ -38,15 +38,15 @@ func (s *server) postageCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	amount, ok := big.NewInt(0).SetString(mux.Vars(r)["amount"], 10)
 	if !ok {
-		s.logger.Error("create batch: invalid amount")
+		s.logger.Error("Create batch: invalid amount")
 		jsonhttp.BadRequest(w, "invalid postage amount")
 		return
 	}
 
 	depth, err := strconv.ParseUint(depthStr, 10, 8)
 	if err != nil {
-		s.logger.Debugf("create batch: invalid depth: %v", err)
-		s.logger.Error("create batch: invalid depth")
+		s.logger.Debugf("Create batch: invalid depth: %v", err)
+		s.logger.Error("Create batch: invalid depth")
 		jsonhttp.BadRequest(w, "invalid depth")
 		return
 	}
@@ -57,7 +57,7 @@ func (s *server) postageCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if price, ok := r.Header[gasPriceHeader]; ok {
 		p, ok := big.NewInt(0).SetString(price[0], 10)
 		if !ok {
-			s.logger.Error("create batch: bad gas price")
+			s.logger.Error("Create batch: bad gas price")
 			jsonhttp.BadRequest(w, errBadGasPrice)
 			return
 		}
@@ -67,19 +67,19 @@ func (s *server) postageCreateHandler(w http.ResponseWriter, r *http.Request) {
 	batchID, err := s.postageContract.CreateBatch(ctx, amount, uint8(depth), label)
 	if err != nil {
 		if errors.Is(err, postagecontract.ErrInsufficientFunds) {
-			s.logger.Debugf("create batch: out of funds: %v", err)
-			s.logger.Error("create batch: out of funds")
+			s.logger.Debugf("Create batch: out of funds: %v", err)
+			s.logger.Error("Create batch: out of funds")
 			jsonhttp.BadRequest(w, "out of funds")
 			return
 		}
 		if errors.Is(err, postagecontract.ErrInvalidDepth) {
-			s.logger.Debugf("create batch: invalid depth: %v", err)
-			s.logger.Error("create batch: invalid depth")
+			s.logger.Debugf("Create batch: invalid depth: %v", err)
+			s.logger.Error("Create batch: invalid depth")
 			jsonhttp.BadRequest(w, "invalid depth")
 			return
 		}
-		s.logger.Debugf("create batch: failed to create: %v", err)
-		s.logger.Error("create batch: failed to create")
+		s.logger.Debugf("Create batch: failed to create: %v", err)
+		s.logger.Error("Create batch: failed to create")
 		jsonhttp.InternalServerError(w, "cannot create batch")
 		return
 	}
@@ -111,22 +111,22 @@ func (s *server) postageGetStampsHandler(w http.ResponseWriter, r *http.Request)
 func (s *server) postageGetStampHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
 	if idStr == "" || len(idStr) != 64 {
-		s.logger.Error("get stamp issuer: invalid batchID")
+		s.logger.Error("Get stamp issuer: invalid batchID")
 		jsonhttp.BadRequest(w, "invalid batchID")
 		return
 	}
 	id, err := hex.DecodeString(idStr)
 	if err != nil {
-		s.logger.Error("get stamp issuer: invalid batchID: %v", err)
-		s.logger.Error("get stamp issuer: invalid batchID")
+		s.logger.Error("Get stamp issuer: invalid batchID: %v", err)
+		s.logger.Error("Get stamp issuer: invalid batchID")
 		jsonhttp.BadRequest(w, "invalid batchID")
 		return
 	}
 
 	issuer, err := s.post.GetStampIssuer(id)
 	if err != nil {
-		s.logger.Error("get stamp issuer: get issuer: %v", err)
-		s.logger.Error("get stamp issuer: get issuer")
+		s.logger.Error("Get stamp issuer: get issuer: %v", err)
+		s.logger.Error("Get stamp issuer: get issuer")
 		jsonhttp.BadRequest(w, "cannot get issuer")
 		return
 	}
