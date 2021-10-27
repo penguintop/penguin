@@ -66,7 +66,7 @@ func TestGatewayMode(t *testing.T) {
 			Code:    http.StatusForbidden,
 		})
 
-		// should work without pinning
+		// It should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/chunks", http.StatusCreated,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
@@ -77,7 +77,7 @@ func TestGatewayMode(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusCreated,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
-		) // should work without pinning
+		) // It should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusForbidden, forbiddenResponseOption, headerOption)
 		jsonhttptest.Request(t, client, http.MethodPost, "/files", http.StatusForbidden, forbiddenResponseOption, headerOption)
 		jsonhttptest.Request(t, client, http.MethodPost, "/dirs", http.StatusForbidden, forbiddenResponseOption, headerOption)
@@ -94,7 +94,7 @@ func TestGatewayMode(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusCreated,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
-		) // should work without pinning
+		) // It should work without pinning
 		jsonhttptest.Request(t, client, http.MethodPost, "/bytes", http.StatusForbidden, forbiddenResponseOption, headerOption)
 		jsonhttptest.Request(t, client, http.MethodPost, "/files", http.StatusForbidden, forbiddenResponseOption, headerOption)
 		jsonhttptest.Request(t, client, http.MethodPost, "/dirs", http.StatusForbidden, forbiddenResponseOption, headerOption)

@@ -28,7 +28,7 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
@@ -85,7 +85,7 @@ func TestDirs(t *testing.T) {
 			name: "binary-file",
 		}})
 
-		// submit valid tar, but with wrong content-type
+		// Submit valid tar, but with wrong content-type
 		jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource,
 			http.StatusBadRequest,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
@@ -334,12 +334,12 @@ func TestDirs(t *testing.T) {
 				)
 			}
 
-			// check if each file can be located and read
+			// Check if each file can be located and read
 			for _, file := range tc.files {
 				validateFile(t, file, path.Join(file.dir, file.name))
 			}
 
-			// check index filename
+			// Check index filename
 			if tc.wantIndexFilename != "" {
 				entry, err := verifyManifest.Lookup(ctx, manifest.RootPath)
 				if err != nil {
@@ -352,7 +352,7 @@ func TestDirs(t *testing.T) {
 					t.Fatalf("expected index filename '%s', did not find any", tc.wantIndexFilename)
 				}
 
-				// check index suffix for each dir
+				// Check index suffix for each dir
 				for _, file := range tc.files {
 					if file.dir != "" {
 						validateIsPermanentRedirect(t, file.dir, file.dir+"/")
@@ -361,7 +361,7 @@ func TestDirs(t *testing.T) {
 				}
 			}
 
-			// check error filename
+			// Check error filename
 			if tc.wantErrorFilename != "" {
 				entry, err := verifyManifest.Lookup(ctx, manifest.RootPath)
 				if err != nil {
@@ -374,14 +374,14 @@ func TestDirs(t *testing.T) {
 					t.Fatalf("expected error filename '%s', did not find any", tc.wantErrorFilename)
 				}
 
-				// check error document
+				// Check error document
 				validateAltPath(t, "_non_existent_file_path_", errorDocumentPath)
 			}
 
 		}
 		t.Run(tc.name, func(t *testing.T) {
 			t.Run("tar_upload", func(t *testing.T) {
-				// tar all the test case files
+				// Tar all the test case files
 				tarReader := tarFiles(t, tc.files)
 
 				var resp api.PenUploadResponse
@@ -403,7 +403,7 @@ func TestDirs(t *testing.T) {
 					options = append(options, jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "true"))
 				}
 
-				// verify directory tar upload response
+				// Verify directory tar upload response
 				jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource, http.StatusCreated, options...)
 
 				if resp.Reference.String() == "" {
@@ -414,7 +414,7 @@ func TestDirs(t *testing.T) {
 			})
 			if tc.doMultipart {
 				t.Run("multipart_upload", func(t *testing.T) {
-					// tar all the test case files
+					// Tar all the test case files
 					mwReader, mwBoundary := multipartFiles(t, tc.files)
 
 					var resp api.PenUploadResponse
@@ -436,7 +436,7 @@ func TestDirs(t *testing.T) {
 						options = append(options, jsonhttptest.WithRequestHeader(api.PenguinEncryptHeader, "true"))
 					}
 
-					// verify directory tar upload response
+					// Verify directory tar upload response
 					jsonhttptest.Request(t, client, http.MethodPost, dirUploadResource, http.StatusCreated, options...)
 
 					if resp.Reference.String() == "" {
@@ -464,7 +464,7 @@ func tarFiles(t *testing.T, files []f) *bytes.Buffer {
 			filePath = file.filePath
 		}
 
-		// create tar header and write it
+		// Create tar header and write it
 		hdr := &tar.Header{
 			Name: filePath,
 			Mode: 0600,
@@ -474,13 +474,13 @@ func tarFiles(t *testing.T, files []f) *bytes.Buffer {
 			t.Fatal(err)
 		}
 
-		// write the file data to the tar
+		// Write the file data to the tar
 		if _, err := tw.Write(file.data); err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	// finally close the tar writer
+	// Finally close the tar writer
 	if err := tw.Close(); err != nil {
 		t.Fatal(err)
 	}
@@ -518,7 +518,7 @@ func multipartFiles(t *testing.T, files []f) (*bytes.Buffer, string) {
 		}
 	}
 
-	// finally close the tar writer
+	// Finally close the tar writer
 	if err := mw.Close(); err != nil {
 		t.Fatal(err)
 	}

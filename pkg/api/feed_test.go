@@ -28,7 +28,7 @@ import (
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 

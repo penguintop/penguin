@@ -14,7 +14,7 @@ import (
 )
 
 type metrics struct {
-	// all metrics fields must be exported
+	// All metrics fields must be exported
 	// to be able to return them by Metrics()
 	// using reflection
 	RequestCount       prometheus.Counter
@@ -76,7 +76,7 @@ func (s *server) responseCodeMetricsHandler(h http.Handler) http.Handler {
 	})
 }
 
-// UpgradedResponseWriter adds more functionality on top of ResponseWriter
+// UpgradedResponseWriter adds more functionality on the top of ResponseWriter
 type UpgradedResponseWriter interface {
 	http.ResponseWriter
 	http.Pusher
