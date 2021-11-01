@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 	"hash"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ Hash = (*Hasher)(nil)
@@ -81,7 +81,7 @@ func (h *Hasher) Hash(b []byte) ([]byte, error) {
 		return sha3hash(h.span, h.zerohashes[h.depth])
 	}
 	copy(h.bmt.buffer[h.size:], zerosection)
-	// write the last section with final flag set to true
+	// Write the last section with final flag set to true
 	go h.processSection(h.pos, true)
 	select {
 	case result := <-h.result:
@@ -134,12 +134,12 @@ func (h *Hasher) processSection(i int, final bool) {
 	secsize := 2 * h.segmentSize
 	offset := i * secsize
 	level := 1
-	// select the leaf node for the section
+	// Select the leaf node for the section
 	n := h.bmt.leaves[i]
 	isLeft := n.isLeft
 	hasher := n.hasher
 	n = n.parent
-	// hash the section
+	// Hash the section
 	section, err := doHash(hasher, h.bmt.buffer[offset:offset+secsize])
 	if err != nil {
 		select {
@@ -148,9 +148,9 @@ func (h *Hasher) processSection(i int, final bool) {
 		}
 		return
 	}
-	// write hash into parent node
+	// Write hash into parent node
 	if final {
-		// for the last segment use writeFinalNode
+		// For the last segment use writeFinalNode
 		h.writeFinalNode(level, n, isLeft, section)
 	} else {
 		h.writeNode(n, isLeft, section)
@@ -166,22 +166,22 @@ func (h *Hasher) writeNode(n *node, isLeft bool, s []byte) {
 	var err error
 	level := 1
 	for {
-		// at the root of the bmt just write the result to the result channel
+		// At the root of the bmt just write the result to the result channel
 		if n == nil {
 			h.result <- s
 			return
 		}
-		// otherwise assign child hash to left or right segment
+		// Otherwise assign child hash to left or right segment
 		if isLeft {
 			n.left = s
 		} else {
 			n.right = s
 		}
-		// the child-thread first arriving will terminate
+		// The child-thread first arriving will terminate
 		if n.toggle() {
 			return
 		}
-		// the thread coming second now can be sure both left and right children are written
+		// The thread coming second now can be sure both left and right children are written
 		// so it calculates the hash of left|right and pushes it to the parent
 		s, err = doHash(n.hasher, n.left, n.right)
 		if err != nil {
@@ -205,7 +205,7 @@ func (h *Hasher) writeNode(n *node, isLeft bool, s []byte) {
 func (h *Hasher) writeFinalNode(level int, n *node, isLeft bool, s []byte) {
 	var err error
 	for {
-		// at the root of the bmt just write the result to the result channel
+		// At the root of the bmt just write the result to the result channel
 		if n == nil {
 			if s != nil {
 				h.result <- s
@@ -214,36 +214,36 @@ func (h *Hasher) writeFinalNode(level int, n *node, isLeft bool, s []byte) {
 		}
 		var noHash bool
 		if isLeft {
-			// coming from left sister branch
-			// when the final section's path is going via left child node
-			// we include an all-zero subtree hash for the right level and toggle the node.
+			// Coming from left sister branch
+			// When the final section's path is going via left child node
+			// We include an all-zero subtree hash for the right level and toggle the node.
 			n.right = h.zerohashes[level]
 			if s != nil {
 				n.left = s
-				// if a left final node carries a hash, it must be the first (and only thread)
-				// so the toggle is already in passive state no need no call
-				// yet thread needs to carry on pushing hash to parent
+				// If a left final node carries a hash, it must be the first (and only thread)
+				// So the toggle is already in passive state no need no call
+				// Yet thread needs to carry on pushing hash to parent
 				noHash = false
 			} else {
-				// if again first thread then propagate nil and calculate no hash
+				// If again first thread then propagate nil and calculate no hash
 				noHash = n.toggle()
 			}
 		} else {
-			// right sister branch
+			// Right sister branch
 			if s != nil {
-				// if hash was pushed from right child node, write right segment change state
+				// If hash was pushed from right child node, write right segment change state
 				n.right = s
-				// if toggle is true, we arrived first so no hashing just push nil to parent
+				// If toggle is true, we arrived first so no hashing just push nil to parent
 				noHash = n.toggle()
 			} else {
-				// if s is nil, then thread arrived first at previous node and here there will be two,
-				// so no need to do anything and keep s = nil for parent
+				// If s is nil, then thread arrived first at previous node and here there will be two,
+				// So no need to do anything and keep s = nil for parent
 				noHash = true
 			}
 		}
-		// the child-thread first arriving will just continue resetting s to nil
-		// the second thread now can be sure both left and right children are written
-		// it calculates the hash of left|right and pushes it to the parent
+		// The child-thread first arriving will just continue resetting s to nil
+		// The second thread now can be sure both left and right children are written
+		// It calculates the hash of left|right and pushes it to the parent
 		if noHash {
 			s = nil
 		} else {
@@ -256,19 +256,19 @@ func (h *Hasher) writeFinalNode(level int, n *node, isLeft bool, s []byte) {
 				return
 			}
 		}
-		// iterate to parent
+		// Iterate to parent
 		isLeft = n.isLeft
 		n = n.parent
 		level++
 	}
 }
 
-// calculates the Keccak256 SHA3 hash of the data
+// Calculates the Keccak256 SHA3 hash of the data
 func sha3hash(data ...[]byte) ([]byte, error) {
 	return doHash(penguin.NewHasher(), data...)
 }
 
-// calculates Hash of the data
+// Calculates Hash of the data
 func doHash(h hash.Hash, data ...[]byte) ([]byte, error) {
 	h.Reset()
 	for _, v := range data {

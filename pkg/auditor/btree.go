@@ -25,7 +25,7 @@ func ParentHash(leftBytes []byte, rightBytes []byte) []byte {
 	return hash.Sum(nil)
 }
 
-// check if the size value is 2^n
+// Check if the size value is 2^n
 func CheckSize(size int) bool {
 	t := size
 	for {
@@ -48,19 +48,19 @@ func BuildBTreeFromRetrievalAddresses(retrievalAddresses [][]byte) (*TreeNode, e
 		return nil, errors.New("BuildBTreeFromRetrievalAddresses: invalid retrievalAddresses size")
 	}
 
-	// if size == 1
+	// If size == 1
 	if len(retrievalAddresses) == 1 {
 		pNode := new(TreeNode)
 		pNode.PtrLeftSon = nil
 		pNode.PtrRightSon = nil
 		pNode.Data = &retrievalAddresses[0]
-		// tree root node
+		// Tree root node
 		return pNode, nil
 	}
 
 	listNext := make([]*TreeNode, 0)
 
-	// init listPrev
+	// Init listPrev
 	for i := 0; i < len(retrievalAddresses); i = i + 2 {
 		lVal := retrievalAddresses[i]
 		rVal := retrievalAddresses[i+1]
@@ -86,9 +86,9 @@ func BuildBTreeFromRetrievalAddresses(retrievalAddresses [][]byte) (*TreeNode, e
 		listTemp := listNext
 		listNext = make([]*TreeNode, 0)
 
-		// if size == 1
+		// If size == 1
 		if len(listTemp) == 1 {
-			// tree root node
+			// Tree root node
 			return listTemp[0], nil
 		}
 
@@ -119,7 +119,7 @@ func (t *TreeNode) GetRootRelatedHashHex() (string, []string) {
 	rootNode := t
 	rootHashHex := rootNode.GetNodeHashHex()
 
-	// if tree depth is 1
+	// If tree depth is 1
 	if rootNode.PtrLeftSon == nil || rootNode.PtrRightSon == nil {
 		return rootHashHex, nil
 	}
@@ -134,7 +134,7 @@ func (t *TreeNode) GetPathWayHashHex(pathway uint64) (string, [][]string, string
 	rootNode := t
 	rootHashHex := rootNode.GetNodeHashHex()
 
-	// if tree depth is 1
+	// If tree depth is 1
 	if rootNode.PtrLeftSon == nil || rootNode.PtrRightSon == nil {
 		return rootHashHex, nil, rootNode.GetNodeHashHex()
 	}
@@ -144,7 +144,7 @@ func (t *TreeNode) GetPathWayHashHex(pathway uint64) (string, [][]string, string
 	m := pathway
 
 	for {
-		// reach the lowest layer of tree
+		// Reach the lowest layer of tree
 		if tempNode.PtrLeftSon == nil || tempNode.PtrRightSon == nil {
 			return rootHashHex, pathwayHexList, tempNode.GetNodeHashHex()
 		}
@@ -156,10 +156,10 @@ func (t *TreeNode) GetPathWayHashHex(pathway uint64) (string, [][]string, string
 
 		direction := m % 2
 		if direction == 0 {
-			// left
+			// Left
 			tempNode = tempNode.PtrLeftSon
 		} else {
-			// right
+			// Right
 			tempNode = tempNode.PtrRightSon
 		}
 

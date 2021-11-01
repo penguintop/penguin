@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/bmt"
 	"github.com/penguintop/penguin/pkg/bmt/reference"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/sync/errgroup"
 )
 

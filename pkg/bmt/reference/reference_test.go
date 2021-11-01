@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-// calculates the hash of the data using hash.Hash
+// Calculates the hash of the data using hash.Hash
 func doSum(h hash.Hash, b []byte, data ...[]byte) ([]byte, error) {
 	h.Reset()
 	for _, v := range data {
@@ -30,7 +30,7 @@ func doSum(h hash.Hash, b []byte, data ...[]byte) ([]byte, error) {
 	return h.Sum(b), nil
 }
 
-// calculates the Keccak256 SHA3 hash of the data
+// Calculates the Keccak256 SHA3 hash of the data
 func sha3hash(t *testing.T, data ...[]byte) []byte {
 	t.Helper()
 	h := sha3.NewLegacyKeccak256()
@@ -43,14 +43,14 @@ func sha3hash(t *testing.T, data ...[]byte) []byte {
 
 // TestRefHasher tests that the RefHasher computes the expected BMT hash for some small data lengths.
 func TestRefHasher(t *testing.T) {
-	// the test struct is used to specify the expected BMT hash for
+	// The test struct is used to specify the expected BMT hash for
 	// segment counts between from and to and lengths from 1 to datalength
 	for _, x := range []struct {
 		from     int
 		to       int
 		expected func([]byte) []byte
 	}{
-		// all lengths in [0,64] should be:
+		// All lengths in [0,64] should be:
 		//
 		//   sha3hash(data)
 		//
@@ -63,7 +63,7 @@ func TestRefHasher(t *testing.T) {
 				return sha3hash(t, data)
 			},
 		},
-		// all lengths in [3,4] should be:
+		// All lengths in [3,4] should be:
 		//
 		//   sha3hash(
 		//     sha3hash(data[:64])
@@ -79,7 +79,7 @@ func TestRefHasher(t *testing.T) {
 				return sha3hash(t, sha3hash(t, data[:64]), sha3hash(t, data[64:]))
 			},
 		},
-		// all bmttestutil.SegmentCounts in [5,8] should be:
+		// All bmttestutil.SegmentCounts in [5,8] should be:
 		//
 		//   sha3hash(
 		//     sha3hash(
