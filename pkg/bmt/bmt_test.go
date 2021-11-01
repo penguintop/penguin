@@ -16,7 +16,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/bmt"
 	"github.com/penguintop/penguin/pkg/bmt/reference"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -55,7 +55,7 @@ func syncHash(h *bmt.Hasher, data []byte) ([]byte, error) {
 	return h.Hash(nil)
 }
 
-// tests if hasher responds with correct hash comparing the reference implementation return value
+// Tests if hasher responds with correct hash comparing the reference implementation return value
 func TestHasherEmptyData(t *testing.T) {
 	for _, count := range testSegmentCounts {
 		t.Run(fmt.Sprintf("%d_segments", count), func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestHasherEmptyData(t *testing.T) {
 	}
 }
 
-// tests sequential write with entire max size written in one go
+// Tests sequential write with entire max size written in one go
 func TestSyncHasherCorrectness(t *testing.T) {
 	testData := randomBytes(t, seed)
 
@@ -100,7 +100,7 @@ func TestSyncHasherCorrectness(t *testing.T) {
 	}
 }
 
-// tests that the BMT hasher can be synchronously reused with poolsizes 1 and testPoolSize
+// Tests that the BMT hasher can be synchronously reused with poolsizes 1 and testPoolSize
 func TestHasherReuse(t *testing.T) {
 	t.Run(fmt.Sprintf("poolsize_%d", 1), func(t *testing.T) {
 		testHasherReuse(t, 1)
@@ -110,7 +110,7 @@ func TestHasherReuse(t *testing.T) {
 	})
 }
 
-// tests if bmt reuse is not corrupting result
+// Tests if bmt reuse is not corrupting result
 func testHasherReuse(t *testing.T, poolsize int) {
 	pool := bmt.NewPool(bmt.NewConf(penguin.NewHasher, testSegmentCount, poolsize))
 	h := pool.Get()
@@ -127,7 +127,7 @@ func testHasherReuse(t *testing.T, poolsize int) {
 	}
 }
 
-// tests if pool can be cleanly reused even in concurrent use by several hashers
+// Tests if pool can be cleanly reused even in concurrent use by several hashers
 func TestBMTConcurrentUse(t *testing.T) {
 	testData := randomBytes(t, seed)
 	pool := bmt.NewPool(bmt.NewConf(penguin.NewHasher, testSegmentCount, testPoolSize))
@@ -155,7 +155,7 @@ func TestBMTConcurrentUse(t *testing.T) {
 	}
 }
 
-// tests BMT Hasher io.Writer interface is working correctly even with random short writes
+// Tests BMT Hasher io.Writer interface is working correctly even with random short writes
 func TestBMTWriterBuffers(t *testing.T) {
 	for i, count := range testSegmentCounts {
 		t.Run(fmt.Sprintf("%d_segments", count), func(t *testing.T) {
@@ -233,7 +233,7 @@ func TestBMTWriterBuffers(t *testing.T) {
 	}
 }
 
-// helper function that compares reference and optimised implementations for correctness
+// Helper function that compares reference and optimised implementations for correctness
 func testHasherCorrectness(h *bmt.Hasher, data []byte, n, count int) (err error) {
 	if len(data) < n {
 		n = len(data)
@@ -252,7 +252,7 @@ func testHasherCorrectness(h *bmt.Hasher, data []byte, n, count int) (err error)
 	return nil
 }
 
-// verifies that the bmt.Hasher can be used with the hash.Hash interface
+// Verifies that the bmt.Hasher can be used with the hash.Hash interface
 func TestUseSyncAsOrdinaryHasher(t *testing.T) {
 	pool := bmt.NewPool(bmt.NewConf(penguin.NewHasher, testSegmentCount, testPoolSize))
 	h := pool.Get()
