@@ -8,7 +8,7 @@ package bmtpool
 
 import (
 	"github.com/penguintop/penguin/pkg/bmt"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 const Capacity = 32
