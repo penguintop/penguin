@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/penguintop/penguin/pkg/bmtpool"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
