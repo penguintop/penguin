@@ -95,7 +95,7 @@ https://i.gyazo.com/390210ddff095523d391b59d24c4868c.mp4
 - [ ]  backup private key
 
 After entering and confirming the password, the terminal will print out the private key of the XWC account, which needs to be backed up
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLUWiBZJW0rCHXpYlzxY0UpLqFG2G7dAV7yN5QGT0cSgr9H-yk8sDjYAHL4ix3tnCDAbPD5L29Glz_a0KAHK6aDkDF9h5ilLlNSsTaQglRwS9l5jM5Nz7V7OV20qZz0Jfsg5GxotA1ZuEz_XxK8LT9Yn=w993-h218-no?authuser=0?raw=true)
+![alt text](/resources/images/guide-backup-pk.png)
 
 
 # Fill up an node wallet
@@ -123,7 +123,7 @@ PEN.
 6. How to export and backup PEN's XWC account private key if you forget to back up the private key when running PEN for the first time
 
 `./pen dumpkey --data-dir=/home/pen/pen_data`
-![alt text](https://lh3.googleusercontent.com/pw/AM-JKLVh_47pEIn9t0OKbUgXVDMgFlhvG3xLbd2v5Zev8iUf1OPThNVX561tcUF-h-NUWlKgmj_kjzxDGFHALKuVFgoKPdrr-EByrEgv3LMKM24UVmCXOLqmxSkFGOtP19T2Ek0ImCUxXE4RoZcuLFS15E9F=w993-h140-no?authuser=0?raw=true)
+![alt text](/resources/images/guide-dumpkey.png)
 
 
 # PEN startup parameters:
