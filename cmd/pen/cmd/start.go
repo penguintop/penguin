@@ -394,8 +394,8 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 				return nil, err
 			}
 			logger.Info("********************************************************************")
-			logger.Infof("!!! Private key: %s !!!", privKeyWif)
-			logger.Infof("!!! Please backup your Private key, and do not tell it to anyone else !!!")
+			logger.Infof("!!! PrivateKey: %s !!!", privKeyWif)
+			logger.Infof("!!! Please backup your PrivateKey, and do not tell it to anyone else !!!")
 			logger.Info("********************************************************************")
 			logger.Infof("Press any key to continue...")
 			reader := bufio.NewReader(os.Stdin)

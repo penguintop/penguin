@@ -93,10 +93,10 @@ func (c *command) initDumpKeyCmd() (err error) {
 					xwcAddr, _ := xwcfmt.HexAddrToXwcAddr(hex.EncodeToString(overlayXwcAddress[:]))
 
 					logger.Info("********************************************************************")
-					logger.Infof("!!! Private key: %s !!!", privKeyWif)
-					logger.Infof("!!! XWC account address: %s !!!", xwcAddr)
-					logger.Infof("!!! Penguin node address: %s !!!", nodeAddress)
-					logger.Infof("!!! Please backup your private key, and do not tell it to anyone else !!!")
+					logger.Infof("!!! PrivateKey: %s !!!", privKeyWif)
+					logger.Infof("!!! XWC Account Address: %s !!!", xwcAddr)
+					logger.Infof("!!! Penguin Node Address: %s !!!", nodeAddress)
+					logger.Infof("!!! Please backup your PrivateKey, and do not tell it to anyone else !!!")
 					logger.Info("********************************************************************")
 
 				} else {
