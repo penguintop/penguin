@@ -26,6 +26,7 @@ const (
 
 	balanceCheckBackoffDuration = 20 * time.Second
 	balanceCheckMaxRetries      = 10
+	CHECK_BALANCE_INTERVAL      = 60 * time.Second
 
 	chequeBookDeployedCheckBackoffDuration = 10 * time.Second
 )
@@ -230,9 +231,18 @@ func Init(
 		if err == storage.ErrNotFound {
 			logger.Info("no chequebook found, deploying new one.")
 			if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
-				err = checkBalance(ctx, logger, swapInitialDeposit, swapBackend, chainId, overlayXwcAddress, erc20Service)
-				if err != nil {
-					return nil, err
+				for {
+					err = checkBalance(ctx, logger, swapInitialDeposit, swapBackend, chainId, overlayXwcAddress, erc20Service)
+					if err != nil {
+						// Never skip the process and retry it until the account balance is available.
+						logger.Errorf("Failed to check balance: %s", err.Error())
+						logger.Info("Wait a moment to retry the checking balance.")
+
+						time.Sleep(CHECK_BALANCE_INTERVAL)
+						continue
+					}
+
+					break
 				}
 
 				// transfer token
