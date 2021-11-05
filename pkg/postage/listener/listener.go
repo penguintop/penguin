@@ -309,7 +309,7 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 		defer l.wg.Done()
 
 		evRpcRetryTimes := 0
-		retryTimesMaxAllow := 60
+		retryTimesMaxAllow := 60000
 
 		for {
 			select {
@@ -331,7 +331,7 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 					return err
 				} else {
 					l.logger.Warningf("l.ev.BlockNumber, retry [%d/%d]", evRpcRetryTimes, retryTimesMaxAllow)
-					time.Sleep(1 * time.Second)
+					time.Sleep(10 * time.Second)
 					continue
 				}
 			}
@@ -370,7 +370,7 @@ func (l *listener) Listen(from uint64, updater postage.EventUpdater) <-chan stru
 					return err
 				} else {
 					l.logger.Warningf("l.ev.GetContractEventsInRange, retry [%d/%d]", evRpcRetryTimes, retryTimesMaxAllow)
-					time.Sleep(1 * time.Second)
+					time.Sleep(10 * time.Second)
 					continue
 				}
 			}
