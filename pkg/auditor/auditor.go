@@ -152,6 +152,7 @@ func (r *Auditor) Run() {
 			r.logger.Infof("R son hash: %s", pathWayHexPair[1])
 		}
 		r.logger.Infof("Final Node Hash: %s", pathWayFinalNodeHashHex)
+		r.logger.Infof("Path Depth: %d", len(pathData))
 
 		pathWayFinalNodeHash, err := hex.DecodeString(pathWayFinalNodeHashHex)
 		if err != nil {
@@ -180,8 +181,7 @@ func (r *Auditor) Run() {
 		err = RequestReportPathData(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.PenguinAddress, hex.EncodeToString(signature), pathData,
 			hex.EncodeToString(item.Data))
 		if err != nil {
-			r.logger.Errorf("RequestReportPathData: %s", err.Error())
-			continue
+			r.logger.Warningf("RequestReportPathData: %s", err.Error())
 		}
 
 		// Done
