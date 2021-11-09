@@ -258,7 +258,7 @@ func (d *defaultSigner) SignTypedData(typedData *eip712.TypedData) ([]byte, erro
 	return d.sign(sighash, false)
 }
 
-// sign the provided hash and convert it to the ethereum (r,s,v) format.
+// Sign the provided hash and convert it to the ethereum (r,s,v) format.
 func (d *defaultSigner) sign(sighash []byte, isCompressedKey bool) ([]byte, error) {
 	signature, err := btcec.SignCompact(btcec.S256(), (*btcec.PrivateKey)(d.key), sighash, false)
 	if err != nil {
