@@ -121,6 +121,7 @@ if __name__ == "__main__":
 
     # check the transaction now...
     check_transaction_on_chain(res["result"]["trxid"])
-    print("update price success!")
+    logger.info("update price success!")
+    
     config["last_staking_price_update_time"] = int(time.time())
     save_config()
