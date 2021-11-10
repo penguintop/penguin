@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -70,16 +70,16 @@ func (s *Service) chequebookBalanceHandler(w http.ResponseWriter, r *http.Reques
 	balance, err := s.chequebook.Balance(r.Context())
 	if err != nil {
 		jsonhttp.InternalServerError(w, errChequebookBalance)
-		s.logger.Debugf("debug api: chequebook balance: %v", err)
-		s.logger.Error("debug api: cannot get chequebook balance")
+		s.logger.Debugf("Debug api: chequebook balance: %v", err)
+		s.logger.Error("Debug api: cannot get chequebook balance")
 		return
 	}
 
 	availableBalance, err := s.chequebook.AvailableBalance(r.Context())
 	if err != nil {
 		jsonhttp.InternalServerError(w, errChequebookBalance)
-		s.logger.Debugf("debug api: chequebook availableBalance: %v", err)
-		s.logger.Error("debug api: cannot get chequebook availableBalance")
+		s.logger.Debugf("Debug api: chequebook availableBalance: %v", err)
+		s.logger.Error("Debug api: cannot get chequebook availableBalance")
 		return
 	}
 
@@ -96,8 +96,8 @@ func (s *Service) chequebookLastPeerHandler(w http.ResponseWriter, r *http.Reque
 	addr := mux.Vars(r)["peer"]
 	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
-		s.logger.Debugf("debug api: chequebook cheque peer: invalid peer address %s: %v", addr, err)
-		s.logger.Errorf("debug api: chequebook cheque peer: invalid peer address %s", addr)
+		s.logger.Debugf("Debug api: chequebook cheque peer: invalid peer address %s: %v", addr, err)
+		s.logger.Errorf("Debug api: chequebook cheque peer: invalid peer address %s", addr)
 		jsonhttp.NotFound(w, errInvalidAddress)
 		return
 	}
@@ -105,8 +105,8 @@ func (s *Service) chequebookLastPeerHandler(w http.ResponseWriter, r *http.Reque
 	var lastSentResponse *chequebookLastChequePeerResponse
 	lastSent, err := s.swap.LastSentCheque(peer)
 	if err != nil && err != chequebook.ErrNoCheque {
-		s.logger.Debugf("debug api: chequebook cheque peer: get peer %s last cheque: %v", peer.String(), err)
-		s.logger.Errorf("debug api: chequebook cheque peer: can't get peer %s last cheque", peer.String())
+		s.logger.Debugf("Debug api: chequebook cheque peer: get peer %s last cheque: %v", peer.String(), err)
+		s.logger.Errorf("Debug api: chequebook cheque peer: can't get peer %s last cheque", peer.String())
 		jsonhttp.InternalServerError(w, errCantLastChequePeer)
 		return
 	}
@@ -123,8 +123,8 @@ func (s *Service) chequebookLastPeerHandler(w http.ResponseWriter, r *http.Reque
 	var lastReceivedResponse *chequebookLastChequePeerResponse
 	lastReceived, err := s.swap.LastReceivedCheque(peer)
 	if err != nil && err != chequebook.ErrNoCheque {
-		s.logger.Debugf("debug api: chequebook cheque peer: get peer %s last cheque: %v", peer.String(), err)
-		s.logger.Errorf("debug api: chequebook cheque peer: can't get peer %s last cheque", peer.String())
+		s.logger.Debugf("Debug api: chequebook cheque peer: get peer %s last cheque: %v", peer.String(), err)
+		s.logger.Errorf("Debug api: chequebook cheque peer: can't get peer %s last cheque", peer.String())
 		jsonhttp.InternalServerError(w, errCantLastChequePeer)
 		return
 	}
@@ -148,15 +148,15 @@ func (s *Service) chequebookLastPeerHandler(w http.ResponseWriter, r *http.Reque
 func (s *Service) chequebookAllLastHandler(w http.ResponseWriter, r *http.Request) {
 	lastchequessent, err := s.swap.LastSentCheques()
 	if err != nil {
-		s.logger.Debugf("debug api: chequebook cheque all: get all last cheques: %v", err)
-		s.logger.Errorf("debug api: chequebook cheque all: can't get all last cheques")
+		s.logger.Debugf("Debug api: chequebook cheque all: get all last cheques: %v", err)
+		s.logger.Errorf("Debug api: chequebook cheque all: can't get all last cheques")
 		jsonhttp.InternalServerError(w, errCantLastCheque)
 		return
 	}
 	lastchequesreceived, err := s.swap.LastReceivedCheques()
 	if err != nil {
-		s.logger.Debugf("debug api: chequebook cheque all: get all last cheques: %v", err)
-		s.logger.Errorf("debug api: chequebook cheque all: can't get all last cheques")
+		s.logger.Debugf("Debug api: chequebook cheque all: get all last cheques: %v", err)
+		s.logger.Errorf("Debug api: chequebook cheque all: can't get all last cheques")
 		jsonhttp.InternalServerError(w, errCantLastCheque)
 		return
 	}
@@ -217,8 +217,8 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
 	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
-		s.logger.Debugf("debug api: cashout peer: invalid peer address %s: %v", addr, err)
-		s.logger.Errorf("debug api: cashout peer: invalid peer address %s", addr)
+		s.logger.Debugf("Debug api: cashout peer: invalid peer address %s: %v", addr, err)
+		s.logger.Errorf("Debug api: cashout peer: invalid peer address %s", addr)
 		jsonhttp.NotFound(w, errInvalidAddress)
 		return
 	}
@@ -227,7 +227,7 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 	if price, ok := r.Header[gasPriceHeader]; ok {
 		p, ok := big.NewInt(0).SetString(price[0], 10)
 		if !ok {
-			s.logger.Error("debug api: cashout peer: bad gas price")
+			s.logger.Error("Debug api: cashout peer: bad gas price")
 			jsonhttp.BadRequest(w, errBadGasPrice)
 			return
 		}
@@ -237,8 +237,8 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 	if limit, ok := r.Header[gasLimitHeader]; ok {
 		l, err := strconv.ParseUint(limit[0], 10, 64)
 		if err != nil {
-			s.logger.Debugf("debug api: cashout peer: bad gas limit: %v", err)
-			s.logger.Error("debug api: cashout peer: bad gas limit")
+			s.logger.Debugf("Debug api: cashout peer: bad gas limit: %v", err)
+			s.logger.Error("Debug api: cashout peer: bad gas limit")
 			jsonhttp.BadRequest(w, errBadGasLimit)
 			return
 		}
@@ -247,8 +247,8 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	txHash, err := s.swap.CashCheque(ctx, peer)
 	if err != nil {
-		s.logger.Debugf("debug api: cashout peer: cannot cash %s: %v", addr, err)
-		s.logger.Errorf("debug api: cashout peer: cannot cash %s", addr)
+		s.logger.Debugf("Debug api: cashout peer: cannot cash %s: %v", addr, err)
+		s.logger.Errorf("Debug api: cashout peer: cannot cash %s", addr)
 		jsonhttp.InternalServerError(w, errCannotCash)
 		return
 	}
@@ -274,8 +274,8 @@ func (s *Service) swapCashoutStatusHandler(w http.ResponseWriter, r *http.Reques
 	addr := mux.Vars(r)["peer"]
 	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
-		s.logger.Debugf("debug api: cashout status peer: invalid peer address %s: %v", addr, err)
-		s.logger.Errorf("debug api: cashout status peer: invalid peer address %s", addr)
+		s.logger.Debugf("Debug api: cashout status peer: invalid peer address %s: %v", addr, err)
+		s.logger.Errorf("Debug api: cashout status peer: invalid peer address %s", addr)
 		jsonhttp.NotFound(w, errInvalidAddress)
 		return
 	}
@@ -283,19 +283,19 @@ func (s *Service) swapCashoutStatusHandler(w http.ResponseWriter, r *http.Reques
 	status, err := s.swap.CashoutStatus(r.Context(), peer)
 	if err != nil {
 		if errors.Is(err, chequebook.ErrNoCheque) {
-			s.logger.Debugf("debug api: cashout status peer: %v, err: %v", addr, err)
-			s.logger.Errorf("debug api: cashout status peer: %s", addr)
+			s.logger.Debugf("Debug api: cashout status peer: %v, err: %v", addr, err)
+			s.logger.Errorf("Debug api: cashout status peer: %s", addr)
 			jsonhttp.NotFound(w, errNoCheque)
 			return
 		}
 		if errors.Is(err, chequebook.ErrNoCashout) {
-			s.logger.Debugf("debug api: cashout status peer: %v, err: %v", addr, err)
-			s.logger.Errorf("debug api: cashout status peer: %s", addr)
+			s.logger.Debugf("Debug api: cashout status peer: %v, err: %v", addr, err)
+			s.logger.Errorf("Debug api: cashout status peer: %s", addr)
 			jsonhttp.NotFound(w, errNoCashout)
 			return
 		}
-		s.logger.Debugf("debug api: cashout status peer: cannot get status %s: %v", addr, err)
-		s.logger.Errorf("debug api: cashout status peer: cannot get status %s", addr)
+		s.logger.Debugf("Debug api: cashout status peer: cannot get status %s: %v", addr, err)
+		s.logger.Errorf("Debug api: cashout status peer: cannot get status %s", addr)
 		jsonhttp.InternalServerError(w, errCannotCashStatus)
 		return
 	}
@@ -343,14 +343,14 @@ func (s *Service) chequebookWithdrawHandler(w http.ResponseWriter, r *http.Reque
 	amountStr := r.URL.Query().Get("amount")
 	if amountStr == "" {
 		jsonhttp.BadRequest(w, errChequebookNoAmount)
-		s.logger.Error("debug api: no withdraw amount")
+		s.logger.Error("Debug api: no withdraw amount")
 		return
 	}
 
 	amount, ok := big.NewInt(0).SetString(amountStr, 10)
 	if !ok {
 		jsonhttp.BadRequest(w, errChequebookNoAmount)
-		s.logger.Error("debug api: invalid withdraw amount")
+		s.logger.Error("Debug api: invalid withdraw amount")
 		return
 	}
 
@@ -358,7 +358,7 @@ func (s *Service) chequebookWithdrawHandler(w http.ResponseWriter, r *http.Reque
 	if price, ok := r.Header[gasPriceHeader]; ok {
 		p, ok := big.NewInt(0).SetString(price[0], 10)
 		if !ok {
-			s.logger.Error("debug api: withdraw: bad gas price")
+			s.logger.Error("Debug api: withdraw: bad gas price")
 			jsonhttp.BadRequest(w, errBadGasPrice)
 			return
 		}
@@ -368,14 +368,14 @@ func (s *Service) chequebookWithdrawHandler(w http.ResponseWriter, r *http.Reque
 	txHash, err := s.chequebook.Withdraw(ctx, amount)
 	if errors.Is(err, chequebook.ErrInsufficientFunds) {
 		jsonhttp.BadRequest(w, errChequebookInsufficientFunds)
-		s.logger.Debugf("debug api: chequebook withdraw: %v", err)
-		s.logger.Error("debug api: cannot withdraw from chequebook")
+		s.logger.Debugf("Debug api: chequebook withdraw: %v", err)
+		s.logger.Error("Debug api: cannot withdraw from chequebook")
 		return
 	}
 	if err != nil {
 		jsonhttp.InternalServerError(w, errChequebookNoWithdraw)
-		s.logger.Debugf("debug api: chequebook withdraw: %v", err)
-		s.logger.Error("debug api: cannot withdraw from chequebook")
+		s.logger.Debugf("Debug api: chequebook withdraw: %v", err)
+		s.logger.Error("Debug api: cannot withdraw from chequebook")
 		return
 	}
 
@@ -387,14 +387,14 @@ func (s *Service) chequebookDepositHandler(w http.ResponseWriter, r *http.Reques
 	amountStr := r.URL.Query().Get("amount")
 	if amountStr == "" {
 		jsonhttp.BadRequest(w, errChequebookNoAmount)
-		s.logger.Error("debug api: no deposit amount")
+		s.logger.Error("Debug api: no deposit amount")
 		return
 	}
 
 	amount, ok := big.NewInt(0).SetString(amountStr, 10)
 	if !ok {
 		jsonhttp.BadRequest(w, errChequebookNoAmount)
-		s.logger.Error("debug api: invalid deposit amount")
+		s.logger.Error("Debug api: invalid deposit amount")
 		return
 	}
 
@@ -402,7 +402,7 @@ func (s *Service) chequebookDepositHandler(w http.ResponseWriter, r *http.Reques
 	if price, ok := r.Header[gasPriceHeader]; ok {
 		p, ok := big.NewInt(0).SetString(price[0], 10)
 		if !ok {
-			s.logger.Error("debug api: deposit: bad gas price")
+			s.logger.Error("Debug api: deposit: bad gas price")
 			jsonhttp.BadRequest(w, errBadGasPrice)
 			return
 		}
@@ -412,14 +412,14 @@ func (s *Service) chequebookDepositHandler(w http.ResponseWriter, r *http.Reques
 	txHash, err := s.chequebook.Deposit(ctx, amount)
 	if errors.Is(err, chequebook.ErrInsufficientFunds) {
 		jsonhttp.BadRequest(w, errChequebookInsufficientFunds)
-		s.logger.Debugf("debug api: chequebook deposit: %v", err)
-		s.logger.Error("debug api: cannot deposit from chequebook")
+		s.logger.Debugf("Debug api: chequebook deposit: %v", err)
+		s.logger.Error("Debug api: cannot deposit from chequebook")
 		return
 	}
 	if err != nil {
 		jsonhttp.InternalServerError(w, errChequebookNoDeposit)
-		s.logger.Debugf("debug api: chequebook deposit: %v", err)
-		s.logger.Error("debug api: cannot deposit from chequebook")
+		s.logger.Debugf("Debug api: chequebook deposit: %v", err)
+		s.logger.Error("Debug api: cannot deposit from chequebook")
 		return
 	}
 
