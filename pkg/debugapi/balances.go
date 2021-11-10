@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/accounting"
 	"github.com/penguintop/penguin/pkg/jsonhttp"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -35,8 +35,8 @@ func (s *Service) balancesHandler(w http.ResponseWriter, r *http.Request) {
 	balances, err := s.accounting.Balances()
 	if err != nil {
 		jsonhttp.InternalServerError(w, errCantBalances)
-		s.logger.Debugf("debug api: balances: %v", err)
-		s.logger.Error("debug api: can not get balances")
+		s.logger.Debugf("Debug api: balances: %v", err)
+		s.logger.Error("Debug api: can not get balances")
 		return
 	}
 
@@ -57,8 +57,8 @@ func (s *Service) peerBalanceHandler(w http.ResponseWriter, r *http.Request) {
 	addr := mux.Vars(r)["peer"]
 	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
-		s.logger.Debugf("debug api: balances peer: invalid peer address %s: %v", addr, err)
-		s.logger.Errorf("debug api: balances peer: invalid peer address %s", addr)
+		s.logger.Debugf("Debug api: balances peer: invalid peer address %s: %v", addr, err)
+		s.logger.Errorf("Debug api: balances peer: invalid peer address %s", addr)
 		jsonhttp.NotFound(w, errInvalidAddress)
 		return
 	}
@@ -69,8 +69,8 @@ func (s *Service) peerBalanceHandler(w http.ResponseWriter, r *http.Request) {
 			jsonhttp.NotFound(w, errNoBalance)
 			return
 		}
-		s.logger.Debugf("debug api: balances peer: get peer %s balance: %v", peer.String(), err)
-		s.logger.Errorf("debug api: balances peer: can't get peer %s balance", peer.String())
+		s.logger.Debugf("Debug api: balances peer: get peer %s balance: %v", peer.String(), err)
+		s.logger.Errorf("Debug api: balances peer: can't get peer %s balance", peer.String())
 		jsonhttp.InternalServerError(w, errCantBalance)
 		return
 	}
@@ -85,8 +85,8 @@ func (s *Service) compensatedBalancesHandler(w http.ResponseWriter, r *http.Requ
 	balances, err := s.accounting.CompensatedBalances()
 	if err != nil {
 		jsonhttp.InternalServerError(w, errCantBalances)
-		s.logger.Debugf("debug api: compensated balances: %v", err)
-		s.logger.Error("debug api: can not get compensated balances")
+		s.logger.Debugf("Debug api: compensated balances: %v", err)
+		s.logger.Error("Debug api: can not get compensated balances")
 		return
 	}
 
@@ -107,8 +107,8 @@ func (s *Service) compensatedPeerBalanceHandler(w http.ResponseWriter, r *http.R
 	addr := mux.Vars(r)["peer"]
 	peer, err := penguin.ParseHexAddress(addr)
 	if err != nil {
-		s.logger.Debugf("debug api: compensated balances peer: invalid peer address %s: %v", addr, err)
-		s.logger.Errorf("debug api: compensated balances peer: invalid peer address %s", addr)
+		s.logger.Debugf("Debug api: compensated balances peer: invalid peer address %s: %v", addr, err)
+		s.logger.Errorf("Debug api: compensated balances peer: invalid peer address %s", addr)
 		jsonhttp.NotFound(w, errInvalidAddress)
 		return
 	}
@@ -119,8 +119,8 @@ func (s *Service) compensatedPeerBalanceHandler(w http.ResponseWriter, r *http.R
 			jsonhttp.NotFound(w, errNoBalance)
 			return
 		}
-		s.logger.Debugf("debug api: compensated balances peer: get peer %s balance: %v", peer.String(), err)
-		s.logger.Errorf("debug api: compensated balances peer: can't get peer %s balance", peer.String())
+		s.logger.Debugf("Debug api: compensated balances peer: get peer %s balance: %v", peer.String(), err)
+		s.logger.Errorf("Debug api: compensated balances peer: can't get peer %s balance", peer.String())
 		jsonhttp.InternalServerError(w, errCantBalance)
 		return
 	}
