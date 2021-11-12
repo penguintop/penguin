@@ -21,7 +21,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook/mock"
 	swapmock "github.com/penguintop/penguin/pkg/settlement/swap/mock"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestChequebookBalance(t *testing.T) {
