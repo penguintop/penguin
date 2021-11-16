@@ -13,7 +13,7 @@ import (
 func newMetricsRegistry() (r *prometheus.Registry) {
 	r = prometheus.NewRegistry()
 
-	// register standard metrics
+	// Register standard metrics
 	r.MustRegister(
 		prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{
 			Namespace: metrics.Namespace,

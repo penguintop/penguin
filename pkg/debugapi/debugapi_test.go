@@ -29,7 +29,7 @@ import (
 	chequebookmock "github.com/penguintop/penguin/pkg/settlement/swap/chequebook/mock"
 	swapmock "github.com/penguintop/penguin/pkg/settlement/swap/mock"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
 	topologymock "github.com/penguintop/penguin/pkg/topology/mock"
