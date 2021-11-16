@@ -22,7 +22,7 @@ import (
 	"github.com/penguintop/penguin/pkg/settlement/swap"
 	"github.com/penguintop/penguin/pkg/settlement/swap/chequebook"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/topology"
 	"github.com/penguintop/penguin/pkg/topology/lightnode"
@@ -102,7 +102,7 @@ func (s *Service) Configure(p2p p2p.DebugService, pingpong pingpong.Interface, t
 
 // ServeHTTP implements http.Handler interface.
 func (s *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// protect handler as it is changed by the Configure method
+	// Protect handler as it is changed by the Configure method
 	s.handlerMu.RLock()
 	h := s.handler
 	s.handlerMu.RUnlock()
