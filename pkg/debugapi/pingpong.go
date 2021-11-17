@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/p2p"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/mux"
 )
 
@@ -27,25 +27,25 @@ func (s *Service) pingpongHandler(w http.ResponseWriter, r *http.Request) {
 
 	address, err := penguin.ParseHexAddress(peerID)
 	if err != nil {
-		logger.Debugf("pingpong: parse peer address %s: %v", peerID, err)
+		logger.Debugf("Pingpong: parse peer address %s: %v", peerID, err)
 		jsonhttp.BadRequest(w, "invalid peer address")
 		return
 	}
 
 	rtt, err := s.pingpong.Ping(ctx, address, "hey", "there", ",", "how are", "you", "?")
 	if err != nil {
-		logger.Debugf("pingpong: ping %s: %v", peerID, err)
+		logger.Debugf("Pingpong: ping %s: %v", peerID, err)
 		if errors.Is(err, p2p.ErrPeerNotFound) {
 			jsonhttp.NotFound(w, "peer not found")
 			return
 		}
 
-		logger.Errorf("pingpong failed to peer %s", peerID)
+		logger.Errorf("Pingpong failed to peer %s", peerID)
 		jsonhttp.InternalServerError(w, nil)
 		return
 	}
 
-	logger.Infof("pingpong succeeded to peer %s", peerID)
+	logger.Infof("Pingpong succeeded to peer %s", peerID)
 	jsonhttp.OK(w, pingpongResponse{
 		RTT: rtt.String(),
 	})
