@@ -18,7 +18,7 @@ import (
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 )
 
