@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/encryption/elgamal"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestElgamalCorrect(t *testing.T) {
