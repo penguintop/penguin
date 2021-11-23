@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/encryption"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/crypto/sha3"
 )
 
