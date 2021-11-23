@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/encryption"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -25,11 +25,11 @@ func New(s storage.Getter) storage.Getter {
 func (s *decryptingStore) Get(ctx context.Context, mode storage.ModeGet, addr penguin.Address) (ch penguin.Chunk, err error) {
 	switch l := len(addr.Bytes()); l {
 	case penguin.HashSize:
-		// normal, unencrypted content
+		// Normal, unencrypted content
 		return s.Getter.Get(ctx, mode, addr)
 
 	case encryption.ReferenceSize:
-		// encrypted reference
+		// Encrypted reference
 		ref := addr.Bytes()
 		address := penguin.NewAddress(ref[:penguin.HashSize])
 		ch, err := s.Getter.Get(ctx, mode, address)
@@ -54,7 +54,7 @@ func decryptChunkData(chunkData []byte, encryptionKey encryption.Key) ([]byte, e
 		return nil, err
 	}
 
-	// removing extra bytes which were just added for padding
+	// Removing extra bytes which were just added for padding
 	length := binary.LittleEndian.Uint64(decryptedSpan)
 	refSize := int64(penguin.HashSize + encryption.KeyLength)
 	for length > penguin.ChunkSize {
