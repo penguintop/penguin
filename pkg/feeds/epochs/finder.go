@@ -10,7 +10,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/feeds"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var _ feeds.Lookup = (*finder)(nil)
@@ -65,19 +65,19 @@ func (f *finder) common(ctx context.Context, at, after int64) (*epoch, penguin.C
 func (f *finder) at(ctx context.Context, at uint64, e *epoch, ch penguin.Chunk) (penguin.Chunk, error) {
 	uch, err := f.getter.Get(ctx, e)
 	if err != nil {
-		// error retrieving
+		// Error retrieving
 		if !errors.Is(err, storage.ErrNotFound) {
 			return nil, err
 		}
-		// epoch not found on branch
+		// Epoch not found on branch
 		if e.isLeft() { // no lower resolution
 			return ch, nil
 		}
-		// traverse earlier branch
+		// Traverse earlier branch
 		return f.at(ctx, e.start-1, e.left(), ch)
 	}
-	// epoch found
-	// check if timestamp is later then target
+	// Epoch found
+	// Check if timestamp is later then target
 	ts, err := feeds.UpdatedAt(uch)
 	if err != nil {
 		return nil, err
@@ -88,10 +88,10 @@ func (f *finder) at(ctx context.Context, at uint64, e *epoch, ch penguin.Chunk) 
 		}
 		return f.at(ctx, e.start-1, e.left(), ch)
 	}
-	if e.level == 0 { // matching update time or finest resolution
+	if e.level == 0 { // Matching update time or finest resolution
 		return uch, nil
 	}
-	// continue traversing based on at
+	// Continue traversing based on at
 	return f.at(ctx, at, e.childAt(at), uch)
 }
 
@@ -179,41 +179,41 @@ func (f *asyncFinder) asyncAt(ctx context.Context, at, after int64) (penguin.Chu
 LOOP:
 	for r := range c {
 		p := r.path
-		// ignore result from paths already  cancelled
+		// Ignore result from paths already  cancelled
 		select {
 		case <-p.cancel:
 			continue LOOP
 		default:
 		}
-		if r.chunk != nil { // update chunk for epoch found
-			if r.level == 0 { // return if deepest level epoch
+		if r.chunk != nil { // Update chunk for epoch found
+			if r.level == 0 { // Return if deepest level epoch
 				return r.chunk, nil
 			}
-			// ignore if higher level than the deepest epoch found
+			// Ignore if higher level than the deepest epoch found
 			if p.top != nil && p.top.level < r.level {
 				continue LOOP
 			}
 			p.top = r
-		} else { // update chunk for epoch not found
-			// if top level than return with no update found
+		} else { // Update chunk for epoch not found
+			// If top level than return with no update found
 			if r.level == 32 {
 				close(p.cancel)
 				return nil, nil
 			}
-			// if topmost epoch not found, then set bottom
+			// If topmost epoch not found, then set bottom
 			if p.bottom == nil || p.bottom.level < r.level {
 				p.bottom = r
 			}
 		}
 
-		// found - not found for two consecutive epochs
+		// Found - not found for two consecutive epochs
 		if p.top != nil && p.bottom != nil && p.top.level == p.bottom.level+1 {
-			// cancel path
+			// Cancel path
 			close(p.cancel)
 			if p.bottom.isLeft() {
 				return p.top.chunk, nil
 			}
-			// recursive call on new path through left sister
+			// Recursively call on new path through left sister
 			np := newPath(at)
 			np.top = &result{np, p.top.chunk, p.top.epoch}
 			go f.at(ctx, int64(p.bottom.start-1), np, p.bottom.left(), c)
