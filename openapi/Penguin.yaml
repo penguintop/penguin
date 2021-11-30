@@ -825,3 +825,25 @@ paths:
         default:
           description: Default response
 
+  "/xwc/xwc_rpc_proxy":
+    post:
+      summary: Proxy for XWC RPC call
+      tags:
+        - XWC RPC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "PenguinCommon.yaml#/components/schemas/XwcRequest"
+      responses:
+        "200":
+          description: format like {"code":200, "message":"json string"}
+          content:
+            application/json:
+              schema:
+                type: object
+        "500":
+          $ref: "PenguinCommon.yaml#/components/responses/500"
+          default:
+            description: Default response
