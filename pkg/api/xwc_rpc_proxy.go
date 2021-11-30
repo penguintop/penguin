@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const RPC_TIME_OUT = 5 * time.Second
+const RPC_TIME_OUT = 20 * time.Second
 
 type xwcRequest struct {
 	Id     uint64   `json:"id,omitempty"`
