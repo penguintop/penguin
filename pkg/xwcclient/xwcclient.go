@@ -561,6 +561,10 @@ func (ec *Client) SendXwcTransaction(ctx context.Context, tx *xwcfmt.Transaction
 	return hash, nil
 }
 
+func (ec *Client) RawCall(ctx context.Context, id uint64, data interface{}) (*rpc.JsonrpcMessage, error) {
+	return ec.c.RawCallContext(ctx, id, data)
+}
+
 func toCallArg(msg ethereum.CallMsg) interface{} {
 	arg := map[string]interface{}{
 		"from": msg.From,

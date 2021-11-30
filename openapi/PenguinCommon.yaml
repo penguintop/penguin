@@ -428,6 +428,18 @@ components:
       type: string
       pattern: "^(sequence|epoch)$"
 
+    XwcRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        method:
+          type: string
+        params:
+          type: array
+          items:
+            type: string
+
   headers:
     PenguinTag:
       description: "Tag UID"

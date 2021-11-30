@@ -193,7 +193,7 @@ func waitForMessages(in *json.Decoder, successes chan subConfirmation, notificat
 }
 
 func readAndValidateMessage(in *json.Decoder) (*subConfirmation, *subscriptionResult, error) {
-	var msg jsonrpcMessage
+	var msg JsonrpcMessage
 	if err := in.Decode(&msg); err != nil {
 		return nil, nil, fmt.Errorf("decode error: %v", err)
 	}

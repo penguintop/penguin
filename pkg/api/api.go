@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/penguintop/penguin/pkg/xwcclient"
 	"io"
 	"math"
 	"net/http"
@@ -105,6 +106,9 @@ type server struct {
 
 	wsWg sync.WaitGroup // wait for all websockets to close on exit
 	quit chan struct{}
+
+	// xwc rpc related
+	swapBackend  *xwcclient.Client
 }
 
 type Options struct {
@@ -119,7 +123,10 @@ const (
 )
 
 // New will create and initialize a new API service.
-func New(tags *tags.Tags, storer storage.Storer, resolver resolver.Interface, pss pss.Interface, traversalService traversal.Traverser, pinning pinning.Interface, feedFactory feeds.Factory, post postage.Service, postageContract postagecontract.Interface, steward steward.Reuploader, signer crypto.Signer, logger logging.Logger, tracer *tracing.Tracer, o Options) Service {
+func New(tags *tags.Tags, storer storage.Storer, resolver resolver.Interface, pss pss.Interface,
+	traversalService traversal.Traverser, pinning pinning.Interface, feedFactory feeds.Factory,
+	post postage.Service, postageContract postagecontract.Interface, steward steward.Reuploader,
+	signer crypto.Signer, swapBackend *xwcclient.Client, logger logging.Logger, tracer *tracing.Tracer, o Options) Service {
 	s := &server{
 		tags:            tags,
 		storer:          storer,
@@ -132,6 +139,7 @@ func New(tags *tags.Tags, storer storage.Storer, resolver resolver.Interface, ps
 		postageContract: postageContract,
 		steward:         steward,
 		signer:          signer,
+		swapBackend: 	 swapBackend,
 		Options:         o,
 		logger:          logger,
 		tracer:          tracer,
