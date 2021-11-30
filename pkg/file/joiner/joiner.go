@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/encryption/store"
 	"github.com/penguintop/penguin/pkg/file"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -34,7 +34,7 @@ type joiner struct {
 // New creates a new Joiner. A Joiner provides Read, Seek and Size functionalities.
 func New(ctx context.Context, getter storage.Getter, address penguin.Address) (file.Joiner, int64, error) {
 	getter = store.New(getter)
-	// retrieve the root chunk to read the total data length the be retrieved
+	// Retrieve the root chunk to read the total data length the be retrieved
 	rootChunk, err := getter.Get(ctx, storage.ModeGetRequest, address)
 	if err != nil {
 		return nil, 0, err
@@ -69,7 +69,7 @@ func (j *joiner) Read(b []byte) (n int, err error) {
 }
 
 func (j *joiner) ReadAt(b []byte, off int64) (read int, err error) {
-	// since offset is int64 and penguin spans are uint64 it means we cannot seek beyond int64 max value
+	// Since offset is int64 and penguin spans are uint64 it means we cannot seek beyond int64 max value
 	if off >= j.span {
 		return 0, io.EOF
 	}
@@ -91,7 +91,7 @@ func (j *joiner) ReadAt(b []byte, off int64) (read int, err error) {
 }
 
 func (j *joiner) readAtOffset(b, data []byte, cur, subTrieSize, off, bufferOffset, bytesToRead int64, bytesRead *int64, eg *errgroup.Group) {
-	// we are at a leaf data chunk
+	// We are at a leaf data chunk
 	if subTrieSize <= int64(len(data)) {
 		dataOffsetStart := off - cur
 		dataOffsetEnd := dataOffsetStart + bytesToRead
@@ -111,19 +111,19 @@ func (j *joiner) readAtOffset(b, data []byte, cur, subTrieSize, off, bufferOffse
 			break
 		}
 
-		// fast forward the cursor
+		// Fast forward the cursor
 		sec := subtrieSection(data, cursor, j.refLength, subTrieSize)
 		if cur+sec < off {
 			cur += sec
 			continue
 		}
 
-		// if we are here it means that we are within the bounds of the data we need to read
+		// If we are here it means that we are within the bounds of the data we need to read
 		address := penguin.NewAddress(data[cursor : cursor+j.refLength])
 		subtrieSpan := sec
 		currentReadSize := subtrieSpan - (off - cur) // the size of the subtrie, minus the offset from the start of the trie
 
-		// upper bound alignments
+		// Upper bound alignments
 		if currentReadSize > bytesToRead {
 			currentReadSize = bytesToRead
 		}
@@ -154,10 +154,10 @@ func (j *joiner) readAtOffset(b, data []byte, cur, subTrieSize, off, bufferOffse
 
 // brute-forces the subtrie size for each of the sections in this intermediate chunk
 func subtrieSection(data []byte, startIdx, refLen int, subtrieSize int64) int64 {
-	// assume we have a trie of size `y` then we can assume that all of
+	// Assume we have a trie of size `y` then we can assume that all of
 	// the forks except for the last one on the right are of equal size
 	// this is due to how the splitter wraps levels.
-	// so for the branches on the left, we can assume that
+	// So for the branches on the left, we can assume that
 	// y = (refs - 1) * x + l
 	// where y is the size of the subtrie, refs are the number of references
 	// x is constant (the brute forced value) and l is the size of the last subtrie
@@ -174,7 +174,7 @@ func subtrieSection(data []byte, startIdx, refLen int, subtrieSize int64) int64 
 		branchSize *= branching
 	}
 
-	// handle last branch edge case
+	// Handle last branch edge case
 	if startIdx == int(refs-1)*refLen {
 		return subtrieSize - (refs-1)*branchSize
 	}
@@ -212,7 +212,7 @@ func (j *joiner) Seek(offset int64, whence int) (int64, error) {
 }
 
 func (j *joiner) IterateChunkAddresses(fn penguin.AddressIterFunc) error {
-	// report root address
+	// Report root address
 	err := fn(j.addr)
 	if err != nil {
 		return err
@@ -222,7 +222,7 @@ func (j *joiner) IterateChunkAddresses(fn penguin.AddressIterFunc) error {
 }
 
 func (j *joiner) processChunkAddresses(ctx context.Context, fn penguin.AddressIterFunc, data []byte, subTrieSize int64) error {
-	// we are at a leaf data chunk
+	// We are at a leaf data chunk
 	if subTrieSize <= int64(len(data)) {
 		return nil
 	}
