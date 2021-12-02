@@ -23,7 +23,7 @@ import (
 	filetest "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"gitlab.com/nolash/go-mockbytes"
 )
 
@@ -44,7 +44,7 @@ func TestJoinerSingleChunk(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// create the chunk to
+	// Create the chunk to
 	mockAddrHex := fmt.Sprintf("%064s", "2a")
 	mockAddr := penguin.MustParseHexAddress(mockAddrHex)
 	mockData := []byte("foo")
@@ -56,7 +56,7 @@ func TestJoinerSingleChunk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// read back data and compare
+	// Read back data and compare
 	joinReader, l, err := joiner.New(ctx, store, mockAddr)
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +82,7 @@ func TestJoinerDecryptingStore_NormalChunk(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// create the chunk to
+	// Create the chunk to
 	mockAddrHex := fmt.Sprintf("%064s", "2a")
 	mockAddr := penguin.MustParseHexAddress(mockAddrHex)
 	mockData := []byte("foo")
@@ -94,7 +94,7 @@ func TestJoinerDecryptingStore_NormalChunk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// read back data and compare
+	// Read back data and compare
 	joinReader, l, err := joiner.New(ctx, store, mockAddr)
 	if err != nil {
 		t.Fatal(err)
@@ -119,7 +119,7 @@ func TestJoinerWithReference(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// create root chunk and two data chunks referenced in the root chunk
+	// Create root chunk and two data chunks referenced in the root chunk
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*2, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {
@@ -140,7 +140,7 @@ func TestJoinerWithReference(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// read back data and compare
+	// Read back data and compare
 	joinReader, l, err := joiner.New(ctx, store, rootChunk.Address())
 	if err != nil {
 		t.Fatal(err)
@@ -302,7 +302,7 @@ func TestSeek(t *testing.T) {
 				}
 			}
 
-			// seek to 10 random locations
+			// Seek to 10 random locations
 			for i := int64(0); i < 10 && i < tc.size; i++ {
 				exp := mrand.Int63n(tc.size)
 				n, err := j.Seek(exp, io.SeekStart)
@@ -319,7 +319,7 @@ func TestSeek(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// seek to all possible locations from current position
+			// Seek to all possible locations from current position
 			for i := int64(1); i < 10 && i < tc.size; i++ {
 				exp := mrand.Int63n(tc.size)
 				n, err := j.Seek(exp, io.SeekCurrent)
@@ -340,7 +340,7 @@ func TestSeek(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// seek to 10 random locations from end
+			// Seek to 10 random locations from end
 			for i := int64(1); i < 10; i++ {
 				exp := mrand.Int63n(tc.size)
 				if exp == 0 {
@@ -360,7 +360,7 @@ func TestSeek(t *testing.T) {
 			if _, err := j.Seek(0, io.SeekStart); err != nil {
 				t.Fatal(err)
 			}
-			// seek overflow for a few bytes
+			// Seek overflow for a few bytes
 			for i := int64(1); i < 5; i++ {
 				n, err := j.Seek(tc.size+i, io.SeekStart)
 				if err != io.EOF {
@@ -583,7 +583,7 @@ func TestJoinerReadAt(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// create root chunk with 2 references and the referenced data chunks
+	// Create root chunk with 2 references and the referenced data chunks
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*2, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {
@@ -628,7 +628,7 @@ func TestJoinerOneLevel(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// create root chunk with 2 references and the referenced data chunks
+	// Create root chunk with 2 references and the referenced data chunks
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*2, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {
@@ -654,7 +654,7 @@ func TestJoinerOneLevel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// verify first chunk content
+	// Verify first chunk content
 	outBuffer := make([]byte, penguin.ChunkSize)
 	c, err := j.Read(outBuffer)
 	if err != nil {
@@ -667,7 +667,7 @@ func TestJoinerOneLevel(t *testing.T) {
 		t.Fatalf("firstchunk data mismatch, expected %x, got %x", outBuffer, firstChunk.Data()[8:])
 	}
 
-	// verify second chunk content
+	// Verify second chunk content
 	c, err = j.Read(outBuffer)
 	if err != nil {
 		t.Fatal(err)
@@ -679,7 +679,7 @@ func TestJoinerOneLevel(t *testing.T) {
 		t.Fatalf("secondchunk data mismatch, expected %x, got %x", outBuffer, secondChunk.Data()[8:])
 	}
 
-	// verify EOF is returned also after first time it is returned
+	// Verify EOF is returned also after first time it is returned
 	_, err = j.Read(outBuffer)
 	if err != io.EOF {
 		t.Fatal("expected io.EOF")
@@ -700,7 +700,7 @@ func TestJoinerTwoLevelsAcrossChunk(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// create root chunk with 2 references and two intermediate chunks with references
+	// Create root chunk with 2 references and two intermediate chunks with references
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*penguin.Branches+42, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {
@@ -721,7 +721,7 @@ func TestJoinerTwoLevelsAcrossChunk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// create 128+1 chunks for all references in the intermediate chunks
+	// Create 128+1 chunks for all references in the intermediate chunks
 	cursor := 8
 	for i := 0; i < penguin.Branches; i++ {
 		chunkAddressBytes := firstChunk.Data()[cursor : cursor+penguin.SectionSize]
@@ -746,7 +746,7 @@ func TestJoinerTwoLevelsAcrossChunk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// read back all the chunks and verify
+	// Read back all the chunks and verify
 	b := make([]byte, penguin.ChunkSize)
 	for i := 0; i < penguin.Branches; i++ {
 		c, err := j.Read(b)
@@ -772,7 +772,7 @@ func TestJoinerIterateChunkAddresses(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// create root chunk with 2 references and the referenced data chunks
+	// Create root chunk with 2 references and the referenced data chunks
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*2, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {

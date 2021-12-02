@@ -8,7 +8,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/joiner"
 	"github.com/penguintop/penguin/pkg/file/pipeline/builder"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 type PutGetter interface {
