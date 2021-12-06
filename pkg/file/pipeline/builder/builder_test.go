@@ -17,7 +17,7 @@ import (
 	test "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestPartialWrites(t *testing.T) {
