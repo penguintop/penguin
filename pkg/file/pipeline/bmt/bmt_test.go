@@ -26,7 +26,7 @@ func TestBmtWriter(t *testing.T) {
 		noSpan  bool
 	}{
 		{
-			// this is a special case, since semantically it can be considered the hash
+			// This is a special case, since semantically it can be considered the hash
 			// of an empty file (since data is all zeros).
 			name:    "empty file",
 			data:    make([]byte, 0),
