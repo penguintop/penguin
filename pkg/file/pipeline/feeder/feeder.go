@@ -8,7 +8,7 @@ import (
 	"encoding/binary"
 
 	"github.com/penguintop/penguin/pkg/file/pipeline"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 const span = penguin.SpanSize
@@ -41,20 +41,20 @@ func (f *chunkFeeder) Write(b []byte) (int, error) {
 	w := 0      // written
 
 	if l+f.bufferIdx < f.size {
-		// write the data into the buffer and return
+		// Write the data into the buffer and return
 		n := copy(f.buffer[f.bufferIdx:], b)
 		f.bufferIdx += n
 		return n, nil
 	}
 
-	// if we are here it means we have to do at least one write
+	// If we are here it means we have to do at least one write
 	d := make([]byte, f.size+span)
 	sp := 0 // span of current write
 
-	//copy from existing buffer to this one
+	// Copy from existing buffer to this one
 	sp = copy(d[span:], f.buffer[:f.bufferIdx])
 
-	// don't account what was already in the buffer when returning
+	// Don't account what was already in the buffer when returning
 	// number of written bytes
 	if sp > 0 {
 		w -= sp
@@ -62,14 +62,14 @@ func (f *chunkFeeder) Write(b []byte) (int, error) {
 
 	var n int
 	for i := 0; i < len(b); {
-		// if we can't fill a whole write, buffer the rest and return
+		// If we can't fill a whole write, buffer the rest and return
 		if sp+len(b[i:]) < f.size {
 			n = copy(f.buffer, b[i:])
 			f.bufferIdx = n
 			return w + n, nil
 		}
 
-		// fill stuff up from the incoming write
+		// Fill stuff up from the incoming write
 		n = copy(d[span+f.bufferIdx:], b[i:])
 		i += n
 		sp += n
@@ -92,7 +92,7 @@ func (f *chunkFeeder) Write(b []byte) (int, error) {
 // the cryptographic root-hash respresenting the data written to
 // the feeder.
 func (f *chunkFeeder) Sum() ([]byte, error) {
-	// flush existing data in the buffer
+	// Flush existing data in the buffer
 	if f.bufferIdx > 0 {
 		d := make([]byte, f.bufferIdx+span)
 		copy(d[span:], f.buffer[:f.bufferIdx])
@@ -106,7 +106,7 @@ func (f *chunkFeeder) Sum() ([]byte, error) {
 	}
 
 	if f.wrote == 0 {
-		// this is an empty file, we should write the span of
+		// This is an empty file, we should write the span of
 		// an empty file (0).
 		d := make([]byte, span)
 		args := &pipeline.PipeWriteArgs{Data: d, Span: d}
