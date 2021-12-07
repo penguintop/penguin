@@ -22,11 +22,11 @@ func TestFeeder(t *testing.T) {
 	)
 
 	for _, tc := range []struct {
-		name      string // name
-		dataSize  []int  // how big each write is
-		expWrites int    // expected number of writes
-		writeData []byte // expected data in last write buffer
-		span      uint64 // expected span of written data
+		name      string // Name
+		dataSize  []int  // How big each write is
+		expWrites int    // Expected number of writes
+		writeData []byte // Expected data in last write buffer
+		span      uint64 // Expected span of written data
 	}{
 		{
 			name:      "empty write",
@@ -122,11 +122,11 @@ func TestFeederFlush(t *testing.T) {
 	)
 
 	for _, tc := range []struct {
-		name      string // name
-		dataSize  []int  // how big each write is
-		expWrites int    // expected number of writes
-		writeData []byte // expected data in last write buffer
-		span      uint64 // expected span of written data
+		name      string // Name
+		dataSize  []int  // How big each write is
+		expWrites int    // Expected number of writes
+		writeData []byte // Expected data in last write buffer
+		span      uint64 // Expected span of written data
 	}{
 		{
 			name:      "empty file",
