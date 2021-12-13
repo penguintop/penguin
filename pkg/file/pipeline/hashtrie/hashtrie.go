@@ -9,7 +9,7 @@ import (
 	"errors"
 
 	"github.com/penguintop/penguin/pkg/file/pipeline"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -23,17 +23,17 @@ type hashTrieWriter struct {
 	branching  int
 	chunkSize  int
 	refSize    int
-	fullChunk  int    // full chunk size in terms of the data represented in the buffer (span+refsize)
-	cursors    []int  // level cursors, key is level. level 0 is data level and is not represented in this package. writes always start at level 1. higher levels will always have LOWER cursor values.
-	buffer     []byte // keeps all level data
-	full       bool   // indicates whether the trie is full. currently we support (128^7)*4096 = 2305843009213693952 bytes
+	fullChunk  int    // Full chunk size in terms of the data represented in the buffer (span+refsize)
+	cursors    []int  // Level cursors, key is level. Level 0 is data level and is not represented in this package. Writes always start at level 1. Higher levels will always have LOWER cursor values.
+	buffer     []byte // Keeps all level data
+	full       bool   // Indicates whether the trie is full. Currently we support (128^7)*4096 = 2305843009213693952 bytes
 	pipelineFn pipeline.PipelineFunc
 }
 
 func NewHashTrieWriter(chunkSize, branching, refLen int, pipelineFn pipeline.PipelineFunc) pipeline.ChainWriter {
 	return &hashTrieWriter{
 		cursors:    make([]int, 9),
-		buffer:     make([]byte, penguin.ChunkWithSpanSize*9*2), // double size as temp workaround for weak calculation of needed buffer space
+		buffer:     make([]byte, penguin.ChunkWithSpanSize*9*2), // Double size as temp workaround for weak calculation of needed buffer space
 		branching:  branching,
 		chunkSize:  chunkSize,
 		refSize:    refLen,
@@ -42,7 +42,7 @@ func NewHashTrieWriter(chunkSize, branching, refLen int, pipelineFn pipeline.Pip
 	}
 }
 
-// accepts writes of hashes from the previous writer in the chain, by definition these writes
+// Accepts writes of hashes from the previous writer in the chain, by definition these writes
 // are on level 1
 func (h *hashTrieWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
 	oneRef := h.refSize + penguin.SpanSize
@@ -86,7 +86,7 @@ func (h *hashTrieWriter) wrapFullLevel(level int) error {
 	sp := uint64(0)
 	var hashes []byte
 	for i := 0; i < len(data); i += h.refSize + 8 {
-		// sum up the spans of the level, then we need to bmt them and store it as a chunk
+		// Sum up the spans of the level, then we need to bmt them and store it as a chunk
 		// then write the chunk address to the next level up
 		sp += binary.LittleEndian.Uint64(data[i : i+8])
 		hash := data[i+8 : i+h.refSize+8]
@@ -109,7 +109,7 @@ func (h *hashTrieWriter) wrapFullLevel(level int) error {
 		return err
 	}
 
-	// this "truncates" the current level that was wrapped
+	// This "truncates" the current level that was wrapped
 	// by setting the cursors to the cursors of one level above
 	h.cursors[level] = h.cursors[level+1]
 	if level+1 == 8 {
@@ -134,10 +134,10 @@ func (h *hashTrieWriter) levelSize(level int) int {
 //		-	If level data length is bigger than 1 reference then sum the level and
 //			write the result to the next level
 //	- Return the hash in level 8
-// the cases are as follows:
-//	- one hash in a given level, in which case we _do not_ perform a hashing operation, but just move
+// The cases are as follows:
+//	- One hash in a given level, in which case we _do not_ perform a hashing operation, but just move
 //		the hash to the next level, potentially resulting in a level wrap
-//	- more than one hash, in which case we _do_ perform a hashing operation, appending the hash to
+//	- More than one hash, in which case we _do_ perform a hashing operation, appending the hash to
 //		the next level
 func (h *hashTrieWriter) Sum() ([]byte, error) {
 	oneRef := h.refSize + penguin.SpanSize
@@ -148,10 +148,10 @@ func (h *hashTrieWriter) Sum() ([]byte, error) {
 		}
 		switch {
 		case l == 0:
-			// level empty, continue to the next.
+			// Level empty, continue to the next.
 			continue
 		case l == h.fullChunk:
-			// this case is possible and necessary due to the carry over
+			// This case is possible and necessary due to the carry over
 			// in the next switch case statement. normal writes done
 			// through writeToLevel will automatically wrap a full level.
 			err := h.wrapFullLevel(i)
@@ -159,7 +159,7 @@ func (h *hashTrieWriter) Sum() ([]byte, error) {
 				return nil, err
 			}
 		case l == oneRef:
-			// this cursor assignment basically means:
+			// This cursor assignment basically means:
 			// take the hash|span|key from this level, and append it to
 			// the data of the next level. you may wonder how this works:
 			// every time we sum a level, the sum gets written into the next level
@@ -174,7 +174,7 @@ func (h *hashTrieWriter) Sum() ([]byte, error) {
 			// hash generated will always be carried over to the last level (8), then returned.
 			h.cursors[i+1] = h.cursors[i]
 		default:
-			// more than 0 but smaller than chunk size - wrap the level to the one above it
+			// More than 0 but smaller than chunk size - wrap the level to the one above it
 			err := h.wrapFullLevel(i)
 			if err != nil {
 				return nil, err
@@ -186,7 +186,7 @@ func (h *hashTrieWriter) Sum() ([]byte, error) {
 		return nil, errInconsistentRefs
 	}
 
-	// return the hash in the highest level, that's all we need
+	// Return the hash in the highest level, that's all we need
 	data := h.buffer[0:h.cursors[8]]
 	return data[8:], nil
 }
