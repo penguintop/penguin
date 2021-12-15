@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/pipeline/store"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (
@@ -42,7 +42,7 @@ func TestLevels(t *testing.T) {
 		hashSize  = 32
 	)
 
-	// to create a level wrap we need to do branching^(level-1) writes
+	// To create a level wrap we need to do branching^(level-1) writes
 	for _, tc := range []struct {
 		desc   string
 		writes int
@@ -115,7 +115,7 @@ func TestLevels(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			//check the span. since write spans are 1 value 1, then expected span == tc.writes
+			//Check the span. Since write spans are 1 value 1, then expected span == tc.writes
 			sp := binary.LittleEndian.Uint64(rootch.Data()[:penguin.SpanSize])
 			if sp != uint64(tc.writes) {
 				t.Fatalf("want span %d got %d", tc.writes, sp)
@@ -129,7 +129,7 @@ func TestLevels_TrieFull(t *testing.T) {
 		branching = 4
 		chunkSize = 128
 		hashSize  = 32
-		writes    = 16384 // this is to get a balanced trie
+		writes    = 16384 // This is to get a balanced trie
 		s         = mock.NewStorer()
 		pf        = func() pipeline.ChainWriter {
 			lsw := store.NewStoreWriter(ctx, s, mode, nil)
@@ -139,7 +139,7 @@ func TestLevels_TrieFull(t *testing.T) {
 		ht = hashtrie.NewHashTrieWriter(chunkSize, branching, hashSize, pf)
 	)
 
-	// to create a level wrap we need to do branching^(level-1) writes
+	// To create a level wrap we need to do branching^(level-1) writes
 	for i := 0; i < writes; i++ {
 		a := &pipeline.PipeWriteArgs{Ref: addr.Bytes(), Span: span}
 		err := ht.ChainWrite(a)
@@ -154,7 +154,7 @@ func TestLevels_TrieFull(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// it is questionable whether the writer should go into some
+	// It is questionable whether the writer should go into some
 	// corrupt state after the last write which causes the trie full
 	// error, in which case we would return an error on Sum()
 	_, err = ht.Sum()
