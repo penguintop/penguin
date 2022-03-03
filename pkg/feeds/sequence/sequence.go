@@ -84,7 +84,7 @@ func (f *finder) At(ctx context.Context, at, after int64) (ch penguin.Chunk, cur
 		if err != nil {
 			return nil, nil, nil, err
 		}
-		// if timestamp is later than the `at` target datetime, then return previous chunk  and index
+		// If timestamp is later than the `at` target datetime, then return previous chunk  and index
 		if ts > uint64(at) {
 			return ch, &index{i - 1}, &index{i}, nil
 		}
@@ -108,29 +108,29 @@ func NewAsyncFinder(getter storage.Getter, feed *feeds.Feed) feeds.Lookup {
 // recording  the level of the latest found update chunk and the earliest not found update
 // the actual latest update is guessed to be within a subinterval
 type interval struct {
-	base     uint64  // beginning of the interval, guaranteed to have an  update
-	level    int     // maximum level to check
-	found    *result // the result with the latest chunk found
-	notFound int     // the earliest level where no update is found
+	base     uint64  // Beginning of the interval, guaranteed to have an  update
+	level    int     // Maximum level to check
+	found    *result // The result with the latest chunk found
+	notFound int     // The earliest level where no update is found
 }
 
-// when a subinterval is identified to contain the latest update
+// When a subinterval is identified to contain the latest update
 // next returns an interval matching it
 func (i *interval) next() *interval {
 	found := i.found.level
 	i.found.level = 0
 	return &interval{
-		base:     i.found.index, // set base to index of latest chunk found
-		level:    found,         // set max level to the latest update level
-		notFound: found,         // set notFound to the latest update level
-		found:    i.found,       // inherit latest found  result
+		base:     i.found.index, // Set base to index of latest chunk found
+		level:    found,         // Set max level to the latest update level
+		notFound: found,         // Set notFound to the latest update level
+		found:    i.found,       // Inherit latest found  result
 	}
 }
 
 func (i *interval) retry() *interval {
 	r := i.next()
-	r.level = i.level    // reset to max
-	r.notFound = i.level //  reset to max
+	r.level = i.level    // Reset to max
+	r.notFound = i.level //  Reset to max
 	return r
 }
 
@@ -140,16 +140,16 @@ func newInterval(base uint64) *interval {
 
 // results capture a chunk lookup on a interval
 type result struct {
-	chunk    penguin.Chunk // the chunk found
-	interval *interval     // the interval it belongs to
-	level    int           // the level within the interval
-	index    uint64        // the actual sequence index of the update
+	chunk    penguin.Chunk // The chunk found
+	interval *interval     // The interval it belongs to
+	level    int           // The level within the interval
+	index    uint64        // The actual sequence index of the update
 }
 
 // At looks up the version valid at time `at`
 // after is a unix time hint of the latest known update
 func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk, cur, next feeds.Index, err error) {
-	// first lookup update at the 0 index
+	// Firstly lookup update at the 0 index
 	// TODO: consider receive after as uint
 	ch, err = f.get(ctx, at, uint64(after))
 	if err != nil {
@@ -158,7 +158,7 @@ func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk
 	if ch == nil {
 		return nil, nil, &index{uint64(after)}, nil
 	}
-	// if chunk exists construct an initial interval with base=0
+	// If chunk exists construct an initial interval with base=0
 	c := make(chan *result)
 	i := newInterval(0)
 	i.found = &result{ch, nil, 0, 0}
@@ -166,10 +166,10 @@ func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk
 	quit := make(chan struct{})
 	defer close(quit)
 
-	// launch concurrent request at  doubling intervals
+	// Launch concurrent request at  doubling intervals
 	go f.at(ctx, at, 0, i, c, quit)
 	for r := range c {
-		// collect the results into the interval
+		// Collect the results into the interval
 		i = r.interval
 		if r.chunk == nil {
 			if i.notFound < r.level {
@@ -180,14 +180,14 @@ func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk
 			if i.found.level > r.level {
 				continue
 			}
-			// if a chunk is found on the max level, and this is already a subinterval
+			// If a chunk is found on the max level, and this is already a subinterval
 			// then found.index+1 is already known to be not found
 			if i.level == r.level && r.level < DefaultLevels {
 				return r.chunk, &index{r.index}, &index{r.index + 1}, nil
 			}
 			i.found = r
 		}
-		// below applies even if i.latest==ceilingLevel in which case we just continue with
+		// Below applies even if i.latest==ceilingLevel in which case we just continue with
 		// DefaultLevel lookaheads
 		if i.found.level == i.notFound {
 			if i.found.level == 0 {
@@ -195,7 +195,7 @@ func (f *asyncFinder) At(ctx context.Context, at, after int64) (ch penguin.Chunk
 			}
 			go f.at(ctx, at, 0, i.next(), c, quit)
 		}
-		// inconsistent feed, retry
+		// Inconsistent feed, retry
 		if i.notFound < i.found.level {
 			go f.at(ctx, at, i.found.level, i.retry(), c, quit)
 		}
@@ -256,14 +256,14 @@ func (f *asyncFinder) get(ctx context.Context, at int64, idx uint64) (penguin.Ch
 		if !errors.Is(err, storage.ErrNotFound) {
 			return nil, err
 		}
-		// if 'not-found' error, then just silence and return nil chunk
+		// If 'not-found' error, then just silence and return nil chunk
 		return nil, nil
 	}
 	ts, err := feeds.UpdatedAt(u)
 	if err != nil {
 		return nil, err
 	}
-	// this means the update timestamp is later than the pivot time we are looking for
+	// This means the update timestamp is later than the pivot time we are looking for
 	// handled as if the update was missing but with no uncertainty due to timeout
 	if at < int64(ts) {
 		return nil, nil

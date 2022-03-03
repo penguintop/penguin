@@ -16,7 +16,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/logging/httpaccess"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func (s *server) setupRouting() {
@@ -174,6 +174,13 @@ func (s *server) setupRouting() {
 		s.gatewayModeForbidEndpointHandler,
 		web.FinalHandler(jsonhttp.MethodHandler{
 			"POST": http.HandlerFunc(s.postageCreateHandler),
+		})),
+	)
+
+	handle("/xwc/xwc_rpc_proxy", web.ChainHandlers(
+		s.gatewayModeForbidEndpointHandler,
+		web.FinalHandler(jsonhttp.MethodHandler{
+			"POST": http.HandlerFunc(s.xwcRpcProxyHandler),
 		})),
 	)
 

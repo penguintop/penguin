@@ -28,7 +28,7 @@ import (
 	"github.com/penguintop/penguin/pkg/pss"
 	"github.com/penguintop/penguin/pkg/pushsync"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/gorilla/websocket"
 )
 
@@ -47,7 +47,7 @@ var (
 	longTimeout = 30 * time.Second
 )
 
-// creates a single websocket handler for an arbitrary topic, and receives a message
+// Creates a single websocket handler for an arbitrary topic, and receives a message
 func TestPssWebsocketSingleHandler(t *testing.T) {
 	var (
 		p, publicKey, cl, _ = newPssTest(t, opts{})
@@ -58,7 +58,7 @@ func TestPssWebsocketSingleHandler(t *testing.T) {
 		done       = make(chan struct{})
 	)
 
-	// the long timeout is needed so that we dont time out while still mining the message with Wrap()
+	// The long timeout is needed so that we dont time out while still mining the message with Wrap()
 	// otherwise the test (and other tests below) flakes
 	err := cl.SetReadDeadline(time.Now().Add(longTimeout))
 	if err != nil {
@@ -80,7 +80,7 @@ func TestPssWebsocketSingleHandler(t *testing.T) {
 }
 
 func TestPssWebsocketSingleHandlerDeregister(t *testing.T) {
-	// create a new pss instance, register a handle through ws, call
+	// Create a new pss instance, register a handle through ws, call
 	// pss.TryUnwrap with a chunk designated for this handler and expect
 	// the handler to be notified
 	var (
@@ -106,7 +106,7 @@ func TestPssWebsocketSingleHandlerDeregister(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// close the websocket before calling pss with the message
+	// Close the websocket before calling pss with the message
 	err = cl.WriteMessage(websocket.CloseMessage, []byte{})
 	if err != nil {
 		t.Fatal(err)
@@ -149,7 +149,7 @@ func TestPssWebsocketMultiHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// close the websocket before calling pss with the message
+	// Close the websocket before calling pss with the message
 	err = cl.WriteMessage(websocket.CloseMessage, []byte{})
 	if err != nil {
 		t.Fatal(err)
@@ -337,7 +337,7 @@ func waitReadMessage(t *testing.T, mtx *sync.Mutex, cl *websocket.Conn, targetCo
 			return
 		}
 		if msgType == websocket.PongMessage {
-			// ignore pings
+			// Ignore pings
 			continue
 		}
 

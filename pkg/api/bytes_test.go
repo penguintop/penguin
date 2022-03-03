@@ -19,7 +19,7 @@ import (
 	mockpost "github.com/penguintop/penguin/pkg/postage/mock"
 	statestore "github.com/penguintop/penguin/pkg/statestore/mock"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"gitlab.com/nolash/go-mockbytes"
 )

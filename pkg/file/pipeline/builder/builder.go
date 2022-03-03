@@ -17,7 +17,7 @@ import (
 	"github.com/penguintop/penguin/pkg/file/pipeline/hashtrie"
 	"github.com/penguintop/penguin/pkg/file/pipeline/store"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 // NewPipelineBuilder returns the appropriate pipeline according to the specified parameters

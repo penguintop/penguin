@@ -3,7 +3,7 @@ package accounting
 import (
 	"time"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func (s *Accounting) SetTimeNow(f func() time.Time) {

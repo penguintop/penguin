@@ -22,16 +22,16 @@ type Auditor struct {
 	logger logging.Logger
 	//
 	AuditEndpoint string
-	// local store db
+	// Local store db
 	LocalDB *localstore.DB
 
-	// node address
+	// Node address
 	PenguinAddress string
-	// signer
+	// Signer
 	Signer crypto.Signer
-	// signer pubkey (hex)
+	// Signer pubkey (hex)
 	SignerPubKey string
-	// payer xwc address
+	// Payer xwc address
 	XwcAcctAddress string
 }
 
@@ -59,7 +59,7 @@ func (r *Auditor) Run() {
 		time.Sleep(WAIT_SECONDS * time.Second)
 		r.logger.Infof("start audit at %s", time.Now().String())
 
-		// dump retrieval keys
+		// Dump retrieval keys
 		retrievalAddresses, err := r.LocalDB.DumpAllRetrievalKeys()
 		if err != nil {
 			r.logger.Errorf("DumpAllRetrievalKeys failed: %s", err.Error())
@@ -77,14 +77,14 @@ func (r *Auditor) Run() {
 		treeDepth := int(math.Log2(float64(len(retrievalAddresses))))
 		r.logger.Infof("Your Contribution Weight is %d", treeDepth)
 
-		// build full binary tree
+		// Build full binary tree
 		treeRootNode, err := BuildBTreeFromRetrievalAddresses(retrievalAddresses)
 		if err != nil {
 			r.logger.Errorf("BuildBTreeFromRetrievalAddresses: %s", err.Error())
 			continue
 		}
 
-		// 1st step, get server timestamp, and calc timestamp diff
+		// The first step, get server timestamp, and calc timestamp diff
 		serverTimestamp, err := RequestServerTimestamp(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT)
 		if err != nil {
 			r.logger.Errorf("RequestServerTimestamp: %s", err.Error())
@@ -95,7 +95,7 @@ func (r *Auditor) Run() {
 		r.logger.Infof("server timestamp: %d", serverTimestamp)
 		r.logger.Infof("time diff: %d seconds", secondDiff)
 
-		// 2st step, get task
+		// The second step, get task
 		adjustTimestamp := time.Now().Unix() + secondDiff
 		adjustTimestampStr := fmt.Sprintf("%d", adjustTimestamp)
 		signature, err := r.Signer.SignForAudit([]byte(adjustTimestampStr))
@@ -111,7 +111,7 @@ func (r *Auditor) Run() {
 		}
 
 		r.logger.Infof("RequestTask task id: %d", taskId)
-		// 3rd step, report merkle root
+		// The third step, report merkle root
 		rootHashHex, nextHashHexPair := treeRootNode.GetRootRelatedHashHex()
 		pathData := make([][]string, 0)
 		pathData = append(pathData, []string{rootHashHex})
@@ -119,10 +119,10 @@ func (r *Auditor) Run() {
 			pathData = append(pathData, nextHashHexPair)
 		}
 
-		r.logger.Infof("root hash: %s", rootHashHex)
+		r.logger.Infof("Root hash: %s", rootHashHex)
 		if nextHashHexPair != nil && len(nextHashHexPair) == 2 {
-			r.logger.Infof("root left son hash: %s", nextHashHexPair[0])
-			r.logger.Infof("root right son hash: %s", nextHashHexPair[1])
+			r.logger.Infof("Root left son hash: %s", nextHashHexPair[0])
+			r.logger.Infof("Root right son hash: %s", nextHashHexPair[1])
 		}
 
 		taskIdStr := fmt.Sprintf("%d", taskId)
@@ -138,7 +138,7 @@ func (r *Auditor) Run() {
 		}
 		r.logger.Infof("RequestReportMerkleRoot task id: %d, path int: %d", taskId, pathInt)
 
-		// 4th step, report path way data
+		// The fourth step, report path way data
 		rootHashHex, pathWayHexPairList, pathWayFinalNodeHashHex := treeRootNode.GetPathWayHashHex(pathInt)
 		pathData = make([][]string, 0)
 		pathData = append(pathData, []string{rootHashHex})
@@ -152,6 +152,7 @@ func (r *Auditor) Run() {
 			r.logger.Infof("R son hash: %s", pathWayHexPair[1])
 		}
 		r.logger.Infof("Final Node Hash: %s", pathWayFinalNodeHashHex)
+		r.logger.Infof("Path Depth: %d", len(pathData))
 
 		pathWayFinalNodeHash, err := hex.DecodeString(pathWayFinalNodeHashHex)
 		if err != nil {
@@ -164,7 +165,7 @@ func (r *Auditor) Run() {
 			r.logger.Errorf("GetRetrievalData: %s", err.Error())
 			continue
 		}
-		// calc item info by data, and verify it
+		// Calculate item info by data, and verify it
 		chunk, err := cac.NewWithDataSpan(item.Data)
 		if chunk.Address().String() != pathWayFinalNodeHashHex {
 			r.logger.Errorf("chunk.Address().String() != pathWayFinalNodeHashHex")
@@ -180,12 +181,11 @@ func (r *Auditor) Run() {
 		err = RequestReportPathData(r.AuditEndpoint, AUDITOR_RPC_TIMEOUT, taskId, r.XwcAcctAddress, r.SignerPubKey, r.PenguinAddress, hex.EncodeToString(signature), pathData,
 			hex.EncodeToString(item.Data))
 		if err != nil {
-			r.logger.Errorf("RequestReportPathData: %s", err.Error())
-			continue
+			r.logger.Warningf("RequestReportPathData: %s", err.Error())
 		}
 
-		// done
-		r.logger.Infof("audit end at %s", time.Now().String())
+		// Done
+		r.logger.Infof("Audit end at %s", time.Now().String())
 	}
 }
 

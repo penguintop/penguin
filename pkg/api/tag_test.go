@@ -22,8 +22,8 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/storage/mock"
 	testingc "github.com/penguintop/penguin/pkg/storage/testing"
-    "github.com/penguintop/penguin/pkg/penguin"
-    "github.com/penguintop/penguin/pkg/penguin/test"
+	"github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin/test"
 	"github.com/penguintop/penguin/pkg/tags"
 	"gitlab.com/nolash/go-mockbytes"
 )
@@ -52,7 +52,7 @@ func TestTags(t *testing.T) {
 		})
 	)
 
-	// list tags without anything pinned
+	// List tags without anything pinned
 	t.Run("list tags zero", func(t *testing.T) {
 		jsonhttptest.Request(t, client, http.MethodGet, tagsResource, http.StatusOK,
 			jsonhttptest.WithExpectedJSONResponse(api.ListTagsResponse{
@@ -81,7 +81,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("get invalid tags", func(t *testing.T) {
-		// invalid tag
+		// Invalid tag
 		jsonhttptest.Request(t, client, http.MethodGet, tagsResource+"/foobar", http.StatusBadRequest,
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "invalid id",
@@ -89,7 +89,7 @@ func TestTags(t *testing.T) {
 			}),
 		)
 
-		// non-existent tag
+		// Non-existent tag
 		jsonhttptest.Request(t, client, http.MethodDelete, tagsWithIdResource(uint32(333)), http.StatusNotFound,
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "tag not present",
@@ -99,7 +99,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("create tag upload chunk", func(t *testing.T) {
-		// create a tag using the API
+		// Create a tag using the API
 		tr := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{}),
@@ -124,13 +124,13 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("list tags", func(t *testing.T) {
-		// list all current tags
+		// List all current tags
 		var resp api.ListTagsResponse
 		jsonhttptest.Request(t, client, http.MethodGet, tagsResource, http.StatusOK,
 			jsonhttptest.WithUnmarshalJSONResponse(&resp),
 		)
 
-		// create 2 new tags
+		// Create 2 new tags
 		tRes1 := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{}),
@@ -151,7 +151,7 @@ func TestTags(t *testing.T) {
 
 		sort.Slice(expectedTags, func(i, j int) bool { return expectedTags[i].Uid < expectedTags[j].Uid })
 
-		// check if listing returns expected tags
+		// Check if listing returns expected tags
 		jsonhttptest.Request(t, client, http.MethodGet, tagsResource, http.StatusOK,
 			jsonhttptest.WithExpectedJSONResponse(api.ListTagsResponse{
 				Tags: expectedTags,
@@ -160,7 +160,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("delete tag error", func(t *testing.T) {
-		// try to delete invalid tag
+		// Try to delete invalid tag
 		jsonhttptest.Request(t, client, http.MethodDelete, tagsResource+"/foobar", http.StatusBadRequest,
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "invalid id",
@@ -168,7 +168,7 @@ func TestTags(t *testing.T) {
 			}),
 		)
 
-		// try to delete non-existent tag
+		// Try to delete non-existent tag
 		jsonhttptest.Request(t, client, http.MethodDelete, tagsWithIdResource(uint32(333)), http.StatusNotFound,
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "tag not present",
@@ -178,19 +178,19 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("delete tag", func(t *testing.T) {
-		// create a tag through API
+		// Create a tag through API
 		tRes := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{}),
 			jsonhttptest.WithUnmarshalJSONResponse(&tRes),
 		)
 
-		// delete tag through API
+		// Delete tag through API
 		jsonhttptest.Request(t, client, http.MethodDelete, tagsWithIdResource(tRes.Uid), http.StatusNoContent,
 			jsonhttptest.WithNoResponseBody(),
 		)
 
-		// try to get tag
+		// Try to get tag
 		jsonhttptest.Request(t, client, http.MethodGet, tagsWithIdResource(tRes.Uid), http.StatusNotFound,
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
 				Message: "tag not present",
@@ -200,7 +200,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("done split error", func(t *testing.T) {
-		// invalid tag
+		// Invalid tag
 		jsonhttptest.Request(t, client, http.MethodPatch, tagsResource+"/foobar", http.StatusBadRequest,
 			jsonhttptest.WithJSONRequestBody(api.TagResponse{}),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
@@ -209,7 +209,7 @@ func TestTags(t *testing.T) {
 			}),
 		)
 
-		// non-existent tag
+		// Non-existent tag
 		jsonhttptest.Request(t, client, http.MethodPatch, tagsWithIdResource(uint32(333)), http.StatusNotFound,
 			jsonhttptest.WithJSONRequestBody(api.TagResponse{}),
 			jsonhttptest.WithExpectedJSONResponse(jsonhttp.StatusResponse{
@@ -220,7 +220,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("done split", func(t *testing.T) {
-		// create a tag through API
+		// Create a tag through API
 		tRes := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{}),
@@ -228,17 +228,17 @@ func TestTags(t *testing.T) {
 		)
 		tagId := tRes.Uid
 
-		// generate address to be supplied to the done split
+		// Generate address to be supplied to the done split
 		addr := test.RandomAddress()
 
-		// upload content with tag
+		// Upload content with tag
 		jsonhttptest.Request(t, client, http.MethodPost, chunksResource, http.StatusCreated,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),
 			jsonhttptest.WithRequestBody(bytes.NewReader(chunk.Data())),
 			jsonhttptest.WithRequestHeader(api.PenguinTagHeader, fmt.Sprint(tagId)),
 		)
 
-		// call done split
+		// Call done split
 		jsonhttptest.Request(t, client, http.MethodPatch, tagsWithIdResource(tagId), http.StatusOK,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{
 				Address: addr,
@@ -250,10 +250,10 @@ func TestTags(t *testing.T) {
 		)
 		tagValueTest(t, tagId, 1, 1, 1, 0, 0, 1, addr, client)
 
-		// try different address value
+		// Try different address value
 		addr = test.RandomAddress()
 
-		// call done split
+		// Call done split
 		jsonhttptest.Request(t, client, http.MethodPatch, tagsWithIdResource(tagId), http.StatusOK,
 			jsonhttptest.WithJSONRequestBody(api.TagRequest{
 				Address: addr,
@@ -267,7 +267,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("file tags", func(t *testing.T) {
-		// upload a file without supplying tag
+		// Upload a file without supplying tag
 		expectedHash := penguin.MustParseHexAddress("40e739ebdfd18292925bba4138cd097db9aa18c1b57e74042f48469b48da33a8")
 		expectedResponse := api.PenUploadResponse{Reference: expectedHash}
 
@@ -287,7 +287,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("dir tags", func(t *testing.T) {
-		// upload a dir without supplying tag
+		// Upload a dir without supplying tag
 		tarReader := tarFiles(t, []f{{
 			data: []byte("some dir data"),
 			name: "binary-file",
@@ -311,7 +311,7 @@ func TestTags(t *testing.T) {
 	})
 
 	t.Run("bytes tags", func(t *testing.T) {
-		// create a tag using the API
+		// Create a tag using the API
 		tr := api.TagResponse{}
 		jsonhttptest.Request(t, client, http.MethodPost, tagsResource, http.StatusCreated,
 			jsonhttptest.WithRequestHeader(api.PenguinPostageBatchIdHeader, batchOkStr),

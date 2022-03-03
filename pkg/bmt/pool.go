@@ -39,7 +39,7 @@ func NewConf(hasher BaseHasherFunc, segmentCount, capacity int) *Conf {
 	zeros := make([]byte, segmentSize)
 	zerohashes[0] = zeros
 	var err error
-	// initialises the zerohashes lookup table
+	// initialize the zerohashes lookup table
 	for i := 1; i < depth+1; i++ {
 		if zeros, err = doHash(hasher(), zeros, zeros); err != nil {
 			panic(err.Error())
@@ -115,7 +115,7 @@ func newNode(index int, parent *node, hasher hash.Hash) *node {
 	}
 }
 
-// newTree initialises a tree by building up the nodes of a BMT
+// Function newTree will initialize a tree by building up the nodes of a BMT
 //
 // segmentSize is stipulated to be the size of the hash.
 func newTree(segmentSize, maxsize, depth int, hashfunc func() hash.Hash) *tree {

@@ -11,7 +11,7 @@ import (
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/pen"
 	"github.com/penguintop/penguin/pkg/statestore/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 
 	ma "github.com/multiformats/go-multiaddr"
 )

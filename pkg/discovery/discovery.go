@@ -9,7 +9,7 @@ package discovery
 import (
 	"context"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Driver interface {

@@ -37,7 +37,7 @@ func terminalPromptPassword(cmd *cobra.Command, r passwordReader, title string) 
 }
 
 func terminalPromptCreatePassword(cmd *cobra.Command, r passwordReader) (password string, err error) {
-	cmd.Println("Pen node is booting up for the first time. Please provide a new password.")
+	cmd.Println("It is the first time to boot up your Pen node. Please set a new password.")
 	p1, err := terminalPromptPassword(cmd, r, "Password")
 	if err != nil {
 		return "", err
@@ -49,7 +49,7 @@ func terminalPromptCreatePassword(cmd *cobra.Command, r passwordReader) (passwor
 	}
 
 	if p1 != p2 {
-		return "", errors.New("passwords are not the same")
+		return "", errors.New("The two passwords are inconsistent")
 	}
 
 	return p1, nil

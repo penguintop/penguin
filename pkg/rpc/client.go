@@ -121,18 +121,18 @@ func (cc *clientConn) close(err error, inflightReq *requestOp) {
 }
 
 type readOp struct {
-	msgs  []*jsonrpcMessage
+	msgs  []*JsonrpcMessage
 	batch bool
 }
 
 type requestOp struct {
 	ids  []json.RawMessage
 	err  error
-	resp chan *jsonrpcMessage // receives up to len(ids) responses
+	resp chan *JsonrpcMessage // receives up to len(ids) responses
 	sub  *ClientSubscription  // only set for EthSubscribe requests
 }
 
-func (op *requestOp) wait(ctx context.Context, c *Client) (*jsonrpcMessage, error) {
+func (op *requestOp) wait(ctx context.Context, c *Client) (*JsonrpcMessage, error) {
 	select {
 	case <-ctx.Done():
 		// Send the timeout to dispatch so it can remove the request IDs.
@@ -296,7 +296,7 @@ func (c *Client) CallContext(ctx context.Context, result interface{}, method str
 	if err != nil {
 		return err
 	}
-	op := &requestOp{ids: []json.RawMessage{msg.ID}, resp: make(chan *jsonrpcMessage, 1)}
+	op := &requestOp{ids: []json.RawMessage{msg.ID}, resp: make(chan *JsonrpcMessage, 1)}
 
 	if c.isHTTP {
 		err = c.sendHTTP(ctx, op, msg)
@@ -317,6 +317,33 @@ func (c *Client) CallContext(ctx context.Context, result interface{}, method str
 		return ErrNoResult
 	default:
 		return json.Unmarshal(resp.Result, &result)
+	}
+}
+
+func (c *Client) RawCallContext(ctx context.Context, id uint64, data interface{}) (*JsonrpcMessage, error) {
+	var err error
+
+	op := &requestOp{ids: []json.RawMessage{strconv.AppendUint(nil, id, 10)}, resp: make(chan *JsonrpcMessage, 1)}
+
+	if c.isHTTP {
+		err = c.sendHTTP(ctx, op, data)
+	} else {
+		err = c.send(ctx, op, data)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	// dispatch has accepted the request and will close the channel when it quits.
+	switch resp, err := op.wait(ctx, c); {
+	case err != nil:
+		return nil, err
+	case resp.Error != nil:
+		return nil, resp.Error
+	case len(resp.Result) == 0:
+		return nil, ErrNoResult
+	default:
+		return resp, nil
 	}
 }
 
@@ -342,10 +369,10 @@ func (c *Client) BatchCall(b []BatchElem) error {
 //
 // Note that batch calls may not be executed atomically on the server side.
 func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
-	msgs := make([]*jsonrpcMessage, len(b))
+	msgs := make([]*JsonrpcMessage, len(b))
 	op := &requestOp{
 		ids:  make([]json.RawMessage, len(b)),
-		resp: make(chan *jsonrpcMessage, len(b)),
+		resp: make(chan *JsonrpcMessage, len(b)),
 	}
 	for i, elem := range b {
 		msg, err := c.newMessage(elem.Method, elem.Args...)
@@ -365,7 +392,7 @@ func (c *Client) BatchCallContext(ctx context.Context, b []BatchElem) error {
 
 	// Wait for all responses to come back.
 	for n := 0; n < len(b) && err == nil; n++ {
-		var resp *jsonrpcMessage
+		var resp *JsonrpcMessage
 		resp, err = op.wait(ctx, c)
 		if err != nil {
 			break
@@ -450,7 +477,7 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 	}
 	op := &requestOp{
 		ids:  []json.RawMessage{msg.ID},
-		resp: make(chan *jsonrpcMessage),
+		resp: make(chan *JsonrpcMessage),
 		sub:  newClientSubscription(c, namespace, chanVal),
 	}
 
@@ -465,8 +492,8 @@ func (c *Client) Subscribe(ctx context.Context, namespace string, channel interf
 	return op.sub, nil
 }
 
-func (c *Client) newMessage(method string, paramsIn ...interface{}) (*jsonrpcMessage, error) {
-	msg := &jsonrpcMessage{Version: vsn, ID: c.nextID(), Method: method}
+func (c *Client) newMessage(method string, paramsIn ...interface{}) (*JsonrpcMessage, error) {
+	msg := &JsonrpcMessage{Version: vsn, ID: c.nextID(), Method: method}
 	if paramsIn != nil { // prevent sending "params":null
 		var err error
 		if msg.Params, err = json.Marshal(paramsIn); err != nil {

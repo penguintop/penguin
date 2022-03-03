@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/penguintop/penguin/pkg/cac"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestNewCAC(t *testing.T) {

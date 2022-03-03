@@ -40,10 +40,10 @@ type Client interface {
 }
 
 type clefSigner struct {
-	client  Client // low-level rpc client to clef as ExternalSigner does not implement account_signTypedData
+	client  Client // Low-level rpc client to clef as ExternalSigner does not implement account_signTypedData
 	clef    ExternalSignerInterface
-	account accounts.Account // the account this signer will use
-	pubKey  *ecdsa.PublicKey // the public key for the account
+	account accounts.Account // The account this signer will use
+	pubKey  *ecdsa.PublicKey // The public key for the account
 }
 
 func (c *clefSigner) SignForAudit(data []byte) ([]byte, error) {
@@ -65,7 +65,7 @@ func (c *clefSigner) SignXwcTx(transaction *xwcfmt.Transaction, chainID string) 
 // DefaultIpcPath returns the os-dependent default ipc path for clef.
 func DefaultIpcPath() (string, error) {
 	socket := "clef.ipc"
-	// on windows clef uses top level pipes
+	// On windows clef uses top level pipes
 	if runtime.GOOS == "windows" {
 		return `\\.\pipe\` + socket, nil
 	}
@@ -75,24 +75,24 @@ func DefaultIpcPath() (string, error) {
 		return "", err
 	}
 
-	// on mac os clef defaults to ~/Library/Signer/clef.ipc
+	// On mac os clef defaults to ~/Library/Signer/clef.ipc
 	if runtime.GOOS == "darwin" {
 		return filepath.Join(home, "Library", "Signer", socket), nil
 	}
 
-	// on unix clef defaults to ~/.clef/clef.ipc
+	// On unix clef defaults to ~/.clef/clef.ipc
 	return filepath.Join(home, ".clef", socket), nil
 }
 
 func selectAccount(clef ExternalSignerInterface, ethAddress *common.Address) (accounts.Account, error) {
-	// get the list of available ethereum accounts
+	// Get the list of available ethereum accounts
 	clefAccounts := clef.Accounts()
 	if len(clefAccounts) == 0 {
 		return accounts.Account{}, ErrNoAccounts
 	}
 
 	if ethAddress == nil {
-		// pick the first account as the one we use
+		// Pick the first account as the one we use
 		return clefAccounts[0], nil
 	}
 
@@ -113,7 +113,7 @@ func NewSigner(clef ExternalSignerInterface, client Client, recoverFunc crypto.R
 		return nil, err
 	}
 
-	// clef currently does not expose the public key
+	// Clef currently does not expose the public key
 	// sign some data so we can recover it
 	sig, err := clef.SignData(account, accounts.MimetypeTextPlain, clefRecoveryMessage)
 	if err != nil {

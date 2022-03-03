@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core"
 )
 
-// type aliases to avoid importing "core" everywhere
+// Type aliases to avoid importing "core" everywhere
 type TypedData = core.TypedData
 type TypedDataDomain = core.TypedDataDomain
 type Types = core.Types

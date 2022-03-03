@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/sctx"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/penguintop/penguin/pkg/tracing"
 	"github.com/gorilla/mux"
@@ -34,7 +34,7 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !created {
-		// only in the case when tag is sent via header (i.e. not created by this request)
+		// Only in the case when the tag is sent via header (i.e. not created by this request)
 		if estimatedTotalChunks := requestCalculateNumberOfChunks(r); estimatedTotalChunks > 0 {
 			err = tag.IncN(tags.TotalChunks, estimatedTotalChunks)
 			if err != nil {
@@ -51,16 +51,16 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	batch, err := requestPostageBatchId(r)
 	if err != nil {
-		logger.Debugf("bytes upload: postage batch id:%v", err)
-		logger.Error("bytes upload: postage batch id")
+		logger.Debugf("Bytes upload: postage batch id:%v", err)
+		logger.Error("Bytes upload: postage batch id")
 		jsonhttp.BadRequest(w, nil)
 		return
 	}
 
 	putter, err := newStamperPutter(s.storer, s.post, s.signer, batch)
 	if err != nil {
-		logger.Debugf("bytes upload: get putter:%v", err)
-		logger.Error("bytes upload: putter")
+		logger.Debugf("Bytes upload: get putter:%v", err)
+		logger.Error("Bytes upload: putter")
 		jsonhttp.BadRequest(w, nil)
 		return
 	}
@@ -68,8 +68,8 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 	p := requestPipelineFn(putter, r)
 	address, err := p(ctx, r.Body)
 	if err != nil {
-		logger.Debugf("bytes upload: split write all: %v", err)
-		logger.Error("bytes upload: split write all")
+		logger.Debugf("Bytes upload: split write all: %v", err)
+		logger.Error("Bytes upload: split write all")
 		jsonhttp.InternalServerError(w, nil)
 		return
 	}
@@ -77,8 +77,8 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 	if created {
 		_, err = tag.DoneSplit(address)
 		if err != nil {
-			logger.Debugf("bytes upload: done split: %v", err)
-			logger.Error("bytes upload: done split failed")
+			logger.Debugf("Bytes upload: done split: %v", err)
+			logger.Error("Bytes upload: done split failed")
 			jsonhttp.InternalServerError(w, nil)
 			return
 		}
@@ -86,8 +86,8 @@ func (s *server) bytesUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, address, false); err != nil {
-			logger.Debugf("bytes upload: creation of pin for %q failed: %v", address, err)
-			logger.Error("bytes upload: creation of pin failed")
+			logger.Debugf("Bytes upload: creation of pin for %q failed: %v", address, err)
+			logger.Error("Bytes upload: creation of pin failed")
 			jsonhttp.InternalServerError(w, nil)
 			return
 		}

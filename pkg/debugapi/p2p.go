@@ -11,7 +11,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/crypto"
 	"github.com/penguintop/penguin/pkg/jsonhttp"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/multiformats/go-multiaddr"
 )
 
@@ -25,14 +25,14 @@ type addressesResponse struct {
 }
 
 func (s *Service) addressesHandler(w http.ResponseWriter, r *http.Request) {
-	// initialize variable to json encode as [] instead null if p2p is nil
+	// Initialize variable to json encode as [] instead null if p2p is nil
 	underlay := make([]multiaddr.Multiaddr, 0)
-	// addresses endpoint is exposed before p2p service is configured
+	// Addresses endpoint is exposed before p2p service is configured
 	// to provide information about other addresses.
 	if s.p2p != nil {
 		u, err := s.p2p.Addresses()
 		if err != nil {
-			s.logger.Debugf("debug api: p2p addresses: %v", err)
+			s.logger.Debugf("Debug api: p2p addresses: %v", err)
 			jsonhttp.InternalServerError(w, err)
 			return
 		}

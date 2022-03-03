@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp"
 	"github.com/penguintop/penguin/pkg/sctx"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"github.com/penguintop/penguin/pkg/tags"
 	"github.com/gorilla/mux"
 )
@@ -38,21 +38,21 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 	if h := r.Header.Get(PenguinTagHeader); h != "" {
 		tag, err = s.getTag(h)
 		if err != nil {
-			s.logger.Debugf("chunk upload: get tag: %v", err)
-			s.logger.Error("chunk upload: get tag")
+			s.logger.Debugf("Chunk upload: get tag: %v", err)
+			s.logger.Error("Chunk upload: get tag")
 			jsonhttp.BadRequest(w, "cannot get tag")
 			return
 
 		}
 
-		// add the tag to the context if it exists
+		// Add the tag to the context if it exists
 		ctx = sctx.SetTag(r.Context(), tag)
 
-		// increment the StateSplit here since we dont have a splitter for the file upload
+		// Increase the StateSplit here since we dont have a splitter for the file upload
 		err = tag.Inc(tags.StateSplit)
 		if err != nil {
-			s.logger.Debugf("chunk upload: increment tag: %v", err)
-			s.logger.Error("chunk upload: increment tag")
+			s.logger.Debugf("Chunk upload: increment tag: %v", err)
+			s.logger.Error("Chunk upload: increment tag")
 			jsonhttp.InternalServerError(w, "increment tag")
 			return
 		}
@@ -63,65 +63,65 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 		if jsonhttp.HandleBodyReadError(err, w) {
 			return
 		}
-		s.logger.Debugf("chunk upload: read chunk data error: %v", err)
-		s.logger.Error("chunk upload: read chunk data error")
+		s.logger.Debugf("Chunk upload: read chunk data error: %v", err)
+		s.logger.Error("Chunk upload: read chunk data error")
 		jsonhttp.InternalServerError(w, "cannot read chunk data")
 		return
 	}
 
 	if len(data) < penguin.SpanSize {
-		s.logger.Debug("chunk upload: not enough data")
-		s.logger.Error("chunk upload: data length")
+		s.logger.Debug("Chunk upload: not enough data")
+		s.logger.Error("Chunk upload: data length")
 		jsonhttp.BadRequest(w, "data length")
 		return
 	}
 
 	chunk, err := cac.NewWithDataSpan(data)
 	if err != nil {
-		s.logger.Debugf("chunk upload: create chunk error: %v", err)
-		s.logger.Error("chunk upload: create chunk error")
+		s.logger.Debugf("Chunk upload: create chunk error: %v", err)
+		s.logger.Error("Chunk upload: create chunk error")
 		jsonhttp.InternalServerError(w, "create chunk error")
 		return
 	}
 
 	batch, err := requestPostageBatchId(r)
 	if err != nil {
-		s.logger.Debugf("chunk upload: postage batch id: %v", err)
-		s.logger.Error("chunk upload: postage batch id")
+		s.logger.Debugf("Chunk upload: postage batch id: %v", err)
+		s.logger.Error("Chunk upload: postage batch id")
 		jsonhttp.BadRequest(w, "invalid postage batch id")
 		return
 	}
 
 	putter, err := newStamperPutter(s.storer, s.post, s.signer, batch)
 	if err != nil {
-		s.logger.Debugf("chunk upload: putter:%v", err)
-		s.logger.Error("chunk upload: putter")
+		s.logger.Debugf("Chunk upload: putter:%v", err)
+		s.logger.Error("Chunk upload: putter")
 		jsonhttp.BadRequest(w, nil)
 		return
 	}
 
 	seen, err := putter.Put(ctx, requestModePut(r), chunk)
 	if err != nil {
-		s.logger.Debugf("chunk upload: chunk write error: %v, addr %s", err, chunk.Address())
-		s.logger.Error("chunk upload: chunk write error")
+		s.logger.Debugf("Chunk upload: chunk write error: %v, addr %s", err, chunk.Address())
+		s.logger.Error("Chunk upload: chunk write error")
 		jsonhttp.BadRequest(w, "chunk write error")
 		return
 	} else if len(seen) > 0 && seen[0] && tag != nil {
 		err := tag.Inc(tags.StateSeen)
 		if err != nil {
-			s.logger.Debugf("chunk upload: increment tag", err)
-			s.logger.Error("chunk upload: increment tag")
+			s.logger.Debugf("Chunk upload: increment tag", err)
+			s.logger.Error("Chunk upload: increment tag")
 			jsonhttp.BadRequest(w, "increment tag")
 			return
 		}
 	}
 
 	if tag != nil {
-		// indicate that the chunk is stored
+		// Indicate that the chunk is stored
 		err = tag.Inc(tags.StateStored)
 		if err != nil {
-			s.logger.Debugf("chunk upload: increment tag", err)
-			s.logger.Error("chunk upload: increment tag")
+			s.logger.Debugf("Chunk upload: increment tag", err)
+			s.logger.Error("Chunk upload: increment tag")
 			jsonhttp.InternalServerError(w, "increment tag")
 			return
 		}
@@ -130,8 +130,8 @@ func (s *server) chunkUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	if strings.ToLower(r.Header.Get(PenguinPinHeader)) == "true" {
 		if err := s.pinning.CreatePin(ctx, chunk.Address(), false); err != nil {
-			s.logger.Debugf("chunk upload: creation of pin for %q failed: %v", chunk.Address(), err)
-			s.logger.Error("chunk upload: creation of pin failed")
+			s.logger.Debugf("Chunk upload: creation of pin for %q failed: %v", chunk.Address(), err)
+			s.logger.Error("Chunk upload: creation of pin failed")
 			jsonhttp.InternalServerError(w, nil)
 			return
 		}
@@ -152,8 +152,8 @@ func (s *server) chunkGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	address, err := s.resolveNameOrAddress(nameOrHex)
 	if err != nil {
-		s.logger.Debugf("chunk: parse chunk address %s: %v", nameOrHex, err)
-		s.logger.Error("chunk: parse chunk address error")
+		s.logger.Debugf("Chunk: parse chunk address %s: %v", nameOrHex, err)
+		s.logger.Error("Chunk: parse chunk address error")
 		jsonhttp.NotFound(w, nil)
 		return
 	}
@@ -161,18 +161,18 @@ func (s *server) chunkGetHandler(w http.ResponseWriter, r *http.Request) {
 	chunk, err := s.storer.Get(ctx, storage.ModeGetRequest, address)
 	if err != nil {
 		if errors.Is(err, storage.ErrNotFound) {
-			s.logger.Tracef("chunk: chunk not found. addr %s", address)
+			s.logger.Tracef("Chunk: chunk not found. addr %s", address)
 			jsonhttp.NotFound(w, "chunk not found")
 			return
 
 		}
 		if errors.Is(err, netstore.ErrRecoveryAttempt) {
-			s.logger.Tracef("chunk: chunk recovery initiated. addr %s", address)
+			s.logger.Tracef("Chunk: chunk recovery initiated. addr %s", address)
 			jsonhttp.Accepted(w, "chunk recovery initiated. retry after sometime.")
 			return
 		}
-		s.logger.Debugf("chunk: chunk read error: %v ,addr %s", err, address)
-		s.logger.Error("chunk: chunk read error")
+		s.logger.Debugf("Chunk: chunk read error: %v ,addr %s", err, address)
+		s.logger.Error("Chunk: chunk read error")
 		jsonhttp.InternalServerError(w, "chunk read error")
 		return
 	}

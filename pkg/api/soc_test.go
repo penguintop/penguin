@@ -79,7 +79,7 @@ func TestSOC(t *testing.T) {
 	t.Run("signature invalid", func(t *testing.T) {
 		s := testingsoc.GenerateMockSOC(t, testData)
 
-		// modify the sign
+		// Modify the sign
 		sig := make([]byte, soc.SignatureSize)
 		copy(sig, s.Signature)
 		sig[12] = 0x98
@@ -105,7 +105,7 @@ func TestSOC(t *testing.T) {
 			}),
 		)
 
-		// try to fetch the same chunk
+		// Try to fetch the same chunk
 		rsrc := fmt.Sprintf("/chunks/" + s.Address().String())
 		resp := request(t, client, http.MethodGet, rsrc, nil, http.StatusOK)
 		data, err := ioutil.ReadAll(resp.Body)

@@ -19,7 +19,7 @@ import (
 	"github.com/penguintop/penguin/pkg/feeds"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Timeout struct {

@@ -12,7 +12,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/soc"
 	"github.com/penguintop/penguin/pkg/storage"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 // Lookup is the interface for time based feed lookup
@@ -70,7 +70,7 @@ func UpdatedAt(ch penguin.Chunk) (uint64, error) {
 	if len(d) < 113 {
 		return 0, fmt.Errorf("too short: %d", len(d))
 	}
-	// a soc chunk with time information in the wrapped content addressed chunk
+	// A soc chunk with time information in the wrapped content addressed chunk
 	// 0-32    index,
 	// 65-97   signature,
 	// 98-105  span of wrapped chunk

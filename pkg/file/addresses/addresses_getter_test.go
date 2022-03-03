@@ -17,7 +17,7 @@ import (
 	filetest "github.com/penguintop/penguin/pkg/file/testing"
 	"github.com/penguintop/penguin/pkg/storage"
 	"github.com/penguintop/penguin/pkg/storage/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestAddressesGetterIterateChunkAddresses(t *testing.T) {
@@ -26,7 +26,7 @@ func TestAddressesGetterIterateChunkAddresses(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	// create root chunk with 2 references and the referenced data chunks
+	// Create root chunk with 2 references and the referenced data chunks
 	rootChunk := filetest.GenerateTestRandomFileChunk(penguin.ZeroAddress, penguin.ChunkSize*2, penguin.SectionSize*2)
 	_, err := store.Put(ctx, storage.ModePutUpload, rootChunk)
 	if err != nil {

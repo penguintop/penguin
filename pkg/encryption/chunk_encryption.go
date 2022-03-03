@@ -5,7 +5,7 @@
 package encryption
 
 import (
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 	"golang.org/x/crypto/sha3"
 )
 

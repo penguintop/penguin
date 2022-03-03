@@ -37,7 +37,7 @@ func (c *command) initDumpKeyCmd() (err error) {
 			var keystore keystore.Service
 			if c.config.GetString(optionNameDataDir) == "" {
 				keystore = memkeystore.New()
-				logger.Warning("data directory not provided, keys are not persisted")
+				logger.Warning("A new keystore has been created in the memory, since the data directory with key store is not provided or missing.")
 				return nil
 			} else {
 				keystore = filekeystore.New(filepath.Join(c.config.GetString(optionNameDataDir), "keys"))
@@ -94,13 +94,13 @@ func (c *command) initDumpKeyCmd() (err error) {
 
 					logger.Info("********************************************************************")
 					logger.Infof("!!! PrivateKey: %s !!!", privKeyWif)
-					logger.Infof("!!! Xwc Account Address: %s !!!", xwcAddr)
+					logger.Infof("!!! XWC Account Address: %s !!!", xwcAddr)
 					logger.Infof("!!! Penguin Node Address: %s !!!", nodeAddress)
-					logger.Infof("!!! Please backup your PrivateKey, and Do not tell it to anyone else !!!")
+					logger.Infof("!!! Please backup your PrivateKey, and do not tell it to anyone else !!!")
 					logger.Info("********************************************************************")
 
 				} else {
-					return errors.New("penguin private key file not existed, maybe you do not set the option --data-dir")
+					return errors.New("Penguin private key file is missing or not existing, you may set it with the option of '--data-dir'.")
 				}
 			}
 

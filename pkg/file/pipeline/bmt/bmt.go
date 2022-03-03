@@ -9,7 +9,7 @@ import (
 
 	"github.com/penguintop/penguin/pkg/bmtpool"
 	"github.com/penguintop/penguin/pkg/file/pipeline"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 var (

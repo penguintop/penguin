@@ -8,7 +8,7 @@ import (
 	"context"
 	"sync"
 
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 type Discovery struct {

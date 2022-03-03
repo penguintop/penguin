@@ -217,7 +217,7 @@ func setupBatchStore(t *testing.T) (postage.Storer, map[string]uint8) {
 	bStore, _ := batchstore.New(stateStore, unreserveFunc)
 	bStore.SetRadiusSetter(noopRadiusSetter{})
 
-	// initialise chainstate
+	// initialize chainstate
 	err = bStore.PutChainState(&postage.ChainState{
 		Block:        0,
 		TotalAmount:  big.NewInt(0),

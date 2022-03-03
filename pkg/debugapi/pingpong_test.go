@@ -16,7 +16,7 @@ import (
 	"github.com/penguintop/penguin/pkg/jsonhttp/jsonhttptest"
 	"github.com/penguintop/penguin/pkg/p2p"
 	pingpongmock "github.com/penguintop/penguin/pkg/pingpong/mock"
-    "github.com/penguintop/penguin/pkg/penguin"
+	"github.com/penguintop/penguin/pkg/penguin"
 )
 
 func TestPingpong(t *testing.T) {

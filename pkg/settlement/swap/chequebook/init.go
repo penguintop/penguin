@@ -26,6 +26,7 @@ const (
 
 	balanceCheckBackoffDuration = 20 * time.Second
 	balanceCheckMaxRetries      = 10
+	CHECK_BALANCE_INTERVAL      = 60 * time.Second
 
 	chequeBookDeployedCheckBackoffDuration = 10 * time.Second
 )
@@ -92,7 +93,7 @@ func checkBalance(
 	}
 }
 
-// Init initialises the chequebook service.
+// Function Init will initialize the chequebook service.
 func Init(
 	ctx context.Context,
 	chequebookFactory Factory,
@@ -207,7 +208,7 @@ func Init(
 	//	logger.Infof("using existing chequebook %x", chequebookAddress)
 	//}
 	//
-	//// regardless of how the chequebook service was initialised make sure that the chequebook is valid
+	//// regardless of how the chequebook service was initialized make sure that the chequebook is valid
 	//err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())
 	//if err != nil {
 	//	return nil, err
@@ -230,9 +231,18 @@ func Init(
 		if err == storage.ErrNotFound {
 			logger.Info("no chequebook found, deploying new one.")
 			if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
-				err = checkBalance(ctx, logger, swapInitialDeposit, swapBackend, chainId, overlayXwcAddress, erc20Service)
-				if err != nil {
-					return nil, err
+				for {
+					err = checkBalance(ctx, logger, swapInitialDeposit, swapBackend, chainId, overlayXwcAddress, erc20Service)
+					if err != nil {
+						// Never skip the process and retry it until the account balance is available.
+						logger.Errorf("Failed to check balance: %s", err.Error())
+						logger.Info("Wait a moment to retry the checking balance.")
+
+						time.Sleep(CHECK_BALANCE_INTERVAL)
+						continue
+					}
+
+					break
 				}
 
 				// transfer token
@@ -296,7 +306,7 @@ func Init(
 		logger.Infof("using existing chequebook %s", chequebookXwcAddr)
 	}
 
-	// regardless of how the chequebook service was initialised make sure that the chequebook is valid
+	// regardless of how the chequebook service was initialized make sure that the chequebook is valid
 	err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())
 	if err != nil {
 		return nil, err
