@@ -7,7 +7,7 @@ import (
 
 const (
 	GOERLI_CHAIN_ID     string = "edad429038838754f84b4214613e33985e5957b09beec04ba4610bbb38fa12d0"
-	GOERLI_CHAIN_ID_NUM int64  = 51107           //compute: (0xad<<8) + (0xed)
+	GOERLI_CHAIN_ID_NUM int64  = 44525           //compute: (0xad<<8) + (0xed)
 	XWC_ASSET_ID               = "1.3.0"
 	XWC_ASSET_ID_NUM           = 0
 
