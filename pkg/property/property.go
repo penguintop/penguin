@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	GOERLI_CHAIN_ID     string = "a3c762d4c7bcbbfa59327c35c2a6e98558f6ca90d9fd71dfc59a15d09c8c52e4"
-	GOERLI_CHAIN_ID_NUM int64  = 51107           //compute: (0xc7<<8) + (0xa3)
+	GOERLI_CHAIN_ID     string = "edad429038838754f84b4214613e33985e5957b09beec04ba4610bbb38fa12d0"
+	GOERLI_CHAIN_ID_NUM int64  = 51107           //compute: (0xad<<8) + (0xed)
 	XWC_ASSET_ID               = "1.3.0"
 	XWC_ASSET_ID_NUM           = 0
 
@@ -19,19 +19,19 @@ var CHAIN_ID string = GOERLI_CHAIN_ID
 var CHAIN_ID_NUM int64 = GOERLI_CHAIN_ID_NUM
 var DOMAIN_ID string = ""
 
-var OfflineCaller string = "pen-caller"
+var OfflineCaller string = "penguin"
 
 // [Test] The receiver account's address
-var EntranceAddress string = "XWCNhr1NeszTwe75B8qGehaTPPku6TVJEg9kU"
+var EntranceAddress string = "XWCNbncadY7UwGQpyP5jBMj8FLA9jTDDNU18E"
 
 // [Test]factory contract
-var FactoryAddress string = "XWCCJ8pa6Bz2Un3fTT8QRu7u1XRUG5QpVbRsd"
+var FactoryAddress string = "XWCCbcYhJjF9vdt9Riv43Gat4ad2MnLCAYTeu"
 
 // [Test]postage stamp contract
-var PostageStampAddress string = "XWCCYzE9banNUQhXB1JYVvWL4ynmxoBRh2j9W"
+var PostageStampAddress string = "XWCCRyYKg5tn9yZ8gDfNAnGMX3HrZKs8g9hQG"
 
 // [Test]staking contract
-var StakingAddress string = "XWCCJy83LxyFm1zFZ9SxfJw18orqbNjP4R3ZM"
+var StakingAddress string = "XWCCV6F9LNQ3XR3kSo75YnKaxipbnvt5rHbCL"
 
 // [Test]factory contract code hash
 var FactoryDeployedCodeHash = []byte("0d17f58ca648876af170ebed1a697cdbba8680cd")
@@ -46,7 +46,7 @@ var StakingAddressDeployedCodeHash = []byte("a9b34ce16a1be02469729ad0cbd5ac79e85
 var ChequeBookDeployedCodeHash = []byte("482186ef6e356cf90b087e4d300c776d7ec3e39a")
 
 // [Test]staking admin
-var StakingAdmin = []byte("XWCNRLpDWifjQeTz27Kf5Sos5iH9LRgcbZo6D")
+var StakingAdmin = []byte("XWCNbncadY7UwGQpyP5jBMj8FLA9jTDDNU18E")
 
 func RFC3339ToUTC(timeFormatStr string) (uint64, error) {
 	t, err := time.Parse(

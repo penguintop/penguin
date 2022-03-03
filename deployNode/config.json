@@ -1,14 +1,14 @@
 {
-    "receive_addr": "XWCNhv8RU2cwPnLp1QEPDbsthL84ScYQNnpSY", 
-    "receive_account_name": "test", 
-    "admin_account_name": "xwc", 
-    "admin_addr": "XWCNdbgFmQia2i58PcH918kSPMLrtwZ4kwK2V", 
-    "factory_addr": "XWCCL3Jsf32yGfcHjnB3mu8DEPjL3nerUnjrR", 
-    "token_addr": "XWCCbayhzZMXu1Q9ab2qzWSbG3MC9T1tR1fKB", 
+    "receive_addr": "XWCNbncadY7UwGQpyP5jBMj8FLA9jTDDNU18E",
+    "receive_account_name": "penguin",
+    "admin_account_name": "penguin",
+    "admin_addr": "XWCNbncadY7UwGQpyP5jBMj8FLA9jTDDNU18E",
+    "factory_addr": "XWCCbcYhJjF9vdt9Riv43Gat4ad2MnLCAYTeu",
+    "token_addr": "XWCCHZRrhfqT3MGyBADX4HuWfvzxNU6zp5Vff",
     "rpc_addr": "192.168.1.123", 
     "rpc_port": 19890, 
     "block_height": 82000, 
-    "caller_account_name": "test", 
-    "staking_contract": "XWCCVkG1CRUoUugnVeViqT8mEo9s5PFLbb5gJ", 
+    "caller_account_name": "penguin",
+    "staking_contract": "XWCCV6F9LNQ3XR3kSo75YnKaxipbnvt5rHbCL",
     "last_staking_price_update_time": 1626227629
 }
